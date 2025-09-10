@@ -1,0 +1,20 @@
+services:
+  frontend_tailwind:
+    container_name: sisbrasfute_tailwind
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/vue/Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8104:8104"
+    networks:
+      - intra_network
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0 --port 8104
+
+networks:
+  intra_network:
+    driver: bridge
