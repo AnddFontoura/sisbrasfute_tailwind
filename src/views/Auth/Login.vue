@@ -9,11 +9,10 @@
       <!-- Formulário -->
       <form @submit.prevent="handleLogin" class="space-y-4">
         <!-- Email -->
-        <div>
-          <label
-            for="email"
-            class="block text-sm font-medium text-gray-700"
-          >
+        <div
+          class=" "
+        >
+          <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">
             Email
           </label>
 
@@ -65,7 +64,7 @@
 </template>
 
 <script>
-import axios from "axios"
+import { useAuthStore } from "@/stores/auth.js";
 
 export default {
   name: "Login",
@@ -75,28 +74,28 @@ export default {
       form: {
         email: "",
         password: ""
-      }
+      },
+      errorMessage: null,
+      loading: false,
     }
   },
 
   methods: {
     async handleLogin() {
+      const auth = useAuthStore()
+
+      this.errorMessage = null
+      this.loading = true
+
       try {
-        const response = await axios.post("http://localhost:8000/api/login", {
-          email: this.form.email,
-          password: this.form.password
-        })
+        await auth.login(this.form.email, this.form.password)
 
-        console.log("Login bem-sucedido:", response.data)
-
-        // exemplo: salvar token no localStorage
-        localStorage.setItem("token", response.data.token)
-
-        // redirecionar para dashboard
+        // redireciona se deu certo
         this.$router.push("/dashboard")
-      } catch (error) {
-        console.error("Erro no login:", error.response?.data || error.message)
-        alert("Falha ao fazer login. Verifique suas credenciais.")
+      } catch (err) {
+        this.errorMessage = err.message || "Falha no login"
+      } finally {
+        this.loading = false
       }
     }
   }

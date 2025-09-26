@@ -4,23 +4,20 @@ import api from '../services/api'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: localStorage.getItem('token') || null,
+    token: localStorage.getItem('access_token') || null,
   }),
   actions: {
     async login(email, password) {
-      try {
-        const { data } = await api.post('/login', { email, password })
-        this.token = data.token
-        localStorage.setItem('token', data.token)
-        this.user = data.user
-      } catch (err) {
-        throw err.response?.data || err
-      }
+        const response = await api.post('/login', { email, password })
+
+        this.token = response.data.access_token
+        localStorage.setItem('access_token', this.token)
+        this.user = response.data.user
     },
     logout() {
       this.user = null
       this.token = null
-      localStorage.removeItem('token')
+      localStorage.removeItem('access_token')
     }
   },
 })

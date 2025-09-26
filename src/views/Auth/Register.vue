@@ -104,6 +104,7 @@
 
 <script>
 import axios from "axios"
+import api  from '@/services/api.js'
 
 export default {
   name: "Register",
@@ -122,14 +123,12 @@ export default {
   methods: {
     async handleRegister() {
       try {
-        const response = await axios.post("http://localhost:8000/api/register", {
-          name: this.form.name,
+        const response = await api.post("register", {
+          fullName: this.form.name,
           email: this.form.email,
           password: this.form.password,
-          password_confirmation: this.form.password_confirmation
+          passwordConfirmation: this.form.password_confirmation
         })
-
-        console.log("Registro bem-sucedido:", response.data)
 
         // Exemplo: redirecionar para login após cadastro
         this.$router.push("/login")
