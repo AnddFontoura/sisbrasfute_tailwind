@@ -8,7 +8,10 @@
         <StateSelect v-model="this.stateId"></StateSelect>
 
         <!-- Cidade -->
-        <CitySelect :stateId="this.stateId"></CitySelect>
+        <CitySelect
+          :stateId="this.stateId"
+          v-model="this.form.teamCityId"
+        ></CitySelect>
 
         <!-- Nome do time -->
         <div>
@@ -73,17 +76,17 @@
               dark:focus:outline-indigo-500
             "
           >
-            <option value="">Selecione</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-            <option value="X">Misto</option>
+            <option value="0">Selecione</option>
+            <option value="1">Masculino</option>
+            <option value="2">Feminino</option>
+            <option value="3">Misto</option>
           </select>
         </div>
 
         <!-- Modalidade -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Modalidade</label>
-          <input
+          <select
             v-model="form.teamModalityId"
             type="text"
             class="
@@ -109,7 +112,12 @@
               dark:placeholder:text-gray-500
               dark:focus:outline-indigo-500
             "
-          />
+          >
+            <option value="1">Futsal</option>
+            <option value="2">Fut7/Fut5</option>
+            <option value="3">Suiço</option>
+            <option value="4">Campo de 11</option>
+          </select>
         </div>
 
         <!-- Descrição -->
@@ -416,8 +424,8 @@
 
 <script>
 import api from "@/services/api";
-import StateSelect from "@/components/Form/StateSelectComponent.vue"
-import CitySelect from "@/components/Form/CitySelectComponent.vue"
+import StateSelect from "@/components/form/StateSelectComponent.vue"
+import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 
 export default {
@@ -427,7 +435,7 @@ export default {
   data() {
     return {
       form: {
-        cityId: "",
+        teamCityId: "",
         teamName: "",
         teamGender: "",
         teamModalityId: "",
