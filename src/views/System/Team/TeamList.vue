@@ -1,93 +1,174 @@
 <template>
   <system-layout>
-  <main>
-    <div
-      class="
-            grid
-            grid-cols-2
-            sm:grid-cols-3
-            md:grid-cols-4
-            lg:grid-cols-5
-            gap-4
-            justify-items-center
-          "
-    >
+    <main>
       <div
-        v-for="item in this.items"
-        :key="item.key"
+        v-for="(team, key) in teams"
         class="
-              w-full
-              max-w-[160px]
-            "
+          max-w-xs
+          rounded-xl
+          shadow-lg
+          overflow-hidden
+          bg-white border
+        "
       >
-        <!-- usa router-link se router existir, senão botão -->
-        <component
-          @click="go(item.to)"
-          class="block"
+        <!-- Título -->
+        <div
+          class="
+            bg-green-200
+            text-center
+            py-3
+          "
+        >
+          <h2
+            class="
+              text-xl
+              font-bold
+              text-gray-800
+            "
+          >
+            {{ team.name }}
+          </h2>
+        </div>
+
+        <!-- Banner com grama -->
+        <div
+          class="
+            h-20
+            bg-[url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg')]
+            bg-cover
+            bg-center
+          "
+        >
+
+        </div>
+
+        <!-- Logo -->
+        <div
+          class="
+            flex
+            justify-center
+            -mt-8
+          "
         >
           <div
             class="
-                  aspect-square
-                  w-full
-                  rounded-xl
-                  shadow-sm
-                  bg-white
-                  dark:bg-slate-800
-                  border
-                  border-transparent
-                  hover:shadow-md
-                  transform
-                  hover:-translate-y-1
-                  transition
-                  p-4
-                  flex
-                  flex-col
-                  items-center
-                  justify-center
-                  gap-3
-                "
-            :class="item.color"
-            role="button"
-            :aria-label="item.label"
+              bg-white
+              p-2
+              rounded-lg
+              shadow-md
+            "
           >
-            <div
+            <img
+              src="https://uploaddeimagens.com.br/images/004/849/793/full/logo.png"
+              alt="Logo"
               class="
-                    w-10
-                    h-10
-                    flex
-                    items-center
-                    justify-center
-                    bg-white/20
-                    rounded-md
-                  "
+                h-20
+                w-20
+                object-contain
+              "
             >
-                  <span
-                    v-html="item.icon"
-                    class="
-                      w-6
-                      h-6
-                      text-white
-                    "
-                  >
-
-                  </span>
-            </div>
-            <div
-              class="
-                    text-sm
-                    font-semibold
-                    text-slate-900
-                    dark:text-slate-100
-                    text-center
-                  "
-            >
-              {{ item.label }}
-            </div>
           </div>
-        </component>
+        </div>
+
+        <!-- Infos -->
+        <div
+          class="
+            px-4
+            py-4
+            grid
+            grid-cols-2
+            text-center
+          "
+        >
+          <div>
+            <p
+              class="
+                font-semibold
+                text-gray-700
+              "
+            >
+              Cidade
+            </p>
+            <p
+              class="
+                text-sm
+                text-gray-900
+              "
+            >
+              CURITIBA
+            </p>
+          </div>
+          <div>
+            <p
+              class="
+                font-semibold
+                text-gray-700
+              "
+            >
+              Estado
+            </p>
+            <p
+              class="
+                text-sm
+                text-gray-900
+              "
+            >
+              PARANÁ
+            </p>
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div
+          class="
+            px-4
+            pb-4
+            flex
+            gap-2
+          "
+        >
+          <button
+            class="
+              flex-1
+              bg-blue-600
+              hover:bg-blue-700
+              text-white
+              py-2
+              rounded-lg
+              text-sm
+            "
+          >
+            Visualizar
+          </button>
+          <button
+            class="
+              flex-1
+              bg-purple-600
+              hover:bg-purple-700
+              text-white
+              py-2
+              rounded-lg
+              text-sm
+            "
+          >
+            Administrar
+          </button>
+          <button
+            class="
+              flex-1
+              bg-green-600
+              hover:bg-green-700
+              text-white
+              py-2
+              rounded-lg
+              text-sm
+            "
+          >
+            Jogador
+          </button>
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
   </system-layout>
 </template>
 
@@ -103,20 +184,23 @@ export default {
 
   data() {
     return {
-      teams: {}
+      teams: {},
+      payload: {}
     }
   },
-  computed: {
+  created() {
+    this.getTeamsList()
   },
   methods: {
     async getTeamsList() {
       this.loading = true;
       try {
-        await api.post("/team/save", this.payload);
-        this.$router.push("/team/list");
+        let response = await api.get("/team", this.payload);
+        this.teams = response.data
+
       } catch (err) {
         console.error(err);
-        alert("Erro ao salvar time!");
+        alert("Erro ao puxar lista do time");
       } finally {
         this.loading = false;
       }

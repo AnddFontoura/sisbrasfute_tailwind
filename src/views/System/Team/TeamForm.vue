@@ -1,7 +1,7 @@
 <template>
   <system-layout>
-    <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Cadastrar Novo Time</h1>
+      <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Cadastrar Novo Time</h1>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <!-- Estado -->
@@ -123,34 +123,13 @@
         <!-- Descrição -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descrição</label>
-          <textarea
-            v-model="form.teamDescription"
-            rows="3"
-            class="
-              block
-              w-full
-              rounded-md
-              bg-white
-              px-3
-              py-1.5
-              text-base
-              text-gray-900
-              outline-1
-              -outline-offset-1
-              outline-gray-300
-              placeholder:text-gray-400
-              focus:outline-2
-              focus:-outline-offset-2
-              focus:outline-indigo-600
-              sm:text-sm/6
-              dark:bg-white/5
-              dark:text-white
-              dark:outline-white/10
-              dark:placeholder:text-gray-500
-              dark:focus:outline-indigo-500"
-          >
 
-          </textarea>
+          <QuillEditor
+            v-model:content="form.teamDescription"
+            content-type="html"
+            theme="snow"
+            class="bg-white rounded border"
+          />
         </div>
 
         <!-- Fundação -->
@@ -193,7 +172,6 @@
             <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
               <div class="text-center">
-                <PhotoIcon class="mx-auto size-12 text-gray-300 dark:text-gray-600" aria-hidden="true" />
                 <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
                   <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
                     <span>Upload a file</span>
@@ -215,7 +193,6 @@
             <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
               <div class="text-center">
-                <PhotoIcon class="mx-auto size-12 text-gray-300 dark:text-gray-600" aria-hidden="true" />
                 <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
                   <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
                     <span>Upload a file</span>
@@ -427,11 +404,16 @@ import api from "@/services/api";
 import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import {QuillEditor} from "@vueup/vue-quill";
 
 export default {
   name: "NewTeam",
-  components: {CitySelect, StateSelect, systemLayout},
-
+  components: {
+    CitySelect,
+    StateSelect,
+    systemLayout,
+    QuillEditor,
+  },
   data() {
     return {
       form: {
@@ -456,6 +438,7 @@ export default {
   },
 
   computed: {
+
     payload() {
       // computed monta o objeto exatamente como a API espera
       return { ...this.form };

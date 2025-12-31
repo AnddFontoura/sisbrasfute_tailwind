@@ -56,15 +56,17 @@
           >
             Olá, Usuário
           </button>
-          <button
-            class="
-              text-white/90
-              hover:text-white
-              text-sm
-            "
-          >
-            Sair
-          </button>
+          <a href="/logout">
+            <button
+              class="
+                text-white/90
+                hover:text-white
+                text-sm
+              "
+            >
+              Sair
+            </button>
+          </a>
         </nav>
       </div>
     </header>
