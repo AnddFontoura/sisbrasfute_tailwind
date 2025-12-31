@@ -36,7 +36,9 @@
               text-lg
             "
           >
-            SISBRASFUTE
+            <a href="/dashboard">
+              SISBRASFUTE
+            </a>
           </h1>
         </div>
 
@@ -54,7 +56,7 @@
               text-sm
             "
           >
-            Olá, Usuário
+            Olá, {{ this.user.name }}
           </button>
           <a href="/logout">
             <button
@@ -76,9 +78,8 @@
       class="
         flex-1
         flex
-        items-center
         justify-center
-        py-12
+        py-4
         px-4
       "
     >
@@ -124,9 +125,14 @@
 <script>
 import { computed } from "vue"
 import { useRouter } from "vue-router"
+import {useAuthStore} from "@/stores/auth.js";
+import auth from "@/router/auth.js";
+import router from "@/router/index.js";
+
 export default {
   data() {
     return {
+      user: {},
       isSidebarOpen: false,
       fabOpen: false,
       fabActions: [
@@ -138,7 +144,10 @@ export default {
       ],
     };
   },
-  computed: {
+  mounted() {
+    const auth = useAuthStore()
+    auth.loadFromStorage()
+    this.user = auth.user
   },
   methods: {
     go(route) {

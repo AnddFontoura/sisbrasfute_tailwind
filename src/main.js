@@ -3,11 +3,8 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import '@vueform/multiselect/themes/default.css'
 
-
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 
 import App from './App.vue'
 import router from './router'
