@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
+  <div class="min-h-screen  bg-slate-50 dark:bg-slate-900 flex flex-col">
     <!-- Top bar -->
     <header class="w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white">
       <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -76,6 +76,7 @@
     <!-- Content -->
     <main
       class="
+        bg-gray-100
         flex-1
         flex
         justify-center
@@ -137,9 +138,9 @@ export default {
       fabOpen: false,
       fabActions: [
         { title: "Criar Time", to: "/team/form" },
-        { title: "Criar Amistoso", to: "/friendly-match/form" },
-        { title: "Criar Campeonato", to: "/championship/form" },
-        { title: "Meu Perfil", to: "/profile" },
+        //{ title: "Criar Amistoso", to: "/friendly-match/form" },
+        //{ title: "Criar Campeonato", to: "/championship/form" },
+        //{ title: "Meu Perfil", to: "/profile" },
         { title: "Sair", to: "/logout" },
       ],
     };

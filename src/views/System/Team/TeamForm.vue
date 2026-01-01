@@ -173,9 +173,16 @@
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
               <div class="text-center">
                 <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                  <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
                     <span>Upload a file</span>
-                    <input id="file-upload" name="file-upload" type="file" class="sr-only" />
+                    <input
+                      id="logo-upload"
+                      name="logo-upload"
+                      type="file"
+                      class="sr-only"
+                      accept="image/*"
+                      @change="onLogoChange"
+                    />
                   </label>
                   <p class="pl-1">or drag and drop</p>
                 </div>
@@ -194,9 +201,16 @@
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
               <div class="text-center">
                 <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                  <label for="banner-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
                     <span>Upload a file</span>
-                    <input id="file-upload" name="file-upload" type="file" class="sr-only" />
+                    <input
+                      id="banner-upload"
+                      name="banner-upload"
+                      type="file"
+                      class="sr-only"
+                      accept="image/*"
+                      @change="onBannerChange"
+                    />
                   </label>
                   <p class="pl-1">or drag and drop</p>
                 </div>
@@ -432,6 +446,8 @@ export default {
         teamYoutube: "",
         teamKwai: "",
       },
+      logoFile: null,
+      bannerFile: null,
       loading: false,
       stateId: null,
     };
@@ -446,10 +462,37 @@ export default {
   },
 
   methods: {
+    onLogoChange(e) {
+      this.logoFile = e.target.files[0]
+    },
+
+    onBannerChange(e) {
+      this.bannerFile = e.target.files[0]
+    },
     async handleSubmit() {
       this.loading = true;
+      const formData = new FormData()
+
+      // 🔹 Campos normais
+      Object.entries(this.form).forEach(([key, value]) => {
+        formData.append(key, value ?? "")
+      })
+
+      if (this.logoFile) {
+        formData.append("teamLogo", this.logoFile)
+      }
+
+      if (this.bannerFile) {
+        formData.append("teamBanner", this.bannerFile)
+      }
+
       try {
-        await api.post("/team/save", this.payload);
+        await api.post("/team/save", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
         this.$router.push("/team/list");
       } catch (err) {
         console.error(err);

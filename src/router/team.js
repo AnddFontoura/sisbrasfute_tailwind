@@ -6,6 +6,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/show/:id',
+    name: 'team-show',
+    component: () => import('../views/System/Team/TeamShow.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team/form',
     name: 'team-form',
     component: () => import('../views/System/Team/TeamForm.vue'),
