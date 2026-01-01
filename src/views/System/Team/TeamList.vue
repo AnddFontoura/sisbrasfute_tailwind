@@ -124,20 +124,15 @@
 
             <!-- Botões -->
             <div
-              class="
-                px-4
-                pb-4
-                flex
-                gap-2
-              "
+              class="px-4 pb-4 grid gap-2"
+              :class="team.user_id === user.id ? 'grid-cols-2' : 'grid-cols-1'"
             >
               <router-link
                 :to="{ name: 'team-show', params: { id: team.id } }"
               >
                 <button
                   class="
-                    p-3
-                    flex-1
+                    w-full
                     bg-blue-600
                     hover:bg-blue-700
                     text-white
@@ -151,8 +146,9 @@
               </router-link>
 
               <button
+                v-if="team.user_id === user.id"
                 class="
-                  flex-1
+                  w-full
                   bg-purple-600
                   hover:bg-purple-700
                   text-white
@@ -163,22 +159,9 @@
               >
                 Administrar
               </button>
-              <button
-                class="
-                  flex-1
-                  bg-green-600
-                  hover:bg-green-700
-                  text-white
-                  py-2
-                  rounded-lg
-                  text-sm
-                "
-              >
-                Jogador
-              </button>
             </div>
           </div>
-      </div>
+        </div>
     </main>
   </system-layout>
 </template>
@@ -188,6 +171,7 @@ import api from "@/services/api";
 import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import {useAuthStore} from "@/stores/auth.js";
 
 export default {
   name: "teamList",
@@ -195,13 +179,19 @@ export default {
 
   data() {
     return {
-      teams: {},
+      teams: [],
       payload: {},
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg'
     }
   },
   created() {
+    this.auth = useAuthStore()
     this.getTeamsList()
+  },
+  computed: {
+    user() {
+      return this.auth.user
+    }
   },
   methods: {
     async getTeamsList() {

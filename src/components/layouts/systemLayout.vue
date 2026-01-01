@@ -147,7 +147,6 @@ export default {
   },
   mounted() {
     const auth = useAuthStore()
-    auth.loadFromStorage()
     this.user = auth.user
   },
   methods: {
