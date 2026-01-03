@@ -127,35 +127,18 @@
               class="px-4 pb-4 grid gap-2"
               :class="team.user_id === user.id ? 'grid-cols-2' : 'grid-cols-1'"
             >
-              <router-link
-                :to="{ name: 'team-show', params: { id: team.id } }"
+              <button
+                v-if="team.user_id === user.id"
+                @click="$router.push({ name: 'team-show', params: { id: team.id } })"
+                class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
               >
-                <button
-                  class="
-                    w-full
-                    bg-blue-600
-                    hover:bg-blue-700
-                    text-white
-                    py-2
-                    rounded-lg
-                    text-sm
-                  "
-                >
-                  Visualizar
-                </button>
-              </router-link>
+                Visualizar
+              </button>
 
               <button
                 v-if="team.user_id === user.id"
-                class="
-                  w-full
-                  bg-purple-600
-                  hover:bg-purple-700
-                  text-white
-                  py-2
-                  rounded-lg
-                  text-sm
-                "
+                @click="$router.push({ name: 'team-admin', params: { id: team.id } })"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm"
               >
                 Administrar
               </button>

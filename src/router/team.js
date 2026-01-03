@@ -23,4 +23,10 @@ export default [
     component: () => import('../views/System/Team/TeamForm.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/teams/:id/admin',
+    name: 'team-admin',
+    component: () => import('../views/System/Team/TeamAdmin.vue'),
+    meta: { requiresAuth: true }
+  }
 ]

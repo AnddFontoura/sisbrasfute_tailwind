@@ -13,7 +13,7 @@ const router = createRouter({
     },
     {
       path: '/dashboard',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: () => import('../views/System/Dashboard.vue'),
       meta: { requiresAuth: true/*, requiresRole: "admin"*/ }
     },
@@ -33,7 +33,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Impede usuário logado de acessar login
-  if (to.name === "Login" && isLoggedIn) {
+  if (to.name === "login" && isLoggedIn) {
     return next({ name: "dashboard" })
   }
 
