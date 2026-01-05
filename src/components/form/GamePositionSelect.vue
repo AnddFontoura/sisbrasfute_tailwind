@@ -1,11 +1,11 @@
 <template>
-
   <div class="mt-3">
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">{{ labelName }}</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="playerPositionSelect">Posição do Jogador</label>
     <Multiselect
+      :multiple="isMultiselect"
       id="stateSelect"
       v-model="internalValue"
-      :options="this.states"
+      :options="this.playerPositions"
       track-by="name"
       label="name"
       :searchable="true"
@@ -18,22 +18,18 @@
 import api from "@/services/api"
 import Multiselect from '@vueform/multiselect'
 
-
 export default {
-  name: "StateSelect",
+  name: "GamePositionSelect",
   components: {
     Multiselect
   },
   props: {
     modelValue: [String, Number],
-    labelName: {
-      type: String,
-      default: "Estado",
-    },
+    isMultiselect: [Boolean]
   },
   data() {
     return {
-      states: [],
+      playerPositions: [],
       internalValue: this.modelValue,
     }
   },
@@ -47,8 +43,8 @@ export default {
   },
   async mounted() {
     try {
-      const { data } = await api.get("/states/list")
-      this.states = data.states
+      const { data } = await api.get("/game-positions/list")
+      this.playerPositions = data.gamePositions
     } catch (err) {
       console.error("Erro ao carregar estados:", err)
     }

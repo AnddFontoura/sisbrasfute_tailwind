@@ -1,7 +1,6 @@
 <template>
-  <div>
-  <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="citySelect">Cidade</label>
-
+  <div class="mt-3">
+  <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="citySelect">{{ labelName }}</label>
     <Multiselect
       id="citySelect"
       v-model="internalValue"
@@ -25,6 +24,10 @@ export default {
     Multiselect
   },
   props: {
+    labelName: {
+      type: String,
+      default: "Cidade",
+    },
     modelValue: [String, Number],
     stateId: [String, Number], // vem do pai
   },

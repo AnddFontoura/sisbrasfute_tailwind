@@ -79,16 +79,26 @@
           <img class="h-8 w-auto not-dark:hidden" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
         </div>
         <nav class="flex flex-1 flex-col">
+
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
-            <li>
-              <ul role="list" class="-mx-2 space-y-1">
-                <li v-for="item in navigation" :key="item.name">
-                  <a :href="item.href" :class="[item.current ? 'bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                    <component :is="item.icon" :class="[item.current ? 'text-indigo-600 dark:text-white' : 'text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white', 'size-6 shrink-0']" aria-hidden="true" />
-                    {{ item.name }}
-                  </a>
-                </li>
-              </ul>
+            <li v-for="item in navigation" :key="item.name">
+              <a v-if="!item.children" :href="item.href" :class="[item.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 dark:text-gray-400']">
+                <component :is="item.icon" class="size-6 shrink-0 text-gray-400 dark:text-current" aria-hidden="true" />
+                {{ item.name }}
+              </a>
+              <Disclosure as="div" v-else v-slot="{ open }">
+                <DisclosureButton :class="[item.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm/6 font-semibold text-gray-700 dark:text-gray-400']">
+                  <component :is="item.icon" class="size-6 shrink-0 text-gray-400 dark:text-current" aria-hidden="true" />
+                  {{ item.name }}
+                  <ChevronRightIcon :class="[open ? 'rotate-90 text-gray-500 dark:text-gray-400' : 'text-gray-400', 'ml-auto size-5 shrink-0']" aria-hidden="true" />
+                </DisclosureButton>
+                <DisclosurePanel as="ul" class="mt-1 px-2">
+                  <li v-for="subItem in item.children" :key="subItem.name">
+                    <!-- 44px -->
+                    <DisclosureButton as="a" :href="subItem.href" :class="[subItem.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'block rounded-md py-2 pr-2 pl-9 text-sm/6 text-gray-700 dark:text-gray-400']">{{ subItem.name }}</DisclosureButton>
+                  </li>
+                </DisclosurePanel>
+              </Disclosure>
             </li>
             <li>
               <div class="text-xs/6 font-semibold text-gray-400">Your teams</div>
@@ -174,7 +184,11 @@ import {
   MenuItem,
   MenuItems,
   TransitionChild,
-  TransitionRoot,} from "@headlessui/vue";
+  TransitionRoot,
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel
+} from "@headlessui/vue";
 import { Bars3Icon,
   BellIcon,
   CalendarIcon,
@@ -186,7 +200,8 @@ import { Bars3Icon,
   UsersIcon,
   XMarkIcon,
   MagnifyingGlassIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ChevronRightIcon
   } from '@heroicons/vue/20/solid'
 
 export default {
@@ -210,15 +225,27 @@ export default {
     UsersIcon,
     XMarkIcon,
     MagnifyingGlassIcon,
-    ChevronDownIcon
+    ChevronDownIcon,
+    ChevronRightIcon,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
   },
   data() {
     return {
       user: {},
       isSidebarOpen: true,
       navigation: [
-        { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-        { name: 'Times', href: '/team/list', icon: UsersIcon, current: false },
+        { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
+        {
+          name: 'Times',
+          icon: UsersIcon,
+          current: false,
+          children: [
+            { name: 'Listar Times', href: '/team/list' },
+            { name: 'Criar Times', href: '/team/form' },
+          ],
+        },
       ],
       teams: [
         { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
@@ -227,7 +254,7 @@ export default {
       ],
       userNavigation: [
         { name: 'Meus Times', href: '#' },
-        { name: 'Meu Perfil', href: '#' },
+        { name: 'Meu Perfil', href: '/player-profile/form' },
         { name: 'Sair', href: '/logout' },
       ]
     };

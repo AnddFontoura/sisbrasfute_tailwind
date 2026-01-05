@@ -1,11 +1,10 @@
 <template>
-
   <div class="mt-3">
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">{{ labelName }}</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">Modalidades que joga</label>
     <Multiselect
       id="stateSelect"
       v-model="internalValue"
-      :options="this.states"
+      :options="this.modalities"
       track-by="name"
       label="name"
       :searchable="true"
@@ -20,20 +19,17 @@ import Multiselect from '@vueform/multiselect'
 
 
 export default {
-  name: "StateSelect",
+  name: "ModalitiesSelect",
   components: {
     Multiselect
   },
   props: {
+    isMultiselect: [Boolean],
     modelValue: [String, Number],
-    labelName: {
-      type: String,
-      default: "Estado",
-    },
   },
   data() {
     return {
-      states: [],
+      modalities: [],
       internalValue: this.modelValue,
     }
   },
@@ -47,8 +43,8 @@ export default {
   },
   async mounted() {
     try {
-      const { data } = await api.get("/states/list")
-      this.states = data.states
+      const { data } = await api.get("/modalities/list")
+      this.modalities = data.modalities
     } catch (err) {
       console.error("Erro ao carregar estados:", err)
     }
