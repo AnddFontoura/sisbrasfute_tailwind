@@ -411,7 +411,6 @@ export default {
   data() {
     return {
       form: {
-        teamName: '',
         playerName: '',
         playerNickName: '',
         playerPositions: {},
@@ -450,6 +449,8 @@ export default {
       Object.entries(this.form).forEach(([key, value]) => {
         formData.append(key, value ?? "")
       })
+
+      formData.append("playerCityId", this.cityId)
 
       if (this.logoFile) {
         formData.append("playerPhoto", this.form.photoFile)
