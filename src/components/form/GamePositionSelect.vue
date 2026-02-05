@@ -2,7 +2,7 @@
   <div class="mt-3">
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="playerPositionSelect">Posição do Jogador</label>
     <Multiselect
-      :multiple="isMultiselect"
+      :mode="isMultiselect"
       id="stateSelect"
       v-model="internalValue"
       :options="this.playerPositions"
@@ -10,6 +10,8 @@
       label="name"
       :searchable="true"
       value-prop="id"
+      :close-on-select="false"
+      :clear-on-select="false"
     />
   </div>
 </template>
@@ -24,8 +26,13 @@ export default {
     Multiselect
   },
   props: {
-    modelValue: [String, Number],
-    isMultiselect: [Boolean]
+    modelValue: {
+      type: Array,
+    },
+    isMultiselect: {
+      type: String,
+      default: 'single'
+    },
   },
   data() {
     return {
@@ -38,7 +45,14 @@ export default {
       this.internalValue = val
     },
     internalValue(val) {
-      this.$emit("update:modelValue", val)
+      if (this.isMultiselect === 'multiple') {
+        this.$emit('update:modelValue', val ?? [])
+      } else {
+        this.$emit(
+          'update:modelValue',
+          val ? [val] : []
+        )
+      }
     },
   },
   async mounted() {

@@ -3,9 +3,9 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div class="mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Atualizar Perfil de Jogador</h1>
-        <player-position-select :is-multiselect="true"></player-position-select>
+        <player-position-select v-model="form.playerPositions" is-multiselect="multiple"></player-position-select>
 
-        <modalities-select :is-multiselect="true"></modalities-select>
+        <modalities-select v-model="form.playerModalities" is-multiselect="multiple"></modalities-select>
 
         <StateSelectComponent
           v-model="this.stateId"
@@ -238,7 +238,7 @@
         <div class="mt-3">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho da luva</label>
           <input
-            v-model="form.playerGLoveSize"
+            v-model="form.playerGloveSize"
             type="number"
             class="
                 block
@@ -303,7 +303,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://youtube.com/</div>
-                <input v-model="form.social.youtube" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerYoutube" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -315,7 +315,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://facebook.com/</div>
-                <input v-model="form.social.facebook" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerFacebook" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -327,7 +327,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://x.com/</div>
-                <input v-model="form.social.twitter" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerX" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -339,7 +339,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.instagram.com/</div>
-                <input v-model="form.social.instagram" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerInstagram" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -351,7 +351,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://tiktok.com/</div>
-                <input v-model="form.social.tiktok" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerTiktok" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -363,7 +363,7 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.kwai.com/</div>
-                <input v-model="form.social.kwaii" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerKwaii" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
@@ -375,10 +375,24 @@
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
                 <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://goleiro.app/</div>
-                <input v-model="form.social.rentAKeeper" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                <input v-model="form.playerGDA" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="statusSelect">Exibir na lista de jogadores ativos?</label>
+          <Multiselect
+            id="statusSelect"
+            v-model="form.playerStatus"
+            :options="this.status"
+            track-by="name"
+            label="name"
+            :search="true"
+            value-prop="id"
+            :preselect-first="true"
+          />
         </div>
 
         <div class="mt-3">
@@ -398,6 +412,7 @@ import SystemLayout from "@/components/layouts/systemLayout.vue";
 import CitySelectComponent from "@/components/form/CitySelectComponent.vue";
 import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
 import api from "@/services/api.js";
+import Multiselect from '@vueform/multiselect'
 
 export default {
   name: "PlayerProfileForm",
@@ -407,37 +422,79 @@ export default {
     ModalitiesSelect,
     CitySelectComponent,
     StateSelectComponent,
+    Multiselect,
   },
   data() {
     return {
       form: {
         playerName: '',
         playerNickName: '',
-        playerPositions: {},
-        playerModalities: {},
+        playerPositions: [],
+        playerModalities: [],
         playerBirthdate: null,
         playerHeight: null,
         playerWeight: null,
         playerFootSize: null,
-        playerGLoveSze: null,
+        playerGloveSize: null,
         playerUniformSize: null,
         photoFile: null,
-        social: {
-          youtube: null,
-          tiktok: null,
-          instagram: null,
-          twitter: null,
-          kwaii: null,
-          facebook: null,
-          rentAKeeper: null,
-        }
+        playerYoutube: null,
+        playerTiktok: null,
+        playerInstagram: null,
+        playerX: null,
+        playerKwaii: null,
+        playerFacebook: null,
+        playerGDA: null,
+        playerStatus: null,
       },
       isGoalkeeper: null,
       stateId: null,
       cityId: null,
+      status: [
+        { name: 'Sim', id: 1 },
+        { name: 'Não', id: 0}
+      ]
     }
   },
+  mounted () {
+    this.getPlayerProfileInfo()
+  },
   methods: {
+   async getPlayerProfileInfo()
+    {
+      console.log('começou')
+      try {
+        let response = await api.get("/player-profile/show")
+        let data = response.data
+        let socialProfiles = data.social_profiles
+
+        this.form.playerName = data.name ?? null
+        this.form.playerNickName = data.nickname ?? null
+        this.form.playerPositions = data.gamePositions ?? null
+        this.form.playerModalities = data.modalities ?? null
+        this.form.playerBirthdate = data.birthdate ?? null
+        this.form.playerHeight = data.height ?? null
+        this.form.playerWeight = data.weight ?? null
+        this.form.playerFootSize = data.foot_size ?? null
+        this.form.playerGloveSize = data.glove_size ?? null
+        this.form.playerUniformSize = data.uniform_size ?? null
+        this.form.playerStatus = data.status ?? null
+        this.cityId = data.city_id ?? null
+        this.form.playerYoutube = socialProfiles.youtube ?? null
+        this.form.playerTiktok = socialProfiles.tiktok ?? null
+        this.form.playerInstagram = socialProfiles.instagram ?? null
+        this.form.playerX = socialProfiles.x  ?? null
+        this.form.playerKwaii = socialProfiles.kwaii ?? null
+        this.form.playerFacebook = socialProfiles.facebook ?? null
+        this.form.playerGDA = socialProfiles.gda ?? null
+
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao puxar dados do jogador!");
+      } finally {
+        this.loading = false;
+      }
+    },
     onPhotoChange(e) {
       this.form.photoFile = e.target.files[0]
     },
@@ -445,7 +502,6 @@ export default {
       this.loading = true;
       const formData = new FormData()
 
-      // 🔹 Campos normais
       Object.entries(this.form).forEach(([key, value]) => {
         formData.append(key, value ?? "")
       })
@@ -463,7 +519,7 @@ export default {
           },
         })
 
-        this.$router.push("/player-profile/list");
+          this.$router.push("/player-profile/form");
       } catch (err) {
         console.error(err);
         alert("Erro ao salvar time!");

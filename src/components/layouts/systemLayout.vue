@@ -246,6 +246,14 @@ export default {
             { name: 'Criar Times', href: '/team/form' },
           ],
         },
+        {
+          name: 'Jogadores',
+          icon: UsersIcon,
+          current: false,
+          children: [
+            { name: 'Listar Jogadores', href: '/player-profile/list' },
+          ],
+        },
       ],
       teams: [
         { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
