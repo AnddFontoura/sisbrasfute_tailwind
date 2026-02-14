@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from "@/stores/auth"
 import auth from './auth.js'
 import team from './team.js'
+import matches from './matches.js'
 import playerProfile from './player-profile.js'
 
 const router = createRouter({
@@ -21,6 +22,7 @@ const router = createRouter({
     ...auth,
     ...team,
     ...playerProfile,
+    ...matches,
   ],
 })
 

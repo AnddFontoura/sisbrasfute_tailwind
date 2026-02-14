@@ -196,6 +196,7 @@ import { Bars3Icon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
   FolderIcon,
+  GlobeAmericasIcon,
   HomeIcon,
   UsersIcon,
   XMarkIcon,
@@ -227,6 +228,7 @@ export default {
     MagnifyingGlassIcon,
     ChevronDownIcon,
     ChevronRightIcon,
+    GlobeAmericasIcon,
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
@@ -244,6 +246,15 @@ export default {
           children: [
             { name: 'Listar Times', href: '/team/list' },
             { name: 'Criar Times', href: '/team/form' },
+          ],
+        },
+        {
+          name: 'Partidas',
+          icon: GlobeAmericasIcon,
+          current: false,
+          children: [
+            { name: 'Listar Partidas', href: '/matches/list' },
+            { name: 'Criar Partida', href: '/matches/form' },
           ],
         },
         {
