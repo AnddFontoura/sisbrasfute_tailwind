@@ -63,7 +63,7 @@
                 "
             >
               <img
-                :src="player?.logo_url || fallbackImage"
+                :src="player?.photo_url || fallbackImage"
                 alt="Logo"
                 class="
                     h-20

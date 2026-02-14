@@ -37,6 +37,7 @@
         "
       >
           <div class="
+            mt-3
             mx-auto
             grid
             max-w-2xl
@@ -44,7 +45,7 @@
             gap-6
             lg:mx-0
             lg:max-w-none
-            lg:grid-cols-3
+            lg:grid-cols-5
             lg:gap-8
           ">
             <div
@@ -111,7 +112,7 @@
                 py-5
                 sm:p-6
                 border-1px-blue
-                col-span-2
+                col-span-4
               "
             >
 

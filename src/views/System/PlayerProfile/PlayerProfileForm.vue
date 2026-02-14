@@ -30,7 +30,7 @@
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
               <div class="text-center">
                 <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                  <label for="photo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
                     <span>Upload a file</span>
                     <input
                       id="photo-upload"
@@ -462,7 +462,6 @@ export default {
   methods: {
    async getPlayerProfileInfo()
     {
-      console.log('começou')
       try {
         let response = await api.get("/player-profile/show")
         let data = response.data
@@ -499,16 +498,23 @@ export default {
       this.form.photoFile = e.target.files[0]
     },
     async handleSubmit() {
-      this.loading = true;
+      this.loading = true
+
       const formData = new FormData()
 
       Object.entries(this.form).forEach(([key, value]) => {
-        formData.append(key, value ?? "")
+        if (Array.isArray(value)) {
+          value.forEach(item => {
+            formData.append(`${key}[]`, item)
+          })
+        } else {
+          formData.append(key, value ?? "")
+        }
       })
 
-      formData.append("playerCityId", this.cityId)
+      formData.append("playerCityId", this.cityId ?? "")
 
-      if (this.logoFile) {
+      if (this.form.photoFile) {
         formData.append("playerPhoto", this.form.photoFile)
       }
 
@@ -519,15 +525,15 @@ export default {
           },
         })
 
-          this.$router.push("/player-profile/form");
+        this.$router.push("/player-profile/form")
       } catch (err) {
-        console.error(err);
-        alert("Erro ao salvar time!");
+        console.error(err)
+        alert("Erro ao salvar jogador!")
       } finally {
-        this.loading = false;
+        this.loading = false
       }
+    }
     },
-  }
 }
 </script>
 
