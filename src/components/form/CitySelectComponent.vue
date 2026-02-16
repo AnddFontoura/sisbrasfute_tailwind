@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3">
+  <div class="mt-3 p-2">
   <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="citySelect">{{ labelName }}</label>
     <Multiselect
       id="citySelect"

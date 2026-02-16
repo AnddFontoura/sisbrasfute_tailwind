@@ -18,7 +18,7 @@ export default [
     meta: { requiresAuth: true }
   },
   {
-    path: '/matches/edit',
+    path: '/matches/edit/:id',
     name: 'matches-edit',
     component: () => import('../views/System/Matches/MatchesForm.vue'),
     meta: { requiresAuth: true }

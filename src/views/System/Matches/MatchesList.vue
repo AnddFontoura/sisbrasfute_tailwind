@@ -3,7 +3,7 @@
     <main>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="(player, key) in players"
+          v-for="(matchInformation, key) in matches"
           class="
               mt-3
               max-w-xs
@@ -40,7 +40,7 @@
                 bg-center
               "
             :style="{
-                backgroundImage: `url(${player?.banner_url || fallbackImage})`
+                backgroundImage: `url(${matchInformation?.logo_url || fallbackImage})`
               }"
           >
 
@@ -63,7 +63,7 @@
                 "
             >
               <img
-                :src="player?.photo_url || fallbackImage"
+                :src="matchInformation?.logo_url || fallbackImage"
                 alt="Logo"
                 class="
                     h-20
@@ -127,7 +127,7 @@
             class="px-4 pb-4 grid gap-2 grid-cols-1"
           >
             <button
-              @click="$router.push({ name: 'player-profile-show', params: { id: player.id } })"
+              @click="$router.push({ name: 'matches-show', params: { id: matchInformation.id } })"
               class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
             >
               Visualizar
@@ -148,18 +148,22 @@ import {useAuthStore} from "@/stores/auth.js";
 
 export default {
   name: "MatchesList",
-  components: {CitySelect, StateSelect, systemLayout},
+  components: {
+    CitySelect,
+    StateSelect,
+    systemLayout
+  },
 
   data() {
     return {
-      players: [],
+      matches: [],
       payload: {},
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg'
     }
   },
   created() {
     this.auth = useAuthStore()
-    this.getTeamsList()
+    this.getMatchesList()
   },
   computed: {
     user() {
@@ -167,11 +171,11 @@ export default {
     }
   },
   methods: {
-    async getTeamsList() {
+    async getMatchesList() {
       this.loading = true;
       try {
-        let response = await api.get("/player-profile", this.payload);
-        this.players = response.data.data
+        let response = await api.get("/matches", this.payload);
+        this.matches = response.data.data
       } catch (err) {
         console.error(err);
         alert("Erro ao puxar lista do time");

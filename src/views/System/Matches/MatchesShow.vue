@@ -142,23 +142,23 @@ export default {
   },
   data() {
     return {
-      playerProfileId: 0,
-      playerProfile: {},
+      matchId: 0,
+      matchInfo: {},
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
     }
   },
   created() {
-    this.playerProfileId = this.$route.params.id
-    this.getTeamInformation()
+    this.matchId = this.$route.params.id
+    this.getMatchInformation()
   },
   methods: {
-    async getTeamInformation() {
-      if (this.playerProfileId !== 0) {
+    async getMatchInformation() {
+      if (this.matchId !== 0) {
         this.loading = true;
 
         try {
-          let response = await api.get("/player-profile/show/" + this.playerProfileId);
-          this.playerProfile = response.data
+          let response = await api.get("/matches/show/" + this.matchId);
+          this.matchInfo = response.data
 
         } catch (err) {
           console.error(err);
