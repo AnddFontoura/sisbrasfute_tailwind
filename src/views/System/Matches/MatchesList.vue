@@ -13,67 +13,6 @@
               bg-white border
             "
         >
-          <!-- Título -->
-          <div
-            class="
-                bg-green-200
-                text-center
-                py-3
-              "
-          >
-            <h2
-              class="
-                  text-xl
-                  font-bold
-                  text-gray-800
-                "
-            >
-              {{ player.name }}
-            </h2>
-          </div>
-
-          <!-- Banner com grama -->
-          <div
-            class="
-                h-20
-                bg-cover
-                bg-center
-              "
-            :style="{
-                backgroundImage: `url(${matchInformation?.logo_url || fallbackImage})`
-              }"
-          >
-
-          </div>
-
-          <!-- Logo -->
-          <div
-            class="
-                flex
-                justify-center
-                -mt-8
-              "
-          >
-            <div
-              class="
-                  bg-white
-                  p-2
-                  rounded-lg
-                  shadow-md
-                "
-            >
-              <img
-                :src="matchInformation?.logo_url || fallbackImage"
-                alt="Logo"
-                class="
-                    h-20
-                    w-20
-                    object-contain
-                  "
-              >
-            </div>
-          </div>
-
           <!-- Infos -->
           <div
             class="
@@ -84,6 +23,20 @@
                 text-center
               "
           >
+
+            <div class="col-span-2 mb-3">
+              <p
+                class="
+                    text-sm
+                    text-gray-900
+                  "
+              >
+                {{ matchInformation.home_team_name }} <b> VS </b> {{ matchInformation.visitor_team_name}}
+              </p>
+
+              <p> {{ matchInformation.schedule_br }}</p>
+            </div>
+
             <div>
               <p
                 class="
@@ -99,7 +52,7 @@
                     text-gray-900
                   "
               >
-                CURITIBA
+                {{ matchInformation.city_info?.name ?? 'Desconhecido' }}
               </p>
             </div>
             <div>
@@ -117,7 +70,8 @@
                     text-gray-900
                   "
               >
-                PARANÁ
+
+                {{ matchInformation.city_info?.state_info?.name ?? 'Desconhecido' }}
               </p>
             </div>
           </div>
@@ -175,7 +129,8 @@ export default {
       this.loading = true;
       try {
         let response = await api.get("/matches", this.payload);
-        this.matches = response.data.data
+        this.matches = response.data
+        console.log(this.matches)
       } catch (err) {
         console.error(err);
         alert("Erro ao puxar lista do time");
