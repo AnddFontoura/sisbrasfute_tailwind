@@ -3,6 +3,11 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div class="grid grid-cols-2 mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 
+        <div class="col-span-2">
+          <TeamsManagedByUserComponent v-model="this.form.teamId">
+          </TeamsManagedByUserComponent>
+        </div>
+
         <div class="mt-3 p-2">
           <label
             class="
@@ -19,7 +24,7 @@
 
           <Multiselect
             id="statusSelect"
-            v-model="form.isHomeTeam"
+            v-model="form.myTeamIs"
             :options="this.homeOrVisitor"
             track-by="name"
             label="name"
@@ -67,7 +72,7 @@
             Placar do seu time
           </label>
           <input
-            v-model="form.enemyTeamName"
+            v-model="form.myTeamScore"
             type="number"
             class="
                 block
@@ -159,7 +164,7 @@
             Placares Penalidades a favor
           </label>
           <input
-            v-model="form.enemyTeamName"
+            v-model="form.myTeamPenaltyScore"
             type="number"
             class="
                 block
@@ -192,7 +197,7 @@
             Placar das penalidades contra
           </label>
           <input
-            v-model="form.enemyTeamName"
+            v-model="form.enemyTeamPenaltyScore"
             type="number"
             class="
                 block
@@ -294,6 +299,7 @@ import ModalitiesSelect from "@/components/form/ModalitiesSelect.vue";
 import SystemLayout from "@/components/layouts/systemLayout.vue";
 import CitySelectComponent from "@/components/form/CitySelectComponent.vue";
 import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
+import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserComponent.vue";
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
@@ -306,12 +312,14 @@ export default {
     ModalitiesSelect,
     CitySelectComponent,
     StateSelectComponent,
+    TeamsManagedByUserComponent,
     Multiselect,
     QuillEditor,
   },
   data() {
     return {
       form: {
+        teamId: null,
         myTeamIs: null,
         enemyTeamId: null,
         enemyTeamName: null,
@@ -377,7 +385,7 @@ export default {
           formData.append(key, value ?? "")
       })
 
-      formData.append("matchCityId", this.cityId ?? "")
+      formData.append("cityId", this.cityId ?? "")
 
       try {
         await api.post("/matches/save", formData, {
