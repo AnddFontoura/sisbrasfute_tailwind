@@ -1,35 +1,17 @@
-# project
+# SISBRASFUTE
 
-This template should help get you started developing with Vue 3 in Vite.
+Esse projeto é o Frontend do Sisbrasfute, feito com Vue + Tailwind.
 
-## Recommended IDE Setup
+## Instalação:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Utilize o comando 'make up' para subir o Docker (funciona em linux, não foi testado em outros sistemas operacionais)
 
-## Customize configuration
+Verifique o arquivo 'Makefile' na raíz para mais comandos.
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Pacotes instalados:
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- [Sweet Alert](https://sweetalert2.github.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [vue-quill](https://vueup.github.io/vue-quill/)
+- [vue-select](https://vueform.com/reference/multiselect-element)
+- [Pinia](https://pinia.vuejs.org/)
