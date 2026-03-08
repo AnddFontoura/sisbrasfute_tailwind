@@ -60,7 +60,9 @@
                 >
                   <span> Partidas </span>
                 </button>
+
                 <button
+                  @click="$router.push({ name: 'team-finance-list', params: { teamId: team.id } })"
                   type="button"
                   class="
                     inline-flex
