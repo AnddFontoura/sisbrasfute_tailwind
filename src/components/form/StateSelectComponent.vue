@@ -1,6 +1,6 @@
 <template>
 
-  <div class="mt-3 p-2">
+  <div class="mt-3">
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">{{ labelName }}</label>
     <Multiselect
       id="stateSelect"

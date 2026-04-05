@@ -1,415 +1,492 @@
 <template>
   <system-layout>
-      <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Cadastrar Novo Time</h1>
+    <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Cadastrar Novo Time</h1>
 
-      <form @submit.prevent="handleSubmit" class="space-y-4">
-        <!-- Estado -->
-        <StateSelect v-model="this.stateId"></StateSelect>
-
-        <!-- Cidade -->
-        <CitySelect
-          :stateId="this.stateId"
-          v-model="this.form.teamCityId"
-        ></CitySelect>
-
-        <!-- Nome do time -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do Time</label>
-          <input
-            v-model="form.teamName"
-            type="text"
-            class="
-              block
-              w-full
-              rounded-md
-              bg-white
-              px-3
-              py-1.5
-              text-base
-              text-gray-900
-              outline-1
-              -outline-offset-1
-              outline-gray-300
-              placeholder:text-gray-400
-              focus:outline-2
-              focus:-outline-offset-2
-              focus:outline-indigo-600
-              sm:text-sm/6
-              dark:bg-white/5
-              dark:text-white
-              dark:outline-white/10
-              dark:placeholder:text-gray-500
-              dark:focus:outline-indigo-500
-            "
-          />
-        </div>
-
-        <!-- Gênero -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Gênero</label>
-
-          <select
-            v-model="form.teamGender"
-            class="
-              col-start-1
-              row-start-1
-              w-full
-              appearance-none
-              rounded-md
-              bg-white
-              py-1.5
-              pr-8 pl-3
-              text-base
-              text-gray-900
-              outline-1
-              -outline-offset-1
-              outline-gray-300
-              focus:outline-2
-              focus:-outline-offset-2
-              focus:outline-indigo-600
-              sm:text-sm/6
-              dark:bg-white/5
-              dark:text-white
-              dark:outline-white/10
-              dark:*:bg-gray-800
-              dark:focus:outline-indigo-500
-            "
+      <div class="relative">
+        <div
+          v-if="loading"
+          class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
+        >
+          <svg
+            class="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
           >
-            <option value="0">Selecione</option>
-            <option value="1">Masculino</option>
-            <option value="2">Feminino</option>
-            <option value="3">Misto</option>
-          </select>
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+
+          <p class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-200">
+            Salvando time...
+          </p>
         </div>
 
-        <!-- Modalidade -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Modalidade</label>
-          <select
-            v-model="form.teamModalityId"
-            type="text"
-            class="
-              block
-              w-full
-              rounded-md
-              bg-white
-              px-3
-              py-1.5
-              text-base
-              text-gray-900
-              outline-1
-              -outline-offset-1
-              outline-gray-300
-              placeholder:text-gray-400
-              focus:outline-2
-              focus:-outline-offset-2
-              focus:outline-indigo-600
-              sm:text-sm/6
-              dark:bg-white/5
-              dark:text-white
-              dark:outline-white/10
-              dark:placeholder:text-gray-500
-              dark:focus:outline-indigo-500
-            "
-          >
-            <option value="1">Futsal</option>
-            <option value="2">Fut7/Fut5</option>
-            <option value="3">Suiço</option>
-            <option value="4">Campo de 11</option>
-          </select>
-        </div>
+        <form @submit.prevent="handleSubmit" class="space-y-4" :class="{ 'pointer-events-none opacity-70': loading }">
+          <!-- Estado -->
+          <StateSelect v-model="this.stateId"></StateSelect>
 
-        <!-- Descrição -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descrição</label>
+          <!-- Cidade -->
+          <CitySelect
+            :stateId="this.stateId"
+            v-model="this.form.teamCityId"
+          ></CitySelect>
 
-          <QuillEditor
-            v-model:content="form.teamDescription"
-            content-type="html"
-            theme="snow"
-            class="bg-white rounded border"
-          />
-        </div>
+          <!-- Nome do time -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do Time</label>
+            <input
+              v-model="form.teamName"
+              type="text"
+              class="
+                block
+                w-full
+                rounded-md
+                bg-white
+                px-3
+                py-1.5
+                text-base
+                text-gray-900
+                outline-1
+                -outline-offset-1
+                outline-gray-300
+                placeholder:text-gray-400
+                focus:outline-2
+                focus:-outline-offset-2
+                focus:outline-indigo-600
+                sm:text-sm/6
+                dark:bg-white/5
+                dark:text-white
+                dark:outline-white/10
+                dark:placeholder:text-gray-500
+                dark:focus:outline-indigo-500
+              "
+            />
+          </div>
 
-        <!-- Fundação -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data de Fundação</label>
-          <input
-            v-model="form.teamFoundationDate"
-            type="date"
-            class="
-              block
-              w-full
-              rounded-md
-              bg-white
-              px-3
-              py-1.5
-              text-base
-              text-gray-900
-              outline-1
-              -outline-offset-1
-              outline-gray-300
-              placeholder:text-gray-400
-              focus:outline-2
-              focus:-outline-offset-2
-              focus:outline-indigo-600
-              sm:text-sm/6
-              dark:bg-white/5
-              dark:text-white
-              dark:outline-white/10
-              dark:placeholder:text-gray-500
-              dark:focus:outline-indigo-500
-            "
-          />
-        </div>
+          <!-- Gênero -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Gênero</label>
 
-        <!-- Logo -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Logo (URL)</label>
+            <select
+              v-model="form.teamGender"
+              class="
+                col-start-1
+                row-start-1
+                w-full
+                appearance-none
+                rounded-md
+                bg-white
+                py-1.5
+                pr-8 pl-3
+                text-base
+                text-gray-900
+                outline-1
+                -outline-offset-1
+                outline-gray-300
+                focus:outline-2
+                focus:-outline-offset-2
+                focus:outline-indigo-600
+                sm:text-sm/6
+                dark:bg-white/5
+                dark:text-white
+                dark:outline-white/10
+                dark:*:bg-gray-800
+                dark:focus:outline-indigo-500
+              "
+            >
+              <option value="0">Selecione</option>
+              <option value="1">Masculino</option>
+              <option value="2">Feminino</option>
+              <option value="3">Misto</option>
+            </select>
+          </div>
 
-          <div class="col-span-full">
-            <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
-            <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
-              <div class="text-center">
-                <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
-                    <span>Upload a file</span>
-                    <input
-                      id="logo-upload"
-                      name="logo-upload"
-                      type="file"
-                      class="sr-only"
-                      accept="image/*"
-                      @change="onLogoChange"
-                    />
-                  </label>
-                  <p class="pl-1">or drag and drop</p>
+          <!-- Modalidade -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Modalidade</label>
+            <select
+              v-model="form.teamModalityId"
+              type="text"
+              class="
+                block
+                w-full
+                rounded-md
+                bg-white
+                px-3
+                py-1.5
+                text-base
+                text-gray-900
+                outline-1
+                -outline-offset-1
+                outline-gray-300
+                placeholder:text-gray-400
+                focus:outline-2
+                focus:-outline-offset-2
+                focus:outline-indigo-600
+                sm:text-sm/6
+                dark:bg-white/5
+                dark:text-white
+                dark:outline-white/10
+                dark:placeholder:text-gray-500
+                dark:focus:outline-indigo-500
+              "
+            >
+              <option value="1">Futsal</option>
+              <option value="2">Fut7/Fut5</option>
+              <option value="3">Suiço</option>
+              <option value="4">Campo de 11</option>
+            </select>
+          </div>
+
+          <!-- Descrição -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descrição</label>
+
+            <QuillEditor
+              v-model:content="form.teamDescription"
+              content-type="html"
+              theme="snow"
+              class="bg-white rounded border"
+            />
+          </div>
+
+          <!-- Fundação -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data de Fundação</label>
+            <input
+              v-model="form.teamFoundationDate"
+              type="date"
+              class="
+                block
+                w-full
+                rounded-md
+                bg-white
+                px-3
+                py-1.5
+                text-base
+                text-gray-900
+                outline-1
+                -outline-offset-1
+                outline-gray-300
+                placeholder:text-gray-400
+                focus:outline-2
+                focus:-outline-offset-2
+                focus:outline-indigo-600
+                sm:text-sm/6
+                dark:bg-white/5
+                dark:text-white
+                dark:outline-white/10
+                dark:placeholder:text-gray-500
+                dark:focus:outline-indigo-500
+              "
+            />
+          </div>
+
+          <!-- Logo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Logo (URL)</label>
+
+            <div class="col-span-full">
+              <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
+              <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
+                <div class="text-center">
+                  <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
+                    <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                      <span>Upload a file</span>
+                      <input
+                        id="logo-upload"
+                        name="logo-upload"
+                        type="file"
+                        class="sr-only"
+                        accept="image/*"
+                        @change="onLogoChange"
+                      />
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
                 </div>
-                <p class="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Banner -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Banner (URL)</label>
+          <!-- Banner -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Banner (URL)</label>
 
-          <div class="col-span-full">
-            <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
-            <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
-              <div class="text-center">
-                <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="banner-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
-                    <span>Upload a file</span>
-                    <input
-                      id="banner-upload"
-                      name="banner-upload"
-                      type="file"
-                      class="sr-only"
-                      accept="image/*"
-                      @change="onBannerChange"
-                    />
-                  </label>
-                  <p class="pl-1">or drag and drop</p>
+            <div class="col-span-full">
+              <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Cover photo</label>
+              <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
+                <div class="text-center">
+                  <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
+                    <label for="banner-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                      <span>Upload a file</span>
+                      <input
+                        id="banner-upload"
+                        name="banner-upload"
+                        type="file"
+                        class="sr-only"
+                        accept="image/*"
+                        @change="onBannerChange"
+                      />
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
                 </div>
-                <p class="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Redes sociais -->
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Facebook</label>
-            <input
-              v-model="form.teamFacebook"
-              type="text"
-              class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
-              "
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Instagram</label>
-            <input
-              v-model="form.teamInstagram"
-              type="text"
-              class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
-              "
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">X (Twitter)</label>
-            <input
-              v-model="form.teamX"
-              type="text"
-              class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
-              "
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">TikTok</label>
-            <input
-              v-model="form.teamTiktok"
-              type="text"
-              class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
-              "
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">YouTube</label>
-            <input
-              v-model="form.teamYoutube"
-              type="text"
-              class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
-              "
-            />
+          <!-- Redes sociais -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Facebook</label>
+              <input
+                v-model="form.teamFacebook"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Instagram</label>
+              <input
+                v-model="form.teamInstagram"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">X (Twitter)</label>
+              <input
+                v-model="form.teamX"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">TikTok</label>
+              <input
+                v-model="form.teamTiktok"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">YouTube</label>
+              <input
+                v-model="form.teamYoutube"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Kwai</label>
+              <input
+                v-model="form.teamKwai"
+                type="text"
+                class="
+                  block
+                  w-full
+                  rounded-md
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-base
+                  text-gray-900
+                  outline-1
+                  -outline-offset-1
+                  outline-gray-300
+                  placeholder:text-gray-400
+                  focus:outline-2
+                  focus:-outline-offset-2
+                  focus:outline-indigo-600
+                  sm:text-sm/6
+                  dark:bg-white/5
+                  dark:text-white
+                  dark:outline-white/10
+                  dark:placeholder:text-gray-500
+                  dark:focus:outline-indigo-500
+                "
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Kwai</label>
-            <input
-              v-model="form.teamKwai"
-              type="text"
+          <!-- Botão -->
+          <div class="pt-4">
+            <button
+              type="submit"
               class="
-                block
+                inline-flex
                 w-full
+                items-center
+                justify-center
+                gap-2
                 rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-indigo-600
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                bg-indigo-600
+                px-4
+                py-2
+                font-semibold
+                text-white
+                transition
+                hover:bg-indigo-700
+                disabled:cursor-not-allowed
+                disabled:bg-indigo-400
+                disabled:opacity-80
               "
-            />
-          </div>
-        </div>
+              :disabled="this.loading"
+            >
+              <svg
+                v-if="loading"
+                class="h-5 w-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
 
-        <!-- Botão -->
-        <div class="pt-4">
-          <button type="submit" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700">Salvar</button>
-        </div>
-      </form>
+              <span>{{ loading ? "Salvando..." : "Salvar" }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </system-layout>
 </template>
@@ -420,6 +497,7 @@ import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {QuillEditor} from "@vueup/vue-quill";
+import Swal from "sweetalert2";
 
 export default {
   name: "NewTeam",
@@ -496,8 +574,21 @@ export default {
 
         this.$router.push("/team/list");
       } catch (err) {
-        console.error(err);
-        alert("Erro ao salvar time!");
+        let data = err.response?.data
+        let mensagens = ""
+
+        if (data?.errors) {
+          mensagens = Object.values(data.errors).flat().join("<br> <br>")
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro encontrado!',
+          html: mensagens,
+          showConfirmButton: true,
+        })
       } finally {
         this.loading = false;
       }
