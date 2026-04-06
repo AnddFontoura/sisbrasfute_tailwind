@@ -3,6 +3,38 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div class="mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Atualizar Perfil de Jogador</h1>
+
+        <div class="relative">
+          <div
+            v-if="loading"
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
+          >
+            <svg
+              class="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+
+            <p class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-200">
+              Salvando time...
+            </p>
+          </div>
+
         <player-position-select v-model="form.playerPositions" is-multiselect="multiple"></player-position-select>
 
         <modalities-select v-model="form.playerModalities" is-multiselect="multiple"></modalities-select>
@@ -297,7 +329,7 @@
           />
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Youtube</label>
             <div class="mt-2">
@@ -309,7 +341,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Facebook</label>
             <div class="mt-2">
@@ -321,7 +353,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">X (Antigo Twitter)</label>
             <div class="mt-2">
@@ -333,7 +365,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Instagram</label>
             <div class="mt-2">
@@ -345,7 +377,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Tiktok</label>
             <div class="mt-2">
@@ -357,7 +389,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Kwai</label>
             <div class="mt-2">
@@ -369,7 +401,7 @@
           </div>
         </div>
 
-        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2 mt-3">
+        <div class="mt-3">
           <div class="sm:col-span-4">
             <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Goleiro de Aluguel</label>
             <div class="mt-2">
@@ -395,11 +427,55 @@
           />
         </div>
 
-        <div class="mt-3">
-          <button type="submit" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700">
-            Salvar dados de jogador
+        <div class="pt-4">
+          <button
+            type="submit"
+            class="
+                inline-flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-md
+                bg-indigo-600
+                px-4
+                py-2
+                font-semibold
+                text-white
+                transition
+                hover:bg-indigo-700
+                disabled:cursor-not-allowed
+                disabled:bg-indigo-400
+                disabled:opacity-80
+              "
+            :disabled="this.loading"
+          >
+            <svg
+              v-if="loading"
+              class="h-5 w-5 animate-spin text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+
+            <span>{{ loading ? "Salvando..." : "Salvar dados do perfil" }}</span>
           </button>
         </div>
+      </div>
       </div>
     </form>
   </system-layout>
@@ -413,6 +489,7 @@ import CitySelectComponent from "@/components/form/CitySelectComponent.vue";
 import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
+import Swal from "sweetalert2";
 
 export default {
   name: "PlayerProfileForm",
@@ -453,7 +530,8 @@ export default {
       status: [
         { name: 'Sim', id: 1 },
         { name: 'Não', id: 0}
-      ]
+      ],
+      loading: false,
     }
   },
   mounted () {
@@ -487,9 +565,6 @@ export default {
         this.form.playerFacebook = socialProfiles.facebook ?? null
         this.form.playerGDA = socialProfiles.gda ?? null
 
-      } catch (err) {
-        console.error(err);
-        alert("Erro ao puxar dados do jogador!");
       } finally {
         this.loading = false;
       }
@@ -498,7 +573,7 @@ export default {
       this.form.photoFile = e.target.files[0]
     },
     async handleSubmit() {
-      this.loading = true
+      this.loading = true;
 
       const formData = new FormData()
 
@@ -527,13 +602,26 @@ export default {
 
         this.$router.push("/player-profile/form")
       } catch (err) {
-        console.error(err)
-        alert("Erro ao salvar jogador!")
+        let data = err.response?.data
+        let mensagens = ""
+
+        if (data?.errors) {
+          mensagens = Object.values(data.errors).flat().join("<br> <br>")
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro encontrado!',
+          html: mensagens,
+          showConfirmButton: true,
+        })
       } finally {
         this.loading = false
       }
     }
-    },
+  },
 }
 </script>
 

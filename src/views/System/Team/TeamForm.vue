@@ -252,187 +252,75 @@
           </div>
 
           <!-- Redes sociais -->
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Facebook</label>
-              <input
-                v-model="form.teamFacebook"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Youtube</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://youtube.com/</div>
+                  <input v-model="form.playerYoutube" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Instagram</label>
-              <input
-                v-model="form.teamInstagram"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">X (Twitter)</label>
-              <input
-                v-model="form.teamX"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">TikTok</label>
-              <input
-                v-model="form.teamTiktok"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">YouTube</label>
-              <input
-                v-model="form.teamYoutube"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
-            </div>
+          </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Kwai</label>
-              <input
-                v-model="form.teamKwai"
-                type="text"
-                class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-indigo-600
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
-                "
-              />
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Facebook</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://facebook.com/</div>
+                  <input v-model="form.teamFacebook" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">X (Antigo Twitter)</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://x.com/</div>
+                  <input v-model="form.playerX" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Instagram</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.instagram.com/</div>
+                  <input v-model="form.teamInstagram" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Tiktok</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://tiktok.com/</div>
+                  <input v-model="form.teamTiktok" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Kwai</label>
+              <div class="mt-2">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                  <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.kwai.com/</div>
+                  <input v-model="form.teamKwaii" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -523,7 +411,7 @@ export default {
         teamX: "",
         teamTiktok: "",
         teamYoutube: "",
-        teamKwai: "",
+        teamKwaii: "",
       },
       logoFile: null,
       bannerFile: null,
