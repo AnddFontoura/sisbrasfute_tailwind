@@ -50,7 +50,6 @@
                     font-semibold
                     text-white
                     shadow-xs
-                    hover:bg-gray-50
                     dark:bg-white/10
                     dark:text-white
                     dark:shadow-none
@@ -76,7 +75,6 @@
                     hover:bg-red-700
                     text-white
                     shadow-xs
-                    hover:bg-gray-50
                     dark:bg-white/10
                     dark:text-white
                     dark:shadow-none
@@ -86,8 +84,8 @@
                 >
                   <span> Financeiro </span>
                 </button>
-                <button
-                  type="button"
+                <router-link
+                  :to="{ name: 'team-edit', params: { id: this.teamId } }"
                   class="
                     inline-flex
                     justify-center
@@ -100,7 +98,6 @@
                     hover:bg-green-700
                     text-white
                     shadow-xs
-                    hover:bg-gray-50
                     dark:bg-white/10
                     dark:text-white
                     dark:shadow-none
@@ -109,7 +106,7 @@
                   "
                 >
                   <span> Editar </span>
-                </button>
+                </router-link>
               </div>
             </div>
           </div>

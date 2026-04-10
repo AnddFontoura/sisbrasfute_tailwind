@@ -18,7 +18,7 @@ export default [
     meta: { requiresAuth: true }
   },
   {
-    path: '/team/edit',
+    path: '/team/edit/:id',
     name: 'team-edit',
     component: () => import('../views/System/Team/TeamForm.vue'),
     meta: { requiresAuth: true }

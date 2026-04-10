@@ -1,7 +1,9 @@
 <template>
   <system-layout>
-    <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Cadastrar Novo Time</h1>
+    <div class="mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+        {{ isEditMode ? "Editar Time" : "Cadastrar Novo Time" }}
+      </h1>
 
       <div class="relative">
         <div
@@ -417,15 +419,31 @@ export default {
       bannerFile: null,
       loading: false,
       stateId: null,
+      teamId: null,
     };
   },
 
   computed: {
-
+    isEditMode() {
+      return !!this.teamId;
+    },
     payload() {
       // computed monta o objeto exatamente como a API espera
       return { ...this.form };
     },
+  },
+
+  created() {
+    const queryId = this.$route.query.id;
+    const routeId = this.$route.params.id;
+
+    this.teamId = queryId || routeId || null;
+
+    console.log(this.teamId)
+
+    if (this.teamId) {
+      this.getTeamInformation();
+    }
   },
 
   methods: {
@@ -436,6 +454,45 @@ export default {
     onBannerChange(e) {
       this.bannerFile = e.target.files[0]
     },
+    async getTeamInformation() {
+      this.loading = true;
+
+      try {
+        let response = await api.get("/team/show/" + this.teamId);
+        let team = response.data;
+        let socialProfiles = response.data.social_profiles;
+
+
+        this.form.teamCityId = team.city_id ?? "";
+        this.form.teamName = team.name ?? "";
+        this.form.teamGender = team.gender ?? "";
+        this.form.teamModalityId = team.modality_id ?? "";
+        this.form.teamDescription = team.description ?? "";
+        this.form.teamFoundationDate = team.foundation_date ?? "";
+        this.form.teamLogo = team.teamLogo ?? "";
+        this.form.teamBanner = team.teamBanner ?? "";
+        this.form.teamFacebook = socialProfiles.facebook ?? "";
+        this.form.teamInstagram = socialProfiles.instagram ?? "";
+        this.form.teamX = socialProfiles.x ?? "";
+        this.form.teamTiktok = socialProfiles.tiktok ?? "";
+        this.form.teamYoutube = socialProfiles.youtube ?? "";
+        this.form.teamKwaii = socialProfiles.kwaii ?? "";
+
+        this.stateId = team.stateId ?? null;
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "error",
+          title: "Erro encontrado!",
+          text: "Não foi possível carregar os dados do time.",
+          showConfirmButton: true,
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async handleSubmit() {
       this.loading = true;
       const formData = new FormData()
@@ -454,7 +511,12 @@ export default {
       }
 
       try {
-        await api.post("/team/save", formData, {
+        let url = "/team/save";
+        if (this.teamId) {
+          url = "/team/update/" + this.teamId;
+        }
+
+        await api.post(url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
