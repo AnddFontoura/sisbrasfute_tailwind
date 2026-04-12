@@ -1,17 +1,9 @@
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white dark:bg-gray-900">
-    <body class="h-full">
-    ```
-  -->
-  <div>
+  <div class="min-h-screen bg-gradient-to-b from-white via-orange-50 to-white text-black">
     <TransitionRoot as="template" :show="this.isSidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="this.isSidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80"></div>
+          <div class="fixed inset-0 bg-black/80"></div>
         </TransitionChild>
 
         <div class="fixed inset-0 flex">
@@ -19,46 +11,44 @@
             <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
               <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="" leave="ease-in-out duration-300" leave-from="" leave-to="opacity-0">
                 <div class="absolute top-0 left-full flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5" @click="this.isSidebarOpen = false">
+                  <button type="button" class="-m-2.5 rounded-md p-2.5 text-white hover:bg-white/10" @click="this.isSidebarOpen = false">
                     <span class="sr-only">Close sidebar</span>
                     <XMarkIcon class="size-6 text-white" aria-hidden="true" />
                   </button>
                 </div>
               </TransitionChild>
 
-              <!-- Sidebar component, swap this element with another sidebar if you like -->
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 dark:bg-gray-900 dark:ring dark:ring-white/10 dark:before:pointer-events-none dark:before:absolute dark:before:inset-0 dark:before:bg-black/10">
-                <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto dark:hidden" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
-                  <img class="h-8 w-auto not-dark:hidden" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-black px-6 pb-4">
+                <div class="relative flex h-16 shrink-0 items-center border-b border-orange-500/40">
+                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=500" alt="Your Company" />
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <a :href="item.href" :class="[item.current ? 'bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <component :is="item.icon" :class="[item.current ? 'text-indigo-600 dark:text-white' : 'text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white', 'size-6 shrink-0']" aria-hidden="true" />
+                          <a :href="item.href" :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
+                            <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300 group-hover:text-orange-200', 'size-6 shrink-0']" aria-hidden="true" />
                             {{ item.name }}
                           </a>
                         </li>
                       </ul>
                     </li>
                     <li>
-                      <div class="text-xs/6 font-semibold text-gray-400">Your teams</div>
+                      <div class="text-xs/6 font-semibold uppercase tracking-wide text-orange-300">Seus times</div>
                       <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li v-for="team in teams" :key="team.name">
-                          <a :href="team.href" :class="[team.current ? 'bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <span :class="[team.current ? 'border-indigo-600 text-indigo-600 dark:border-white/20 dark:text-white' : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white', 'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5']">{{ team.initial }}</span>
+                          <a :href="team.href" :class="[team.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
+                            <span :class="[team.current ? 'border-black/20 bg-white text-black' : 'border-orange-300/40 bg-black text-orange-200 group-hover:border-orange-300 group-hover:text-orange-100', 'flex size-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium']">{{ team.initial }}</span>
                             <span class="truncate">{{ team.name }}</span>
                           </a>
                         </li>
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                        <Cog6ToothIcon class="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white" aria-hidden="true" />
-                        Settings
+                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-white hover:bg-orange-500/20 hover:text-orange-300 transition-colors">
+                        <Cog6ToothIcon class="size-6 shrink-0 text-orange-300 group-hover:text-orange-200" aria-hidden="true" />
+                        Configurações
                       </a>
                     </li>
                   </ul>
@@ -70,51 +60,46 @@
       </Dialog>
     </TransitionRoot>
 
-    <!-- Static sidebar for desktop -->
-    <div class="hidden bg-gray-900 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <!-- Sidebar component, swap this element with another sidebar if you like -->
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4 dark:border-white/10 dark:bg-black/10">
-        <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto dark:hidden" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
-          <img class="h-8 w-auto not-dark:hidden" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-black">
+      <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-orange-500/30 bg-black px-6 pb-4">
+        <div class="flex h-16 shrink-0 items-center border-b border-orange-500/40">
+          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=500" alt="Your Company" />
         </div>
         <nav class="flex flex-1 flex-col">
-
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li v-for="item in navigation" :key="item.name">
-              <a v-if="!item.children" :href="item.href" :class="[item.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 dark:text-gray-400']">
-                <component :is="item.icon" class="size-6 shrink-0 text-gray-400 dark:text-current" aria-hidden="true" />
+              <a v-if="!item.children" :href="item.href" :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
+                <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300 group-hover:text-orange-200', 'size-6 shrink-0']" aria-hidden="true" />
                 {{ item.name }}
               </a>
               <Disclosure as="div" v-else v-slot="{ open }">
-                <DisclosureButton :class="[item.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm/6 font-semibold text-gray-700 dark:text-gray-400']">
-                  <component :is="item.icon" class="size-6 shrink-0 text-gray-400 dark:text-current" aria-hidden="true" />
+                <DisclosureButton :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm/6 font-semibold transition-colors']">
+                  <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300', 'size-6 shrink-0']" aria-hidden="true" />
                   {{ item.name }}
-                  <ChevronRightIcon :class="[open ? 'rotate-90 text-gray-500 dark:text-gray-400' : 'text-gray-400', 'ml-auto size-5 shrink-0']" aria-hidden="true" />
+                  <ChevronRightIcon :class="[open ? 'rotate-90 text-orange-200' : 'text-orange-300', 'ml-auto size-5 shrink-0 transition-transform']" aria-hidden="true" />
                 </DisclosureButton>
                 <DisclosurePanel as="ul" class="mt-1 px-2">
                   <li v-for="subItem in item.children" :key="subItem.name">
-                    <!-- 44px -->
-                    <DisclosureButton as="a" :href="subItem.href" :class="[subItem.current ? 'bg-gray-50 dark:bg-white/5 dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 dark:hover:text-white', 'block rounded-md py-2 pr-2 pl-9 text-sm/6 text-gray-700 dark:text-gray-400']">{{ subItem.name }}</DisclosureButton>
+                    <DisclosureButton as="a" :href="subItem.href" :class="[subItem.current ? 'bg-orange-500 text-black' : 'text-white/90 hover:bg-orange-500/20 hover:text-orange-200', 'block rounded-md py-2 pr-2 pl-9 text-sm/6 transition-colors']">{{ subItem.name }}</DisclosureButton>
                   </li>
                 </DisclosurePanel>
               </Disclosure>
             </li>
             <li>
-              <div class="text-xs/6 font-semibold text-gray-400">Your teams</div>
+              <div class="text-xs/6 font-semibold uppercase tracking-wide text-orange-300">Seus times</div>
               <ul role="list" class="-mx-2 mt-2 space-y-1">
                 <li v-for="team in teams" :key="team.name">
-                  <a :href="team.href" :class="[team.current ? 'bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                    <span :class="[team.current ? 'border-indigo-600 text-indigo-600 dark:border-white/20 dark:text-white' : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white', 'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5']">{{ team.initial }}</span>
+                  <a :href="team.href" :class="[team.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
+                    <span :class="[team.current ? 'border-black/20 bg-white text-black' : 'border-orange-300/40 bg-black text-orange-200 group-hover:border-orange-300 group-hover:text-orange-100', 'flex size-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium']">{{ team.initial }}</span>
                     <span class="truncate">{{ team.name }}</span>
                   </a>
                 </li>
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <Cog6ToothIcon class="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white" aria-hidden="true" />
-                Settings
+              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-white hover:bg-orange-500/20 hover:text-orange-300 transition-colors">
+                <Cog6ToothIcon class="size-6 shrink-0 text-orange-300 group-hover:text-orange-200" aria-hidden="true" />
+                Configurações
               </a>
             </li>
           </ul>
@@ -123,40 +108,37 @@
     </div>
 
     <div class="lg:pl-72">
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8 dark:border-white/10 dark:bg-gray-900 dark:shadow-none">
-        <button type="button" class="-m-2.5 p-2.5 text-gray-700 hover:text-gray-900 lg:hidden dark:text-gray-400 dark:hover:text-white" @click="this.isSidebarOpen = true">
+      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-orange-200 bg-white/95 px-4 shadow-sm backdrop-blur sm:gap-x-6 sm:px-6 lg:px-8">
+        <button type="button" class="-m-2.5 rounded-md p-2.5 text-black hover:bg-orange-100 lg:hidden" @click="this.isSidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="size-6" aria-hidden="true" />
         </button>
 
-        <!-- Separator -->
-        <div class="h-6 w-px bg-gray-200 lg:hidden dark:bg-white/10" aria-hidden="true"></div>
+        <div class="h-6 w-px bg-orange-200 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
           <div class="flex items-center gap-x-4 lg:gap-x-6">
-            <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:hover:text-white">
+            <button type="button" class="-m-2.5 rounded-md p-2.5 text-black hover:bg-orange-100 hover:text-orange-600 transition-colors">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
             </button>
 
-            <!-- Separator -->
-            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-white/10" aria-hidden="true"></div>
+            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-orange-200" aria-hidden="true"></div>
 
-            <!-- Profile dropdown -->
-            <Menu as="div" class="relative" >
-              <MenuButton class="relative flex items-center">
+            <Menu as="div" class="relative">
+              <MenuButton class="relative flex items-center rounded-md p-1 hover:bg-orange-100 transition-colors">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline -outline-offset-1 outline-black/5 dark:bg-gray-800 dark:outline-white/10" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-orange-100 outline -outline-offset-1 outline-orange-300" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900 dark:text-white" aria-hidden="true">{{ user.name }}</span>
-                  <ChevronDownIcon class="ml-2 size-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                  <span class="ml-4 text-sm/6 font-semibold text-black" aria-hidden="true">{{ user.name }}</span>
+                  <ChevronDownIcon class="ml-2 size-5 text-orange-500" aria-hidden="true" />
                 </span>
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline-1 outline-gray-900/5 dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+                <MenuItems class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md border border-orange-200 bg-white py-2 shadow-lg">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-hidden dark:bg-white/5' : '', 'block px-3 py-1 text-sm/6 text-gray-900 dark:text-white']">{{ item.name }}</a>
+                    <a :href="item.href" :class="[active ? 'bg-orange-50 text-orange-700' : 'text-black', 'block px-3 py-1 text-sm/6']">{{ item.name }}</a>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -167,7 +149,7 @@
 
       <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
-          <slot/>
+          <slot />
         </div>
       </main>
     </div>
@@ -175,7 +157,7 @@
 </template>
 
 <script>
-import {useAuthStore} from "@/stores/auth.js";
+import { useAuthStore } from "@/stores/auth.js";
 import {
   Dialog,
   DialogPanel,
@@ -189,7 +171,8 @@ import {
   DisclosureButton,
   DisclosurePanel
 } from "@headlessui/vue";
-import { Bars3Icon,
+import {
+  Bars3Icon,
   BellIcon,
   CalendarIcon,
   ChartPieIcon,
@@ -203,7 +186,7 @@ import { Bars3Icon,
   MagnifyingGlassIcon,
   ChevronDownIcon,
   ChevronRightIcon
-  } from '@heroicons/vue/20/solid'
+} from "@heroicons/vue/20/solid";
 
 export default {
   components: {
@@ -238,49 +221,49 @@ export default {
       user: {},
       isSidebarOpen: true,
       navigation: [
-        { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
+        { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
         {
-          name: 'Times',
+          name: "Times",
           icon: UsersIcon,
           current: false,
           children: [
-            { name: 'Listar Times', href: '/team/list' },
-            { name: 'Criar Times', href: '/team/form' },
+            { name: "Listar Times", href: "/team/list" },
+            { name: "Criar Times", href: "/team/form" },
           ],
         },
         {
-          name: 'Partidas',
+          name: "Partidas",
           icon: GlobeAmericasIcon,
           current: false,
           children: [
-            { name: 'Listar Partidas', href: '/matches/list' },
-            { name: 'Criar Partida', href: '/matches/form' },
+            { name: "Listar Partidas", href: "/matches/list" },
+            { name: "Criar Partida", href: "/matches/form" },
           ],
         },
         {
-          name: 'Jogadores',
+          name: "Jogadores",
           icon: UsersIcon,
           current: false,
           children: [
-            { name: 'Listar Jogadores', href: '/player-profile/list' },
+            { name: "Listar Jogadores", href: "/player-profile/list" },
           ],
         },
       ],
       teams: [
-        { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-        { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-        { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
+        { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
+        { id: 2, name: "Tailwind Labs", href: "#", initial: "T", current: false },
+        { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
       ],
       userNavigation: [
-        { name: 'Meus Times', href: '#' },
-        { name: 'Meu Perfil', href: '/player-profile/form' },
-        { name: 'Sair', href: '/logout' },
+        { name: "Meus Times", href: "#" },
+        { name: "Meu Perfil", href: "/player-profile/form" },
+        { name: "Sair", href: "/logout" },
       ]
     };
   },
   mounted() {
-    const auth = useAuthStore()
-    this.user = auth.user
+    const auth = useAuthStore();
+    this.user = auth.user;
   },
   methods: {
     go(route) {
@@ -292,11 +275,7 @@ export default {
 </script>
 
 <style scoped>
-/* garante que as células fiquem visualmente quadradas e consistentes */
-.aspect-square {
-  /* a classe tailwind aspect-square já aplica a razão 1:1 */
+[v-cloak] {
+  display: none;
 }
-
-/* para um leve efeito quando o tema escuro/clear */
-[v-cloak] { display: none; }
 </style>

@@ -1,6 +1,36 @@
 <template>
   <system-layout>
     <team-banner :team-info-id="teamId"></team-banner>
+
+
+    <div class="mt-3 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+
+      <router-link
+        :to="{ name: 'team-finance-form', params: { id: this.teamId } }"
+        class="
+            inline-flex
+            justify-center
+            rounded-md
+            bg-blue-500
+            hover:bg-blue-700
+            px-3
+            py-2
+            text-sm
+            font-semibold
+            text-white
+            shadow-xs
+            dark:bg-white/10
+            dark:text-white
+            dark:shadow-none
+            dark:inset-ring-white/5
+            dark:hover:bg-white/20
+          "
+
+      >
+        <span> + Movimentação Financeira </span>
+      </router-link>
+    </div>
+
     <main class="p-4">
       <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
         <div class="border-b border-gray-200 px-4 py-4 dark:border-gray-700">

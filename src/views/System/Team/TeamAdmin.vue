@@ -4,7 +4,8 @@
       <team-banner/>
 
       <div class="mt-3 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-        <button
+        <router-link
+          :to="{ name: 'team-players-list', params: { teamId: this.teamId } }"
           type="button"
           class="
             inline-flex
@@ -18,82 +19,65 @@
             font-semibold
             text-white
             shadow-xs
-            dark:bg-white/10
-            dark:text-white
-            dark:shadow-none
-            dark:inset-ring-white/5
-            dark:hover:bg-white/20
           "
         >
           <span> Jogadores </span>
-        </button>
-        <button
+        </router-link>
+
+        <router-link
+          :to="{ name: 'team-matches-list', params: { teamId: this.teamId } }"
           type="button"
           class="
             inline-flex
             justify-center
             rounded-md
-            bg-purple-500
-            hover:bg-purple-700
+            bg-orange-500
+            hover:bg-orange-700
             px-3
             py-2
             text-sm
             font-semibold
             text-white
             shadow-xs
-            dark:bg-white/10
-            dark:text-white
-            dark:shadow-none
-            dark:inset-ring-white/5
-            dark:hover:bg-white/20
           "
         >
           <span> Partidas </span>
-        </button>
+        </router-link>
 
-        <button
-          @click="$router.push({ name: 'team-finance-list', params: { teamId: team.id } })"
+        <router-link
+          :to="{ name: 'team-finance-list', params: { teamId: this.teamId } }"
           type="button"
           class="
             inline-flex
             justify-center
             rounded-md
+            bg-orange-500
+            hover:bg-orange-700
             px-3
             py-2
             text-sm
             font-semibold
-            bg-red-500
-            hover:bg-red-700
             text-white
             shadow-xs
-            dark:bg-white/10
-            dark:text-white
-            dark:shadow-none
-            dark:inset-ring-white/5
-            dark:hover:bg-white/20
           "
         >
           <span> Financeiro </span>
-        </button>
+        </router-link>
+
         <router-link
           :to="{ name: 'team-edit', params: { id: this.teamId } }"
           class="
             inline-flex
             justify-center
             rounded-md
+            bg-orange-500
+            hover:bg-orange-700
             px-3
             py-2
             text-sm
             font-semibold
-            bg-green-500
-            hover:bg-green-700
             text-white
             shadow-xs
-            dark:bg-white/10
-            dark:text-white
-            dark:shadow-none
-            dark:inset-ring-white/5
-            dark:hover:bg-white/20
           "
         >
           <span> Editar </span>
