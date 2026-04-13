@@ -9,7 +9,7 @@
       </team-banner>
 
       <div
-        v-if="matches.length === 0"
+        v-if="matches.data.length === 0"
         class="
             mt-6
             rounded-lg
@@ -30,7 +30,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <div
-          v-for="(matchInformation, key) in matches"
+          v-for="(matchInformation, key) in matches.data"
           class="
               mt-3
               max-w-xs
@@ -117,6 +117,8 @@
         </div>
       </div>
     </main>
+
+    <pagination-component :pagination="matches" @change="getMatchesList"></pagination-component>
   </system-layout>
 </template>
 
@@ -127,6 +129,7 @@ import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
+import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 
 export default {
   name: "MatchesList",
@@ -134,12 +137,16 @@ export default {
     TeamBanner,
     CitySelect,
     StateSelect,
-    systemLayout
+    systemLayout,
+    PaginationComponent
   },
   data() {
     return {
-      matches: [],
-      payload: {},
+      matches: {
+        data: [],
+        current_page: 1,
+        last_page: 1
+      },
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
       teamId: null,
     }
@@ -155,15 +162,19 @@ export default {
     }
   },
   methods: {
-    async getMatchesList() {
+    async getMatchesList(page = 1) {
       this.loading = true;
 
-      this.payload.team_id = this.teamId
-
       try {
-        let response = await api.get("/matches", this.payload);
-        this.matches = response.data
-        console.log(this.matches)
+        const response = await api.get('/matches', {
+          params: {
+            page,
+            team_id: this.teamId
+          }
+        });
+
+        this.matches = response.data;
+
       } catch (err) {
         console.error(err);
         alert("Erro ao puxar lista do time");
