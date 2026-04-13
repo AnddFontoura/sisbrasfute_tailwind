@@ -8,6 +8,85 @@
 
       </team-banner>
 
+      <!-- FILTROS -->
+      <div class="mt-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">
+            Filtros
+          </h2>
+
+          <button
+            @click="resetFilters"
+            class="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Limpar filtros
+          </button>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <!-- Nome do time -->
+          <div class="lg:col-span-2 mt-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do time</label>
+            <input
+              v-model="filters.team_name"
+              type="text"
+              placeholder="Ex: Flamengo"
+              class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
+               focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none"
+            />
+          </div>
+
+          <state-select v-model="filters.state_id"></state-select>
+
+          <city-select :stateId="filters.state_id" v-model="filters.city_id"></city-select>
+
+          <!-- Range -->
+          <div class="lg:col-span-2 mt-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Período</label>
+
+            <div class="flex items-center gap-2 mt-1">
+              <input
+                v-model="filters.date_start"
+                type="date"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
+                 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none"
+              />
+
+              <span class="text-gray-400 text-sm">até</span>
+
+              <input
+                v-model="filters.date_end"
+                type="date"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
+                 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-2 mt-5">
+          <button
+            @click="resetFilters"
+            class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100"
+          >
+            Limpar
+          </button>
+
+          <button
+            @click="applyFilters"
+            class="px-4 py-2 text-sm rounded-lg bg-orange-500 text-white
+             hover:bg-orange-600 shadow-sm"
+          >
+            Aplicar filtros
+          </button>
+        </div>
+      </div>
+
       <div
         v-if="matches.data.length === 0"
         class="
@@ -130,6 +209,8 @@ import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
+import stateSelectComponent from "@/components/form/StateSelectComponent.vue";
+import citySelectComponent from "@/components/form/CitySelectComponent.vue";
 
 export default {
   name: "MatchesList",
@@ -142,6 +223,14 @@ export default {
   },
   data() {
     return {
+      filters: {
+        team_name: '',
+        state_id: null,
+        city_id: null,
+        date: null,
+        date_start: null,
+        date_end: null
+      },
       matches: {
         data: [],
         current_page: 1,
@@ -169,7 +258,14 @@ export default {
         const response = await api.get('/matches', {
           params: {
             page,
-            team_id: this.teamId
+            team_id: this.teamId,
+            // filtros
+            team_name: this.filters.team_name,
+            state_id: this.filters.state_id,
+            city_id: this.filters.city_id,
+            date: this.filters.date,
+            date_start: this.filters.date_start,
+            date_end: this.filters.date_end
           }
         });
 
@@ -181,6 +277,23 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+
+    applyFilters() {
+      this.getMatchesList(1)
+    },
+
+    resetFilters() {
+      this.filters = {
+        team_name: '',
+        state_id: null,
+        city_id: null,
+        date: null,
+        date_start: null,
+        date_end: null
+      }
+
+      this.getMatchesList(1)
     }
   },
 };
