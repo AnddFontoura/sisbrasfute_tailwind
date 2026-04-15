@@ -128,7 +128,24 @@
           >
             <router-link
               :to="{ name: 'player-profile-show', params: { id: player.id } }"
-              class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
+              class="
+                inline-flex
+                justify-center
+                rounded-md
+                bg-blue-500
+                hover:bg-blue-700
+                px-3
+                py-2
+                text-sm
+                font-semibold
+                text-white
+                shadow-xs
+                dark:bg-white/10
+                dark:text-white
+                dark:shadow-none
+                dark:inset-ring-white/5
+                dark:hover:bg-white/20
+              "
             >
               Visualizar
             </router-link>
