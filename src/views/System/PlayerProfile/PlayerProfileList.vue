@@ -126,12 +126,12 @@
           <div
             class="px-4 pb-4 grid gap-2 grid-cols-1"
           >
-            <button
-              @click="$router.push({ name: 'player-profile-show', params: { id: player.id } })"
+            <router-link
+              :to="{ name: 'player-profile-show', params: { id: player.id } }"
               class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
             >
               Visualizar
-            </button>
+            </router-link>
           </div>
         </div>
       </div>
