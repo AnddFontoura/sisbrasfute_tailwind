@@ -1,5 +1,5 @@
 <template>
-    <system-layout>
+  <system-layout>
     <!-- Content -->
     <main
       class="
@@ -61,8 +61,8 @@
                   w-full
                   rounded-xl
                   shadow-sm
-                  bg-white
-                  dark:bg-slate-800
+                  bg-orange-500
+                  dark:bg-orange-500
                   border
                   border-transparent
                   hover:shadow-md
@@ -96,7 +96,7 @@
                     class="
                       w-6
                       h-6
-                      text-white
+                      text-black
                     "
                   >
 
@@ -106,8 +106,8 @@
                   class="
                     text-sm
                     font-semibold
-                    text-slate-900
-                    dark:text-slate-100
+                    text-black
+                    dark:text-black
                     text-center
                   "
                 >
@@ -119,7 +119,7 @@
         </div>
       </div>
     </main>
-    </system-layout>
+  </system-layout>
 </template>
 
 <script>
@@ -162,11 +162,11 @@ export default {
   computed: {
     items() {
       return [
-        { key: 'team', label: 'Times', icon: this.icons.team, to: '/team/list', color: 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-white' },
-        { key: 'players', label: 'Jogadores', icon: this.icons.players, to: '/player/list', color: 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white' },
-        { key: 'match', label: 'Amistosos', icon: this.icons.match, to: '/friendly-matches/list', color: 'bg-gradient-to-br from-teal-400 to-teal-500 text-white' },
-        { key: 'trophy', label: 'Campeonatos', icon: this.icons.trophy, to: '/championships/list', color: 'bg-gradient-to-br from-rose-500 to-rose-600 text-white' },
-        { key: 'settings', label: 'Configurações', icon: this.icons.settings, to: '/configuration', color: 'bg-gradient-to-br from-slate-500 to-slate-600 text-white' },
+        { key: 'team', label: 'Times', icon: this.icons.team, to: '/team/list', color: 'bg-orange-500 text-black' },
+        { key: 'players', label: 'Jogadores', icon: this.icons.players, to: '/player/list', color: 'bg-orange-500 text-black' },
+        //{ key: 'match', label: 'Amistosos', icon: this.icons.match, to: '/friendly-matches/list', color: 'bg-orange-500 text-black' },
+        //{ key: 'trophy', label: 'Campeonatos', icon: this.icons.trophy, to: '/championships/list', color: 'bg-orange-500 text-black' },
+        //{ key: 'settings', label: 'Configurações', icon: this.icons.settings, to: '/configuration', color: 'bg-orange-500 text-black' },
       ]
     },
   },
@@ -178,6 +178,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-</style>
