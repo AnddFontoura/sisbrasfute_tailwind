@@ -163,7 +163,7 @@ export default {
     items() {
       return [
         { key: 'team', label: 'Times', icon: this.icons.team, to: '/team/list', color: 'bg-orange-500 text-black' },
-        { key: 'players', label: 'Jogadores', icon: this.icons.players, to: '/player/list', color: 'bg-orange-500 text-black' },
+        { key: 'players', label: 'Jogadores', icon: this.icons.players, to: '/player-profile/list', color: 'bg-orange-500 text-black' },
         //{ key: 'match', label: 'Amistosos', icon: this.icons.match, to: '/friendly-matches/list', color: 'bg-orange-500 text-black' },
         //{ key: 'trophy', label: 'Campeonatos', icon: this.icons.trophy, to: '/championships/list', color: 'bg-orange-500 text-black' },
         //{ key: 'settings', label: 'Configurações', icon: this.icons.settings, to: '/configuration', color: 'bg-orange-500 text-black' },
