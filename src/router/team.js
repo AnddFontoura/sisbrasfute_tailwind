@@ -8,7 +8,7 @@ export default [
   {
     path: '/team/:teamId/players/list',
     name: 'team-players-list',
-    component: () => import('../views/System/Team/TeamList.vue'),
+    component: () => import('../views/System/Team/TeamPlayerList.vue'),
     meta: { requiresAuth: true }
   },
   {
