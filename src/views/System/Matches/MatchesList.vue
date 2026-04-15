@@ -106,13 +106,12 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
 
         <div
           v-for="(matchInformation, key) in matches.data"
           class="
-              mt-3
-              max-w-xs
+              m-3
               rounded-xl
               shadow-lg
               overflow-hidden

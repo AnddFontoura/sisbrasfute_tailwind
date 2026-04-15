@@ -65,6 +65,7 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth.js";
+import Swal from 'sweetalert2'
 
 export default {
   name: "Login",
@@ -93,7 +94,12 @@ export default {
         // redireciona se deu certo
         this.$router.push("/dashboard")
       } catch (err) {
-        this.errorMessage = err.message || "Falha no login"
+        await Swal.fire({
+          title: "Encontramos um erro!",
+          text: "Seu login não foi localizado ou a sua senha está incorreta, tente novamente!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       } finally {
         this.loading = false
       }
