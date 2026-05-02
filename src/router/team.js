@@ -12,6 +12,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/players/form',
+    name: 'team-players-form',
+    component: () => import('../views/System/Team/TeamPlayerRecruitamentForm.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team/:teamId/matches/list',
     name: 'team-matches-list',
     component: () => import('../views/System/Matches/MatchesList.vue'),
@@ -23,6 +29,13 @@ export default [
     component: () => import('../views/System/Team/TeamShow.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/team/form',
+    name: 'team-form',
+    component: () => import('../views/System/Team/TeamForm.vue'),
+    meta: { requiresAuth: true }
+  },
+
   {
     path: '/team/form',
     name: 'team-form',

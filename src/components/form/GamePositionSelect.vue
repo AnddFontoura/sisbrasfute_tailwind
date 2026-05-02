@@ -33,6 +33,10 @@ export default {
       type: String,
       default: 'single'
     },
+    teamId: {
+      type: Number,
+      default: null
+    }
   },
   data() {
     return {
@@ -57,7 +61,9 @@ export default {
   },
   async mounted() {
     try {
-      const { data } = await api.get("/game-positions/list")
+      const { data } = await api.get("/game-positions/list", {
+        params: { teamId: this.teamId }
+      })
       this.playerPositions = data.gamePositions
     } catch (err) {
       console.error("Erro ao carregar estados:", err)
