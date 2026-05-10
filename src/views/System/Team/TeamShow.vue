@@ -59,6 +59,142 @@
       </div>
 
       <div
+        v-if="team.isRecruiting"
+        class="
+          flex items-center justify-between
+          rounded-2xl
+          border border-orange-200
+          bg-black
+          px-6 py-5
+          shadow-lg
+          transition-all
+          duration-300
+          hover:border-orange-400
+          hover:shadow-2xl
+        "
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="
+              flex h-14 w-14 items-center justify-center
+              rounded-2xl
+              bg-orange-500
+              text-2xl
+              shadow-md
+            "
+          >
+            ⚽
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-white">
+              Esse time está recrutando jogadores!
+            </h3>
+
+            <p class="text-sm text-gray-300">
+              <span v-for="(item, index) in team.isRecruiting" :key="index">
+                 | {{ item.game_position_info.name }}
+              </span>
+                |
+            </p>
+          </div>
+        </div>
+
+        <button
+          @click="handleInterestClick"
+          class="
+            rounded-xl
+            bg-orange-500
+            px-5 py-3
+            font-semibold
+            text-white
+            shadow-md
+            transition-all
+            duration-200
+            hover:bg-orange-400
+            hover:shadow-xl
+            active:scale-95
+          "
+        >
+          Tenho interesse
+        </button>
+      </div>
+
+      <div
+        v-if="showInterestModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      >
+        <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Escolha uma posição
+              </h2>
+
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                Seu perfil será exibido ao dono do time. Você poderá checar o status da sua aplicação
+                a qualquer momento no menu "Minhas Aplicações" dentro da área de jogadores.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="rounded-lg px-2 py-1 text-xl font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
+              @click="closeInterestModal"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="mt-6">
+            <label
+              for="recruitGamePositionId"
+              class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+            >
+              Posição desejada
+            </label>
+
+            <select
+              id="recruitGamePositionId"
+              v-model="recruitGamePositionId"
+              class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option :value="0" disabled>
+                Selecione uma posição
+              </option>
+
+              <option
+                v-for="item in team.isRecruiting"
+                :key="item.id"
+                :value="item.game_position_info.id"
+              >
+                {{ item.game_position_info.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              class="rounded-xl border border-gray-300 bg-white px-5 py-2 font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+              @click="closeInterestModal"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              class="rounded-xl bg-orange-500 px-5 py-2 font-semibold text-white shadow-md transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-orange-300"
+              :disabled="loading || !recruitGamePositionId"
+              @click="submitInterest"
+            >
+              {{ loading ? 'Salvando...' : 'Salvar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
         v-html="team.description"
         class="
           mt-10
@@ -75,6 +211,7 @@ import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import { MapIcon, MapPinIcon, CalendarIcon } from '@heroicons/vue/20/solid'
+import Swal from 'sweetalert2'
 
 export default {
   name: "teamList",
@@ -90,6 +227,9 @@ export default {
     return {
       teamId: 0,
       team: {},
+      recruitGamePositionId: 0,
+      showInterestModal: false,
+      loading: false,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
     }
   },
@@ -112,6 +252,62 @@ export default {
         } finally {
           this.loading = false;
         }
+      }
+    },
+    handleInterestClick() {
+      this.recruitGamePositionId = 0;
+      this.showInterestModal = true;
+    },
+    closeInterestModal() {
+      this.showInterestModal = false;
+      this.recruitGamePositionId = 0;
+    },
+    async submitInterest() {
+      if (!this.recruitGamePositionId) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Atenção!",
+          text: "Selecione uma posição antes de salvar.",
+        });
+
+        return;
+      }
+
+      this.loading = true;
+
+      try {
+        await api.post(`/team-application/apply/save`, {
+          gamePositionId: this.recruitGamePositionId,
+          teamId: this.teamId,
+        });
+
+        this.closeInterestModal();
+
+        await Swal.fire({
+          icon: "success",
+          title: "Pedido enviado!",
+          text: "Sua aplicação foi enviada com sucesso.",
+          confirmButtonText: "Ok",
+        });
+      } catch (err) {
+        let mensagem = "Não foi possível aplicar nesse time.";
+
+        if (err.response?.data?.message) {
+          mensagem = err.response.data.message;
+        }
+
+        if (err.response?.data?.errors) {
+          mensagem = Object.values(err.response.data.errors).flat().join("<br><br>");
+        }
+
+        await Swal.fire({
+          icon: "error",
+          title: "Erro",
+          html: mensagem,
+          confirmButtonText: "Ok",
+        });
+      } finally {
+        this.loading = false;
       }
     }
   },
