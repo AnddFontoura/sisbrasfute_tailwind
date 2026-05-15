@@ -29,7 +29,7 @@
         </router-link>
 
         <router-link
-          :to="{ name: 'team-players-list', params: { teamId: this.teamId } }"
+          :to="{ name: 'team-application-list', params: { teamId: this.teamId } }"
           type="button"
           class="
           inline-flex
@@ -188,7 +188,6 @@ export default {
 
       return player.position_name || player.position || 'N/A'
     },
-
     async getTeamPlayerList(page = 1) {
       this.loading = true;
 

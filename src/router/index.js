@@ -5,6 +5,7 @@ import team from './team.js'
 import teamFinance from "@/router/team-finance.js";
 import matches from './matches.js'
 import playerProfile from './player-profile.js'
+import teamApplication from './team-application.js'
 
 
 const router = createRouter({
@@ -26,6 +27,7 @@ const router = createRouter({
     ...teamFinance,
     ...playerProfile,
     ...matches,
+    ...teamApplication,
   ],
 })
 

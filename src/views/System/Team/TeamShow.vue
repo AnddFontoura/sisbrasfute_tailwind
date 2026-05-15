@@ -29,7 +29,7 @@
       </div>
 
       <div class="relative isolate overflow-hidden dark:bg-gray-900">
-        <div class="mx-auto max-w-7xl">
+        <div class="mx-auto">
           <div class="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
             <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
               <component is="MapIcon" class="h-7 w-5 flex-none text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
@@ -61,6 +61,7 @@
       <div
         v-if="team.isRecruiting"
         class="
+          mt-3
           flex items-center justify-between
           rounded-2xl
           border border-orange-200
@@ -87,11 +88,11 @@
           </div>
 
           <div>
-            <h3 class="text-lg font-bold text-white">
+            <h3 class="text-lg font-bold text-white p-2">
               Esse time está recrutando jogadores!
             </h3>
 
-            <p class="text-sm text-gray-300">
+            <p class="text-sm text-gray-300 p-2">
               <span v-for="(item, index) in team.isRecruiting" :key="index">
                  | {{ item.game_position_info.name }}
               </span>
