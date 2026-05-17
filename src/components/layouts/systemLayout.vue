@@ -1,155 +1,276 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-white via-orange-50 to-white text-black">
-    <TransitionRoot as="template" :show="this.isSidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="this.isSidebarOpen = false">
-        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-black/80"></div>
+  <div class="min-h-screen bg-black text-zinc-100">
+    <TransitionRoot as="template" :show="isSidebarOpen">
+      <Dialog class="relative z-50 lg:hidden" @close="isSidebarOpen = false">
+        <TransitionChild
+          as="template"
+          enter="transition-opacity ease-linear duration-300"
+          enter-from="opacity-0"
+          enter-to=""
+          leave="transition-opacity ease-linear duration-300"
+          leave-from=""
+          leave-to="opacity-0"
+        >
+          <div class="fixed inset-0 bg-black/85"></div>
         </TransitionChild>
 
         <div class="fixed inset-0 flex">
-          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
+          <TransitionChild
+            as="template"
+            enter="transition ease-in-out duration-300 transform"
+            enter-from="-translate-x-full"
+            enter-to="translate-x-0"
+            leave="transition ease-in-out duration-300 transform"
+            leave-from="translate-x-0"
+            leave-to="-translate-x-full"
+          >
             <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
-              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="" leave="ease-in-out duration-300" leave-from="" leave-to="opacity-0">
+              <TransitionChild
+                as="template"
+                enter="ease-in-out duration-300"
+                enter-from="opacity-0"
+                enter-to=""
+                leave="ease-in-out duration-300"
+                leave-from=""
+                leave-to="opacity-0"
+              >
                 <div class="absolute top-0 left-full flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 rounded-md p-2.5 text-white hover:bg-white/10" @click="this.isSidebarOpen = false">
-                    <span class="sr-only">Close sidebar</span>
-                    <XMarkIcon class="size-6 text-white" aria-hidden="true" />
+                  <button
+                    type="button"
+                    class="-m-2.5 rounded-xl p-2.5 text-white hover:bg-white/10"
+                    @click="isSidebarOpen = false"
+                  >
+                    <span class="sr-only">Fechar menu</span>
+                    <XMarkIcon class="size-6" aria-hidden="true" />
                   </button>
                 </div>
               </TransitionChild>
 
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-black px-6 pb-4">
-                <div class="relative flex h-16 shrink-0 items-center border-b border-orange-500/40">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=500" alt="Your Company" />
-                </div>
-                <nav class="relative flex flex-1 flex-col">
-                  <ul role="list" class="flex flex-1 flex-col gap-y-7">
-                    <li>
-                      <ul role="list" class="-mx-2 space-y-1">
-                        <li v-for="item in navigation" :key="item.name">
-                          <a :href="item.href" :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
-                            <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300 group-hover:text-orange-200', 'size-6 shrink-0']" aria-hidden="true" />
-                            {{ item.name }}
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>
-                      <div class="text-xs/6 font-semibold uppercase tracking-wide text-orange-300">Seus times</div>
-                      <ul role="list" class="-mx-2 mt-2 space-y-1">
-                        <li v-for="team in teams" :key="team.name">
-                          <a :href="team.href" :class="[team.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
-                            <span :class="[team.current ? 'border-black/20 bg-white text-black' : 'border-orange-300/40 bg-black text-orange-200 group-hover:border-orange-300 group-hover:text-orange-100', 'flex size-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium']">{{ team.initial }}</span>
-                            <span class="truncate">{{ team.name }}</span>
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-white hover:bg-orange-500/20 hover:text-orange-300 transition-colors">
-                        <Cog6ToothIcon class="size-6 shrink-0 text-orange-300 group-hover:text-orange-200" aria-hidden="true" />
-                        Configurações
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
+              <aside class="flex min-h-full grow flex-col border-r border-white/10 bg-[#070707]">
+                <SidebarContent
+                  :navigation="navigation"
+                  :user="user"
+                  :user-navigation="userNavigation"
+                />
+              </aside>
             </DialogPanel>
           </TransitionChild>
         </div>
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-black">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-orange-500/30 bg-black px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center border-b border-orange-500/40">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=500" alt="Your Company" />
+    <aside class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+      <div class="flex grow flex-col border-r border-white/10 bg-[#070707]">
+        <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-6">
+          <div class="flex size-10 items-center justify-center rounded-sm bg-orange-500 shadow-[0_0_24px_rgba(249,115,22,0.35)]">
+            <BoltIcon class="size-6 text-white" aria-hidden="true" />
+          </div>
+
+          <div>
+            <p class="text-sm font-black leading-4 tracking-tight text-white">
+              SisBrasFute
+            </p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+              Gestão de Clubes
+            </p>
+          </div>
         </div>
-        <nav class="flex flex-1 flex-col">
-          <ul role="list" class="flex flex-1 flex-col gap-y-7">
-            <li v-for="item in navigation" :key="item.name">
-              <a v-if="!item.children" :href="item.href" :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
-                <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300 group-hover:text-orange-200', 'size-6 shrink-0']" aria-hidden="true" />
-                {{ item.name }}
-              </a>
-              <Disclosure as="div" v-else v-slot="{ open }">
-                <DisclosureButton :class="[item.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm/6 font-semibold transition-colors']">
-                  <component :is="item.icon" :class="[item.current ? 'text-black' : 'text-orange-300', 'size-6 shrink-0']" aria-hidden="true" />
-                  {{ item.name }}
-                  <ChevronRightIcon :class="[open ? 'rotate-90 text-orange-200' : 'text-orange-300', 'ml-auto size-5 shrink-0 transition-transform']" aria-hidden="true" />
-                </DisclosureButton>
-                <DisclosurePanel as="ul" class="mt-1 px-2">
-                  <li v-for="subItem in item.children" :key="subItem.name">
-                    <DisclosureButton as="a" :href="subItem.href" :class="[subItem.current ? 'bg-orange-500 text-black' : 'text-white/90 hover:bg-orange-500/20 hover:text-orange-200', 'block rounded-md py-2 pr-2 pl-9 text-sm/6 transition-colors']">{{ subItem.name }}</DisclosureButton>
-                  </li>
-                </DisclosurePanel>
-              </Disclosure>
-            </li>
-            <li>
-              <div class="text-xs/6 font-semibold uppercase tracking-wide text-orange-300">Seus times</div>
-              <ul role="list" class="-mx-2 mt-2 space-y-1">
-                <li v-for="team in teams" :key="team.name">
-                  <a :href="team.href" :class="[team.current ? 'bg-orange-500 text-black' : 'text-white hover:bg-orange-500/20 hover:text-orange-300', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-colors']">
-                    <span :class="[team.current ? 'border-black/20 bg-white text-black' : 'border-orange-300/40 bg-black text-orange-200 group-hover:border-orange-300 group-hover:text-orange-100', 'flex size-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium']">{{ team.initial }}</span>
-                    <span class="truncate">{{ team.name }}</span>
+
+        <div class="px-4 pt-5">
+          <div class="flex items-center gap-3 border border-white/10 bg-white/[0.04] p-3 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
+            <div class="flex size-12 shrink-0 items-center justify-center bg-gradient-to-br from-orange-400 to-orange-700 text-lg font-black text-white shadow-[0_0_24px_rgba(249,115,22,0.35)]">
+              5
+            </div>
+
+            <div class="min-w-0">
+              <p class="truncate text-sm font-black text-white">
+                Quinta Liga FC
+              </p>
+              <div class="mt-1 flex items-center gap-1.5">
+                <span class="size-1.5 rounded-full bg-emerald-400"></span>
+                <span class="truncate text-xs font-medium text-zinc-500">
+                  Temporada 2026 • Ativo
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="flex flex-1 flex-col overflow-y-auto px-4 py-6">
+          <div class="space-y-7">
+            <div>
+              <p class="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-zinc-600">
+                Navegação
+              </p>
+
+              <ul role="list" class="space-y-1">
+                <li v-for="item in navigation" :key="item.name">
+                  <a
+                    v-if="!item.children"
+                    :href="item.href"
+                    :class="[
+                      isCurrentRoute(item.href)
+                        ? 'bg-orange-500 text-white shadow-[0_0_26px_rgba(249,115,22,0.28)]'
+                        : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white',
+                      'group flex items-center gap-x-3 px-3 py-3 text-sm font-black transition-all'
+                    ]"
+                  >
+                    <component
+                      :is="item.icon"
+                      :class="[
+                        isCurrentRoute(item.href)
+                          ? 'text-white'
+                          : 'text-zinc-500 group-hover:text-orange-400',
+                        'size-5 shrink-0 transition-colors'
+                      ]"
+                      aria-hidden="true"
+                    />
+
+                    {{ item.name }}
                   </a>
+
+                  <Disclosure v-else as="div" v-slot="{ open }">
+                    <DisclosureButton
+                      :class="[
+                        item.children.some((child) => isCurrentRoute(child.href))
+                          ? 'bg-orange-500 text-white shadow-[0_0_26px_rgba(249,115,22,0.28)]'
+                          : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white',
+                        'group flex w-full items-center gap-x-3 px-3 py-3 text-left text-sm font-black transition-all'
+                      ]"
+                    >
+                      <component
+                        :is="item.icon"
+                        :class="[
+                          item.children.some((child) => isCurrentRoute(child.href))
+                            ? 'text-white'
+                            : 'text-zinc-500 group-hover:text-orange-400',
+                          'size-5 shrink-0 transition-colors'
+                        ]"
+                        aria-hidden="true"
+                      />
+
+                      {{ item.name }}
+
+                      <ChevronRightIcon
+                        :class="[
+                          open ? 'rotate-90 text-orange-400' : 'text-zinc-600',
+                          'ml-auto size-4 shrink-0 transition-transform'
+                        ]"
+                        aria-hidden="true"
+                      />
+                    </DisclosureButton>
+
+                    <DisclosurePanel as="ul" class="mt-1 space-y-1 border-l border-white/10 pl-4">
+                      <li v-for="subItem in item.children" :key="subItem.name">
+                        <DisclosureButton
+                          as="a"
+                          :href="subItem.href"
+                          :class="[
+                            isCurrentRoute(subItem.href)
+                              ? 'bg-orange-500/15 text-orange-400'
+                              : 'text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-200',
+                            'block px-3 py-2 text-sm font-bold transition-colors'
+                          ]"
+                        >
+                          {{ subItem.name }}
+                        </DisclosureButton>
+                      </li>
+                    </DisclosurePanel>
+                  </Disclosure>
                 </li>
               </ul>
-            </li>
-            <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-white hover:bg-orange-500/20 hover:text-orange-300 transition-colors">
-                <Cog6ToothIcon class="size-6 shrink-0 text-orange-300 group-hover:text-orange-200" aria-hidden="true" />
-                Configurações
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
+            </div>
+          </div>
 
-    <div class="lg:pl-72">
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-orange-200 bg-white/95 px-4 shadow-sm backdrop-blur sm:gap-x-6 sm:px-6 lg:px-8">
-        <button type="button" class="-m-2.5 rounded-md p-2.5 text-black hover:bg-orange-100 lg:hidden" @click="this.isSidebarOpen = true">
-          <span class="sr-only">Open sidebar</span>
-          <Bars3Icon class="size-6" aria-hidden="true" />
-        </button>
-
-        <div class="h-6 w-px bg-orange-200 lg:hidden" aria-hidden="true"></div>
-
-        <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex items-center gap-x-4 lg:gap-x-6">
-            <button type="button" class="-m-2.5 rounded-md p-2.5 text-black hover:bg-orange-100 hover:text-orange-600 transition-colors">
-              <span class="sr-only">View notifications</span>
-              <BellIcon class="size-6" aria-hidden="true" />
-            </button>
-
-            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-orange-200" aria-hidden="true"></div>
-
+          <div class="mt-auto border-t border-white/10 pt-4">
             <Menu as="div" class="relative">
-              <MenuButton class="relative flex items-center rounded-md p-1 hover:bg-orange-100 transition-colors">
-                <span class="absolute -inset-1.5"></span>
-                <span class="sr-only">Open user menu</span>
-                <!--img class="size-8 rounded-full bg-orange-100 outline -outline-offset-1 outline-orange-300" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" /-->
-                <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-black" aria-hidden="true">{{ user.name }}</span>
-                  <ChevronDownIcon class="ml-2 size-5 text-orange-500" aria-hidden="true" />
-                </span>
+              <MenuButton class="flex w-full items-center gap-3 bg-white/[0.04] p-3 text-left hover:bg-white/[0.07]">
+                <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white">
+                  {{ userInitials }}
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-black text-white">
+                    {{ user.name || 'Usuário' }}
+                  </p>
+                  <p class="truncate text-xs font-semibold text-zinc-500">
+                    Gestor do Clube
+                  </p>
+                </div>
+
+                <ChevronDownIcon class="size-4 text-zinc-500" aria-hidden="true" />
               </MenuButton>
-              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md border border-orange-200 bg-white py-2 shadow-lg">
+
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <MenuItems class="absolute bottom-full left-0 z-10 mb-2 w-full origin-bottom-left border border-white/10 bg-[#111111] py-2 shadow-2xl">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-orange-50 text-orange-700' : 'text-black', 'block px-3 py-1 text-sm/6']">{{ item.name }}</a>
+                    <a
+                      :href="item.href"
+                      :class="[
+                        active ? 'bg-orange-500 text-white' : 'text-zinc-300',
+                        'block px-4 py-2 text-sm font-bold'
+                      ]"
+                    >
+                      {{ item.name }}
+                    </a>
                   </MenuItem>
                 </MenuItems>
               </transition>
             </Menu>
           </div>
-        </div>
+        </nav>
       </div>
+    </aside>
 
-      <main class="py-10">
-        <div class="px-4 sm:px-6 lg:px-8">
-          <slot />
+    <div class="lg:pl-72">
+      <header class="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b border-white/10 bg-black/90 px-4 backdrop-blur sm:px-6 lg:px-8">
+        <button
+          type="button"
+          class="-m-2.5 rounded-xl p-2.5 text-zinc-300 hover:bg-white/10 hover:text-white lg:hidden"
+          @click="isSidebarOpen = true"
+        >
+          <span class="sr-only">Abrir menu</span>
+          <Bars3Icon class="size-6" aria-hidden="true" />
+        </button>
+
+        <div class="ml-4 hidden items-center gap-2 text-sm font-bold text-zinc-600 lg:flex">
+          <span>SisBrasFute</span>
+          <span>/</span>
+          <span class="text-white">{{ currentPageName }}</span>
+        </div>
+
+        <div class="ml-auto flex items-center gap-3">
+          <button
+            type="button"
+            class="relative rounded-xl p-2 text-zinc-500 hover:bg-white/10 hover:text-orange-400"
+          >
+            <span class="sr-only">Notificações</span>
+            <BellIcon class="size-5" aria-hidden="true" />
+            <span class="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-orange-500"></span>
+          </button>
+
+          <div class="hidden border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-xs font-black text-orange-400 sm:block">
+            Futebol
+          </div>
+
+          <div class="flex size-8 items-center justify-center rounded-full bg-orange-500 text-sm font-black text-white">
+            5
+          </div>
+        </div>
+      </header>
+
+      <main class="min-h-[calc(100vh-4rem)] bg-black">
+        <div class="px-4 py-8 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-[1920px]">
+            <slot />
+          </div>
         </div>
       </main>
     </div>
@@ -269,6 +390,13 @@ export default {
     go(route) {
       this.fabOpen = false;
       this.$router.push(route);
+    },
+    isCurrentRoute(href) {
+      if (!href || href === "#") {
+        return false;
+      }
+
+      return this.$route.path === href || this.$route.path.startsWith(`${href}/`);
     },
   },
 };
