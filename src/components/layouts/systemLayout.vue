@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-black text-zinc-100">
+  <div class="min-h-screen ">
     <TransitionRoot as="template" :show="isSidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="isSidebarOpen = false">
         <TransitionChild
@@ -266,7 +266,7 @@
         </div>
       </header>
 
-      <main class="min-h-[calc(100vh-4rem)] bg-black">
+      <main class="min-h-[calc(100vh-4rem)]">
         <div class="px-4 py-8 sm:px-6 lg:px-8">
           <div class="mx-auto max-w-[1920px]">
             <slot />

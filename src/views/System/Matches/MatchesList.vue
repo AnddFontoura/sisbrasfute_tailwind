@@ -8,6 +8,14 @@
 
       </team-banner>
 
+      <orange-button
+        v-if="teamId"
+        :url="{ name: 'team-players-list', params: { teamId: this.teamId } }"
+        text="Registrar nova partida"
+      >
+    
+      </orange-button>
+
       <!-- FILTROS -->
       <div class="mt-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
 
@@ -210,6 +218,7 @@ import TeamBanner from "@/components/team/teamBanner.vue";
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 import stateSelectComponent from "@/components/form/StateSelectComponent.vue";
 import citySelectComponent from "@/components/form/CitySelectComponent.vue";
+import OrangeButton from "@/components/button/OrangeButton.vue";
 
 export default {
   name: "MatchesList",
@@ -218,7 +227,8 @@ export default {
     CitySelect,
     StateSelect,
     systemLayout,
-    PaginationComponent
+    PaginationComponent,
+    OrangeButton,
   },
   data() {
     return {
