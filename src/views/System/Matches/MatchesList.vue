@@ -10,7 +10,7 @@
 
       <orange-button
         v-if="teamId"
-        :url="{ name: 'team-players-list', params: { teamId: this.teamId } }"
+        :url="{ name: 'team-matches-form', params: { teamId: this.teamId } }"
         text="Registrar nova partida"
       >
     

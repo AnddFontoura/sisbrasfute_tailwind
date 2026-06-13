@@ -24,6 +24,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/matches/form',
+    name: 'team-matches-form',
+    component: () => import('../views/System/Matches/MatchesForm.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team/show/:id',
     name: 'team-show',
     component: () => import('../views/System/Team/TeamShow.vue'),
