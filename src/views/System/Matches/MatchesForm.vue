@@ -287,7 +287,7 @@
           />
         </div>
         
-        <div class="mt-20 p-2 col-span-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5">
+        <div class="mt-20 p-2 col-span-2 rounded-xl ">
           <label class="block text-sm font-semibold text-slate-900 dark:text-white">Indicar posições de jogadores?</label>
           <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Ative essa opção para abrir a configuração detalhada da partida.</p>
           <Multiselect
@@ -302,7 +302,7 @@
           />
         </div>
 
-        <div v-if="form.indicatePositions" class="mt-3 p-2 col-span-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5">
+        <div v-if="form.indicatePositions" class="mt-3 p-2 col-span-2">
           <div class="flex items-center justify-between gap-3">
             <div>
               <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Configuração da partida</h3>
@@ -320,6 +320,7 @@
                     v-model.number="form.playersCount"
                     type="number"
                     min="1"
+                    max="30"
                     class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   />
                 </div>
@@ -369,18 +370,16 @@
                 <div
                   v-for="(position, index) in form.positions"
                   :key="index"
-                  class="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5 md:grid-cols-[1.1fr_180px_auto]"
+                  class="grid items-end gap-3 md:grid-cols-[1.1fr_180px_auto]"
                 >
-                  <div>
-                    <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Posição</label>
+                  <div class="pt-2">
                     <GamePositionSelect
                       v-model="position.selectedPositions"
-                      is-multiselect="multiple"
+                      is-multiselect="single"
                       :team-id="form.teamId"
                     />
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Selecionadas: {{ position.name || 'Nenhuma' }}</p>
                   </div>
-                  <div>
+                  <div class="">
                     <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Valor em R$</label>
                     <input
                       v-model.number="position.price"
@@ -456,10 +455,7 @@ export default {
         teamsCount: 1,
         matchType: null,
         positions: [
-          { name: 'Atacante', price: 0, selectedPositions: [] },
-          { name: 'Meio', price: 0, selectedPositions: [] },
-          { name: 'Zagueiro', price: 0, selectedPositions: [] },
-          { name: 'Goleiro', price: 0, selectedPositions: [] },
+          { name: '', price: 0, selectedPositions: [] },
         ],
       },
       stateId: null,
