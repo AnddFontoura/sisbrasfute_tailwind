@@ -193,12 +193,23 @@
           <div
             class="px-4 pb-4 grid gap-2 grid-cols-1"
           >
-            <button
-              @click="$router.push({ name: 'matches-show', params: { id: matchInformation.id } })"
-              class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
+            <orange-button
+              :url="{ name: 'matches-show', params: { id: matchInformation.id } }"
+              text="Visualizar"
             >
-              Visualizar
-            </button>
+            </orange-button>
+
+            <orange-button
+              :url="{ name: 'matches-edit', params: { id: matchInformation.id } }"
+              text="Editar"
+            >
+            </orange-button>
+
+            <orange-button
+              :url="{ name: 'team-matches-manage', params: { teamId: matchInformation.created_by_team_id, matchId: matchInformation.id } }"
+              text="Administrar"
+            >
+            </orange-button>
           </div>
         </div>
       </div>
