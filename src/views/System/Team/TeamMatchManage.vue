@@ -83,8 +83,7 @@
 
               <div class="mt-3 space-y-3">
                 <div
-                  v-for="(position, index) in form.positions"
-                  :key="index"
+                  v-for="dataPositions in form.playersCount"
                   class="grid items-end gap-3 md:grid-cols-[1.1fr_180px_auto]"
                 >
                   <div class="pt-2">
@@ -169,7 +168,11 @@ export default {
       positionToggleOptions: [
         { name: 'Sim', id: true },
         { name: 'Não', id: false },
-      ]
+      ],
+      position:[{
+        price: '',
+        selectedPositions: '',
+      }],
     }
   },
   mounted () {
