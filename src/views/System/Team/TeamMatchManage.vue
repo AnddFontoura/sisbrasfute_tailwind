@@ -1,7 +1,7 @@
 <template>
   <system-layout>
     <form @submit.prevent="handleSubmit" class="space-y-4">
-      <div class="grid grid-cols-2 mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">        
+      <div class="grid grid-cols-2 mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div class="mt-20 p-2 col-span-2 rounded-xl ">
           <label class="block text-sm font-semibold text-slate-900 dark:text-white">Indicar posições de jogadores?</label>
           <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Ative essa opção para abrir a configuração detalhada da partida.</p>
@@ -83,14 +83,22 @@
 
               <div class="mt-3 space-y-3">
                 <div
-                  v-for="dataPositions in form.playersCount"
+                  v-for="(position, index) in form.positions"
                   class="grid items-end gap-3 md:grid-cols-[1.1fr_180px_auto]"
+                  :key="index"
                 >
                   <div class="pt-2">
-                    <GamePositionSelect
-                      v-model="position.selectedPositions"
-                      is-multiselect="single"
-                      :team-id="form.teamId"
+                    <Multiselect
+                      mode="single"
+                      id="stateSelect"
+                      v-model="position.game_position_id"
+                      :options="this.gamePositions"
+                      track-by="name"
+                      label="name"
+                      :searchable="true"
+                      value-prop="id"
+                      :close-on-select="false"
+                      :clear-on-select="false"
                     />
                   </div>
                   <div class="">
@@ -137,6 +145,7 @@ import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserCom
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
+import { fetchGamePositions } from "@/services/gamePositionService"
 
 export default {
   name: "MatchesForm",
@@ -149,6 +158,7 @@ export default {
     TeamsManagedByUserComponent,
     Multiselect,
     QuillEditor,
+    fetchGamePositions,
   },
   data() {
     return {
@@ -157,9 +167,6 @@ export default {
         playersCount: 1,
         teamsCount: 1,
         matchType: null,
-        positions: [
-          { name: '', price: 0, selectedPositions: [] },
-        ],
       },
       matchTypeOptions: [
         { name: 'Partida entre o time', id: 'team_match' },
@@ -169,14 +176,23 @@ export default {
         { name: 'Sim', id: true },
         { name: 'Não', id: false },
       ],
-      position:[{
-        price: '',
-        selectedPositions: '',
-      }],
+      gamePositions: [],
     }
   },
-  mounted () {
+  async mounted() {
+    this.gamePositions = await fetchGamePositions(this.form.teamId)
     this.matchId = this.$route.params?.id
+  },
+  watch: {
+    'form.playersCount'(newValue) {
+      this.form.positions = Array.from(
+        { length: newValue },
+        () => ({
+          game_position_id: null,
+          price: 0,
+        })
+      );
+    }
   },
   methods: {
    async getMatchInfo()

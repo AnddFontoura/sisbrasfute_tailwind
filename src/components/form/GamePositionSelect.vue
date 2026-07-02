@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import api from "@/services/api"
+import { fetchGamePositions } from "@/services/gamePositionService"
 import Multiselect from '@vueform/multiselect'
 
 export default {
@@ -61,12 +61,9 @@ export default {
   },
   async mounted() {
     try {
-      const { data } = await api.get("/game-positions/list", {
-        params: { teamId: this.teamId }
-      })
-      this.playerPositions = data.gamePositions
+      this.playerPositions = await fetchGamePositions(this.teamId)
     } catch (err) {
-      console.error("Erro ao carregar estados:", err)
+      console.error("Erro ao carregar posições:", err)
     }
   },
 }

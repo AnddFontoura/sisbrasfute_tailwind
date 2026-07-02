@@ -47,11 +47,12 @@
               </TransitionChild>
 
               <aside class="flex min-h-full grow flex-col border-r border-white/10 bg-[#070707]">
-                <SidebarContent
+                <div
                   :navigation="navigation"
                   :user="user"
                   :user-navigation="userNavigation"
-                />
+                >
+                </div>
               </aside>
             </DialogPanel>
           </TransitionChild>
@@ -306,7 +307,8 @@ import {
   XMarkIcon,
   MagnifyingGlassIcon,
   ChevronDownIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  BoltIcon,
 } from "@heroicons/vue/20/solid";
 
 export default {
@@ -321,6 +323,7 @@ export default {
     TransitionRoot,
     Bars3Icon,
     BellIcon,
+    BoltIcon,
     CalendarIcon,
     ChartPieIcon,
     Cog6ToothIcon,
@@ -341,6 +344,7 @@ export default {
     return {
       user: {},
       isSidebarOpen: true,
+      userInitials: 'A',
       navigation: [
         { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
         {
@@ -379,7 +383,8 @@ export default {
         { name: "Meus Times", href: "#" },
         { name: "Meu Perfil", href: "/player-profile/form" },
         { name: "Sair", href: "/logout" },
-      ]
+      ],
+      currentPageName: false,
     };
   },
   mounted() {
