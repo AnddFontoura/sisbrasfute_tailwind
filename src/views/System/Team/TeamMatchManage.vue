@@ -117,7 +117,7 @@
                     @click="removePosition(index)"
                     class="inline-flex h-fit items-center justify-center rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-200"
                   >
-                    Remover
+                    Remover #{{ index + 1}}
                   </button>
                 </div>
               </div>
@@ -171,6 +171,7 @@ export default {
       matchTypeOptions: [
         { name: 'Partida entre o time', id: 'team_match' },
         { name: 'Amistoso', id: 'friendly' },
+        { name: 'Campeonato', id: 'championship' },
       ],
       positionToggleOptions: [
         { name: 'Sim', id: true },
@@ -195,6 +196,16 @@ export default {
     }
   },
   methods: {
+    addPosition() {
+      this.form.positions.push({
+        game_position_id: null,
+        price: 0,
+      });
+    },
+    removePosition(index) {
+      this.form.positions.splice(index, 1);
+      this.form.playersCount -= 1;
+    },
    async getMatchInfo()
     {
       if (this.matchId) {
