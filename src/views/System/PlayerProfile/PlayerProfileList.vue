@@ -10,13 +10,16 @@
               rounded-xl
               shadow-lg
               overflow-hidden
-              bg-white border
+              bg-white
+              border
+              border-orange-500
             "
         >
           <!-- Título -->
           <div
             class="
-                bg-green-200
+                text-white
+                bg-orange-500
                 text-center
                 py-3
               "
@@ -25,7 +28,6 @@
               class="
                   text-xl
                   font-bold
-                  text-gray-800
                 "
             >
               {{ player.name }}
@@ -60,6 +62,8 @@
                   p-2
                   rounded-lg
                   shadow-md
+                  border
+                  border-orange-500
                 "
             >
               <img
@@ -129,22 +133,25 @@
             <router-link
               :to="{ name: 'player-profile-show', params: { id: player.id } }"
               class="
-                inline-flex
-                justify-center
-                rounded-md
-                bg-blue-500
-                hover:bg-blue-700
-                px-3
-                py-2
-                text-sm
-                font-semibold
-                text-white
-                shadow-xs
-                dark:bg-white/10
-                dark:text-white
-                dark:shadow-none
-                dark:inset-ring-white/5
-                dark:hover:bg-white/20
+                  w-full
+                  inline-flex
+                  items-center
+                  justify-center
+                  rounded-xl
+                  px-5
+                  py-3
+                  text-sm
+                  font-semibold
+                  text-white
+                  shadow-sm
+                  transition
+                  duration-200
+                  bg-orange-500
+                  hover:bg-orange-600
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-orange-300
+                  focus:ring-offset-2
               "
             >
               Visualizar
