@@ -1,7 +1,7 @@
 <template>
   <system-layout>
     <main>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
         <div
           v-for="(player, key) in players"
           class="
@@ -130,32 +130,11 @@
           <div
             class="px-4 pb-4 grid gap-2 grid-cols-1"
           >
-            <router-link
-              :to="{ name: 'player-profile-show', params: { id: player.id } }"
-              class="
-                  w-full
-                  inline-flex
-                  items-center
-                  justify-center
-                  rounded-xl
-                  px-5
-                  py-3
-                  text-sm
-                  font-semibold
-                  text-white
-                  shadow-sm
-                  transition
-                  duration-200
-                  bg-orange-500
-                  hover:bg-orange-600
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-orange-300
-                  focus:ring-offset-2
-              "
+            <orange-button
+              :url="{ name: 'player-profile-show', params: { id: player.id } }"
+              text="Visualizar"
             >
-              Visualizar
-            </router-link>
+            </orange-button>
           </div>
         </div>
       </div>
@@ -169,10 +148,16 @@ import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
+import OrangeButton from "@/components/button/OrangeButton.vue";
 
 export default {
   name: "playerProfileList",
-  components: {CitySelect, StateSelect, systemLayout},
+  components: {
+    CitySelect,
+    StateSelect,
+    systemLayout,
+    OrangeButton
+  },
 
   data() {
     return {

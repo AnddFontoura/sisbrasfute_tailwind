@@ -96,7 +96,7 @@
                     class="
                       w-6
                       h-6
-                      text-black
+                      text-white
                     "
                   >
 
@@ -106,8 +106,7 @@
                   class="
                     text-sm
                     font-semibold
-                    text-black
-                    dark:text-black
+                    text-white
                     text-center
                   "
                 >
