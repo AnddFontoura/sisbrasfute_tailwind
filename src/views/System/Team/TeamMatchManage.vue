@@ -36,7 +36,7 @@
                     type="number"
                     min="1"
                     max="30"
-                    class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                    class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   />
                 </div>
 
@@ -46,7 +46,7 @@
                     v-model.number="form.teamsCount"
                     type="number"
                     min="1"
-                    class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                    class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   />
                 </div>
 
@@ -75,7 +75,7 @@
                 <button
                   type="button"
                   @click="addPosition"
-                  class="rounded-md bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
+                  class="rounded-md bg-orange-500 px-3 py-2 text-xs font-semibold text-white hover:bg-orange-600"
                 >
                   Adicionar posição
                 </button>
@@ -109,7 +109,7 @@
                       min="0"
                       step="0.5"
                       placeholder="Valor em R$"
-                      class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                      class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                     />
                   </div>
                   <button
@@ -126,7 +126,7 @@
         </div>
 
         <div class="mt-20 col-span-2">
-          <button type="submit" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700">
+          <button type="submit" class="w-full rounded-md bg-orange-500 px-4 py-2 text-white font-semibold hover:bg-orange-600">
             Salvar partida
           </button>
         </div>
@@ -137,28 +137,18 @@
 
 <script>
 import GamePositionSelect from "@/components/form/GamePositionSelect.vue";
-import ModalitiesSelect from "@/components/form/ModalitiesSelect.vue";
 import SystemLayout from "@/components/layouts/systemLayout.vue";
-import CitySelectComponent from "@/components/form/CitySelectComponent.vue";
-import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
-import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserComponent.vue";
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
-import {QuillEditor} from "@vueup/vue-quill";
 import { fetchGamePositions } from "@/services/gamePositionService"
+import Swal from "@/services/swal.js";
 
 export default {
   name: "MatchesForm",
   components: {
     SystemLayout,
     GamePositionSelect,
-    ModalitiesSelect,
-    CitySelectComponent,
-    StateSelectComponent,
-    TeamsManagedByUserComponent,
     Multiselect,
-    QuillEditor,
-    fetchGamePositions,
   },
   data() {
     return {
@@ -215,7 +205,14 @@ export default {
 
         } catch (err) {
           console.error(err);
-          alert("Erro ao puxar dados do jogador!");
+          await Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Erro ao puxar dados do jogador!',
+            showConfirmButton: false,
+            timer: 3000,
+          })
         } finally {
           this.loading = false;
         }
@@ -247,7 +244,14 @@ export default {
         this.$router.push("/player-profile/form")
       } catch (err) {
         console.error(err)
-        alert("Erro ao salvar jogador!")
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro ao salvar jogador!',
+          showConfirmButton: false,
+          timer: 3000,
+        })
       } finally {
         this.loading = false
       }

@@ -11,7 +11,7 @@
           class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
         >
           <svg
-            class="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400"
+            class="h-10 w-10 animate-spin text-orange-500 dark:text-orange-400"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -67,13 +67,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
             />
           </div>
@@ -100,13 +100,13 @@
                 outline-gray-300
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:*:bg-gray-800
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
             >
               <option value="0">Selecione</option>
@@ -137,13 +137,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
             >
               <option value="1">Futsal</option>
@@ -186,13 +186,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
             />
           </div>
@@ -206,7 +206,7 @@
               <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
                 <div class="text-center">
                   <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                    <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                    <label for="logo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-orange-500 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-orange-500 hover:text-orange-500 dark:text-orange-400 dark:focus-within:outline-orange-500 dark:hover:text-orange-300">
                       <span>Upload a file</span>
                       <input
                         id="logo-upload"
@@ -234,7 +234,7 @@
               <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
                 <div class="text-center">
                   <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                    <label for="banner-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                    <label for="banner-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-orange-500 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-orange-500 hover:text-orange-500 dark:text-orange-400 dark:focus-within:outline-orange-500 dark:hover:text-orange-300">
                       <span>Upload a file</span>
                       <input
                         id="banner-upload"
@@ -258,7 +258,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Youtube</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://youtube.com/</div>
                   <input v-model="form.playerYoutube" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -270,7 +270,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Facebook</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://facebook.com/</div>
                   <input v-model="form.teamFacebook" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -282,7 +282,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">X (Antigo Twitter)</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://x.com/</div>
                   <input v-model="form.playerX" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -294,7 +294,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Instagram</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.instagram.com/</div>
                   <input v-model="form.teamInstagram" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -306,7 +306,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Tiktok</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://tiktok.com/</div>
                   <input v-model="form.teamTiktok" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -318,7 +318,7 @@
             <div class="sm:col-span-4">
               <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Kwai</label>
               <div class="mt-2">
-                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
                   <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.kwai.com/</div>
                   <input v-model="form.teamKwaii" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
                 </div>
@@ -337,15 +337,15 @@
                 justify-center
                 gap-2
                 rounded-md
-                bg-indigo-600
+                bg-orange-500
                 px-4
                 py-2
                 font-semibold
                 text-white
                 transition
-                hover:bg-indigo-700
+                hover:bg-orange-600
                 disabled:cursor-not-allowed
-                disabled:bg-indigo-400
+                disabled:bg-orange-400
                 disabled:opacity-80
               "
               :disabled="this.loading"
@@ -387,7 +387,7 @@ import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {QuillEditor} from "@vueup/vue-quill";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "NewTeam",

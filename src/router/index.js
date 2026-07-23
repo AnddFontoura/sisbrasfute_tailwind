@@ -33,7 +33,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
-  const isLoggedIn = !!auth.token || !!localStorage.getItem("token")
+  const isLoggedIn = !!auth.token || !!localStorage.getItem("access_token")
   const userRole = auth.user?.role || null // depende de como vem do backend
 
   // Bloqueia rota que precisa de login

@@ -79,13 +79,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -114,13 +114,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -149,13 +149,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -212,13 +212,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -248,13 +248,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -299,13 +299,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -354,7 +354,7 @@
                 type="number"
                 min="1"
                 max="30"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
@@ -366,7 +366,7 @@
                 v-model.number="form.teamsCount"
                 type="number"
                 min="1"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
           </div>
@@ -451,7 +451,7 @@
                 min="0"
                 step="0.5"
                 placeholder="Valor em R$"
-                class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
@@ -530,7 +530,8 @@ import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserCom
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
-import fetchGamePositions from "@/services/gamePositionService.js";
+import { fetchGamePositions } from "@/services/gamePositionService.js";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "MatchesForm",
@@ -543,7 +544,6 @@ export default {
     TeamsManagedByUserComponent,
     Multiselect,
     QuillEditor,
-    fetchGamePositions,
   },
   data() {
     return {
@@ -565,10 +565,12 @@ export default {
         matchType: null,
         positions: [],
       },
+      gamePositions: [],
       stateId: null,
       cityId: null,
       matchId: null,
-      isHomeTeam: null,
+      loading: false,
+      isEditing: false,
       homeOrVisitor: [
         {name: 'Mandante', id: 'home'},
         {name: 'Visitante', id: 'visitor'}
@@ -588,19 +590,29 @@ export default {
       ],
     }
   },
-  mounted() {
-    this.gamePositions = fetchGamePositions(this.form.teamId)
-    this.matchId = this.$route.params?.id
+  async mounted() {
+    this.matchId = this.$route.params?.id || null
+    this.form.teamId = this.$route.params?.teamId || null
+    this.isEditing = !!this.matchId
+
+    await this.loadGamePositions()
+
+    if (this.isEditing) {
+      await this.getMatchInfo()
+    }
   },
   watch: {
-    'form.playersCount'(newValue) {
-      this.form.positions = Array.from(
-        {length: newValue},
-        () => ({
-          game_position_id: null,
-          price: 0,
-        })
-      );
+    'form.playersCount'(newValue, oldValue) {
+      // Só reseta posições se estiver criando (não editando com dados carregados)
+      if (!this.isEditing || this.form.positions.length === 0) {
+        this.form.positions = Array.from(
+          {length: newValue},
+          () => ({
+            game_position_id: null,
+            price: 0,
+          })
+        );
+      }
     }
   },
   methods: {
@@ -613,44 +625,68 @@ export default {
     isChampionshipMatch() {
       return this.form.matchType === 'championship_match'
     },
+    async loadGamePositions() {
+      try {
+        this.gamePositions = await fetchGamePositions(this.form.teamId)
+      } catch (err) {
+        console.error("Erro ao carregar posições:", err)
+      }
+    },
     async getMatchInfo() {
-      if (this.matchId) {
-        try {
-          let response = await api.get("/matches/show/" + this.matchId)
-          let data = response.data
+      if (!this.matchId) return
 
-          this.form.myTeamIs = data.name ?? null
-          this.form.enemyTeamId = data.nickname ?? null
-          this.form.enemyTeamName = data.gamePositions ?? null
-          this.form.matchLocation = data.modalities ?? null
-          this.form.myTeamScore = data.birthdate ?? null
-          this.form.enemyTeamScore = data.height ?? null
-          this.form.hasPenalties = data.weight ?? null
-          this.form.enemyTeamPenaltyScore = data.foot_size ?? null
-          this.form.myTeamPenaltyScore = data.glove_size ?? null
-          this.form.matchSchedule = data.uniform_size ?? null
-          this.form.playersCount = data.playersCount ?? 1
-          this.form.teamsCount = data.teamsCount ?? 1
-          this.form.matchType = this.matchTypeOptions.find((option) => option.id === (data.matchType || data.type))?.id ?? null
-          this.form.indicatePositions = Boolean(data.positions?.length || data.matchType || data.type)
+      this.loading = true
+      try {
+        const response = await api.get("/matches/show/" + this.matchId)
+        const data = response.data
 
-          const positions = typeof data.positions === 'string' ? JSON.parse(data.positions) : data.positions
-          if (Array.isArray(positions) && positions.length) {
-            this.form.positions = positions.map((position) => ({
-              name: position.name || position,
-              price: Number(position.price ?? 0),
-              selectedPositions: Array.isArray(position.selectedPositions)
-                ? position.selectedPositions
-                : (typeof position.name === 'string' ? [{name: position.name}] : [])
-            }))
-          }
+        this.form.teamId = data.team_id ?? data.created_by_team_id ?? this.form.teamId
+        this.form.myTeamIs = data.my_team_is ?? data.home_away ?? null
+        this.form.enemyTeamId = data.enemy_team_id ?? null
+        this.form.enemyTeamName = data.enemy_team_name ?? data.visitor_team_name ?? null
+        this.form.matchLocation = data.match_location ?? data.description ?? null
+        this.form.myTeamScore = data.my_team_score ?? data.home_team_score ?? null
+        this.form.enemyTeamScore = data.enemy_team_score ?? data.visitor_team_score ?? null
+        this.form.hasPenalties = data.has_penalties ?? null
+        this.form.enemyTeamPenaltyScore = data.enemy_team_penalty_score ?? null
+        this.form.myTeamPenaltyScore = data.my_team_penalty_score ?? null
+        this.form.matchSchedule = data.match_schedule ?? data.schedule ?? null
+        this.form.playersCount = data.players_count ?? data.playersCount ?? 1
+        this.form.teamsCount = data.teams_count ?? data.teamsCount ?? 1
+        this.form.matchType = this.matchTypeOptions.find(
+          (option) => option.id === (data.match_type ?? data.type)
+        )?.id ?? null
+        this.stateId = data.state_id ?? data.city_info?.state_id ?? null
+        this.cityId = data.city_id ?? null
 
-        } catch (err) {
-          console.error(err);
-          alert("Erro ao puxar dados do jogador!");
-        } finally {
-          this.loading = false;
+        // Carrega posições corretamente
+        const positions = typeof data.positions === 'string'
+          ? JSON.parse(data.positions)
+          : data.positions
+
+        if (Array.isArray(positions) && positions.length) {
+          this.form.indicatePositions = true
+          this.form.positions = positions.map((position) => ({
+            game_position_id: position.game_position_id ?? position.id ?? null,
+            price: Number(position.price ?? 0),
+          }))
+          this.form.playersCount = this.form.positions.length
+        } else {
+          this.form.indicatePositions = !!this.form.matchType && this.form.matchType !== 'team_match'
         }
+
+      } catch (err) {
+        console.error(err)
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro ao carregar dados da partida',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.loading = false
       }
     },
     async handleSubmit() {
@@ -669,6 +705,11 @@ export default {
 
       formData.append("cityId", this.cityId ?? "")
 
+      // Inclui o ID da partida para o backend diferenciar criação/atualização
+      if (this.matchId) {
+        formData.append("matchId", this.matchId)
+      }
+
       try {
         await api.post("/matches/save", formData, {
           headers: {
@@ -676,24 +717,51 @@ export default {
           },
         })
 
-        this.$router.push("/player-profile/form")
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: this.isEditing ? 'Partida atualizada!' : 'Partida criada!',
+          showConfirmButton: false,
+          timer: 2000,
+        })
+
+        this.$router.push("/matches/list")
       } catch (err) {
         console.error(err)
-        alert("Erro ao salvar jogador!")
+        let data = err.response?.data
+        let mensagens = ""
+
+        if (data?.errors) {
+          mensagens = Object.values(data.errors).flat().join("<br> <br>")
+        } else if (data?.message) {
+          mensagens = data.message
+        } else {
+          mensagens = "Erro inesperado ao salvar partida."
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro encontrado!',
+          html: mensagens,
+          showConfirmButton: true,
+        })
       } finally {
         this.loading = false
       }
     },
     addPosition() {
-      this.form.playersCount++
       this.form.positions.push({
         game_position_id: null,
         price: 0,
       });
+      this.form.playersCount = this.form.positions.length
     },
     removePosition(index) {
       this.form.positions.splice(index, 1);
-      this.form.playersCount -= 1;
+      this.form.playersCount = this.form.positions.length
     },
   },
 }

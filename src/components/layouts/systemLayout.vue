@@ -108,12 +108,13 @@
                 <li v-for="item in navigation" :key="item.name">
                   <a
                     v-if="!item.children"
+                    @click.prevent="$router.push(item.href)"
                     :href="item.href"
                     :class="[
                       isCurrentRoute(item.href)
                         ? 'bg-orange-500 text-white shadow-[0_0_26px_rgba(249,115,22,0.28)]'
                         : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white',
-                      'group flex items-center gap-x-3 px-3 py-3 text-sm font-black transition-all'
+                      'group flex items-center gap-x-3 px-3 py-3 text-sm font-black transition-all cursor-pointer'
                     ]"
                   >
                     <component
@@ -166,11 +167,12 @@
                         <DisclosureButton
                           as="a"
                           :href="subItem.href"
+                          @click.prevent="$router.push(subItem.href)"
                           :class="[
                             isCurrentRoute(subItem.href)
                               ? 'bg-orange-500/15 text-orange-400'
                               : 'text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-200',
-                            'block px-3 py-2 text-sm font-bold transition-colors'
+                            'block px-3 py-2 text-sm font-bold transition-colors cursor-pointer'
                           ]"
                         >
                           {{ subItem.name }}
@@ -214,9 +216,10 @@
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                     <a
                       :href="item.href"
+                      @click.prevent="$router.push(item.href)"
                       :class="[
                         active ? 'bg-orange-500 text-white' : 'text-zinc-300',
-                        'block px-4 py-2 text-sm font-bold'
+                        'block px-4 py-2 text-sm font-bold cursor-pointer'
                       ]"
                     >
                       {{ item.name }}

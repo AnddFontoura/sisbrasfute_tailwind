@@ -125,20 +125,13 @@
 
 <script>
 import api from "@/services/api";
-import StateSelect from "@/components/form/StateSelectComponent.vue"
-import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
-import { MapIcon, MapPinIcon, CalendarIcon } from '@heroicons/vue/20/solid'
+import Swal from "@/services/swal.js";
 
 export default {
   name: "PlayerProfileShow",
   components: {
-    CitySelect,
-    StateSelect,
     systemLayout,
-    MapIcon,
-    MapPinIcon,
-    CalendarIcon,
   },
   data() {
     return {
@@ -162,7 +155,14 @@ export default {
 
         } catch (err) {
           console.error(err);
-          alert("Erro ao puxar lista do time");
+          await Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Erro ao puxar lista do time',
+            showConfirmButton: false,
+            timer: 3000,
+          })
         } finally {
           this.loading = false;
         }
