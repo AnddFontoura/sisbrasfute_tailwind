@@ -9,7 +9,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    vueDevTools({
+      enabled: process.env.NODE_ENV !== 'production',
+    }),
     tailwindcss(),
   ],
   resolve: {
@@ -17,4 +19,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-ui': ['@headlessui/vue', '@heroicons/vue'],
+          'vendor-forms': ['@vueform/multiselect', '@vueup/vue-quill'],
+          'vendor-utils': ['axios', 'sweetalert2'],
+        }
+      }
+    }
+  }
 })

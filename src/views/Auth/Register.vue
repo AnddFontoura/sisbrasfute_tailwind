@@ -103,8 +103,8 @@
 </template>
 
 <script>
-import axios from "axios"
 import api  from '@/services/api.js'
+import Swal from "sweetalert2"
 
 export default {
   name: "Register",
@@ -134,7 +134,20 @@ export default {
         this.$router.push("/login")
       } catch (error) {
         console.error("Erro no registro:", error.response?.data || error.message)
-        alert("Falha ao criar conta. Verifique os dados.")
+
+        let mensagens = "Falha ao criar conta. Verifique os dados."
+        if (error.response?.data?.errors) {
+          mensagens = Object.values(error.response.data.errors).flat().join("<br><br>")
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro no cadastro',
+          html: mensagens,
+          showConfirmButton: true,
+        })
       }
     }
   }

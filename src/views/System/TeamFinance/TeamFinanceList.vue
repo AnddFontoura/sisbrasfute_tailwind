@@ -122,6 +122,7 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
+import Swal from "sweetalert2";
 
 export default {
   name: "FinancesList",
@@ -182,7 +183,14 @@ export default {
           let response = await api.get("/team-finance/" + this.teamId, this.payload)
           this.finances = response.data
         } catch (err) {
-          alert("Erro ao puxar lista do time")
+          await Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Erro ao puxar lista do time',
+            showConfirmButton: false,
+            timer: 3000,
+          })
         } finally {
           this.loading = false
         }

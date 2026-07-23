@@ -303,6 +303,7 @@ import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserCom
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
+import Swal from "sweetalert2";
 
 export default {
   name: "MatchesForm",
@@ -370,7 +371,14 @@ export default {
 
         } catch (err) {
           console.error(err);
-          alert("Erro ao puxar dados do jogador!");
+          await Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Erro ao puxar dados do jogador!',
+            showConfirmButton: false,
+            timer: 3000,
+          })
         } finally {
           this.loading = false;
         }
@@ -397,7 +405,14 @@ export default {
         this.$router.push("/player-profile/form")
       } catch (err) {
         console.error(err)
-        alert("Erro ao salvar jogador!")
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro ao salvar jogador!',
+          showConfirmButton: false,
+          timer: 3000,
+        })
       } finally {
         this.loading = false
       }

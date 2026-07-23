@@ -55,28 +55,70 @@
         </city-select-component>
 
         <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Foto</label>
-
-          <div class="col-span-full">
-            <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Foto de Apresentação</label>
-            <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
-              <div class="text-center">
-                <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                  <label for="photo-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
-                    <span>Upload a file</span>
-                    <input
-                      id="photo-upload"
-                      name="photo-upload"
-                      type="file"
-                      class="sr-only"
-                      accept="image/*"
-                      @change="onPhotoChange"
-                    />
-                  </label>
-                  <p class="pl-1">or drag and drop</p>
-                </div>
-                <p class="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+            Foto de Apresentação
+          </label>
+          <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
+            <div class="text-center">
+              <!-- Imagem: preview, foto existente ou placeholder -->
+              <div class="mx-auto h-24 w-24 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
+                <img
+                  v-if="photoPreviewUrl"
+                  :src="photoPreviewUrl"
+                  alt="Foto do jogador"
+                  class="h-full w-full object-cover"
+                  @error="photoPreviewUrl = null; existingPhotoUrl = null"
+                />
+                <svg
+                  v-else
+                  class="h-full w-full text-gray-300 dark:text-gray-500"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+                </svg>
               </div>
+
+              <!-- Nome do arquivo -->
+              <p v-if="photoFileName" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {{ photoFileName }}
+              </p>
+
+              <!-- Input de upload -->
+              <div class="mt-4 flex justify-center text-sm text-gray-600 dark:text-gray-400">
+                <label
+                  for="photo-upload"
+                  class="relative cursor-pointer rounded-md font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                  :class="{ 'pointer-events-none opacity-50': loading }"
+                >
+                  <span>Escolher arquivo</span>
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    class="sr-only"
+                    accept="image/png,image/jpeg,image/gif"
+                    :disabled="loading"
+                    @change="onPhotoChange"
+                  />
+                </label>
+              </div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">PNG, JPG, GIF até 10MB</p>
+
+              <!-- Botão remover -->
+              <button
+                v-if="photoPreviewUrl || existingPhotoUrl"
+                type="button"
+                class="mt-2 text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+                :disabled="loading"
+                @click="onRemovePhoto"
+              >
+                Remover foto
+              </button>
+
+              <!-- Erro inline -->
+              <p v-if="photoError" class="mt-2 text-sm text-red-600 dark:text-red-400">
+                {{ photoError }}
+              </p>
             </div>
           </div>
         </div>
@@ -532,6 +574,11 @@ export default {
         { name: 'Não', id: 0}
       ],
       loading: false,
+      photoPreviewUrl: null,
+      photoFileName: null,
+      photoError: null,
+      removePhoto: false,
+      existingPhotoUrl: null,
     }
   },
   mounted () {
@@ -565,48 +612,98 @@ export default {
         this.form.playerFacebook = socialProfiles.facebook ?? null
         this.form.playerGDA = socialProfiles.gda ?? null
 
+        if (data.photo) {
+          const baseUrl = import.meta.env.VITE_API_BASE_URL
+          this.existingPhotoUrl = `${baseUrl}/${data.photo}`
+          this.photoPreviewUrl = this.existingPhotoUrl
+        }
+
       } finally {
         this.loading = false;
       }
     },
-    onPhotoChange(e) {
-      this.form.photoFile = e.target.files[0]
+    onPhotoChange(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/gif']
+      const maxSize = 10 * 1024 * 1024 // 10MB
+
+      if (file.size > maxSize) {
+        this.photoError = 'O arquivo excede o tamanho máximo de 10MB.'
+        event.target.value = ''
+        return
+      }
+
+      if (!allowedTypes.includes(file.type)) {
+        this.photoError = 'Formato não permitido. Use PNG, JPG ou GIF.'
+        event.target.value = ''
+        return
+      }
+
+      this.revokePreviewUrl()
+      this.form.photoFile = file
+      this.photoPreviewUrl = URL.createObjectURL(file)
+      this.photoFileName = file.name
+      this.photoError = null
+      this.removePhoto = false
+    },
+    onRemovePhoto() {
+      this.revokePreviewUrl()
+      this.photoPreviewUrl = null
+      this.form.photoFile = null
+      this.photoFileName = null
+      this.photoError = null
+      this.removePhoto = true
+    },
+    revokePreviewUrl() {
+      if (this.photoPreviewUrl && this.photoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.photoPreviewUrl)
+      }
     },
     async handleSubmit() {
-      this.loading = true;
+      this.loading = true
 
       const formData = new FormData()
 
       Object.entries(this.form).forEach(([key, value]) => {
+        if (key === 'photoFile') return // Exclui do loop genérico
+
         if (Array.isArray(value)) {
           value.forEach(item => {
             formData.append(`${key}[]`, item)
           })
         } else {
-          formData.append(key, value ?? "")
+          formData.append(key, value ?? '')
         }
       })
 
-      formData.append("playerCityId", this.cityId ?? "")
+      formData.append('playerCityId', this.cityId ?? '')
 
-      if (this.form.photoFile) {
-        formData.append("playerPhoto", this.form.photoFile)
+      // Adição condicional da foto
+      if (this.removePhoto) {
+        formData.append('removePhoto', '1')
+      } else if (this.form.photoFile) {
+        formData.append('playerPhoto', this.form.photoFile)
       }
 
       try {
-        await api.post("/player-profile/save", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        await api.post('/player-profile/save', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         })
-
-        this.$router.push("/player-profile/form")
+        this.$router.push('/player-profile/form')
       } catch (err) {
         let data = err.response?.data
-        let mensagens = ""
+        let mensagens = ''
 
         if (data?.errors) {
-          mensagens = Object.values(data.errors).flat().join("<br> <br>")
+          // Extrai erro específico da foto
+          const photoErrorMsg = data.errors.playerPhoto?.[0] || data.errors.photo?.[0]
+          if (photoErrorMsg) {
+            this.photoError = photoErrorMsg
+          }
+
+          mensagens = Object.values(data.errors).flat().join('<br> <br>')
         }
 
         await Swal.fire({

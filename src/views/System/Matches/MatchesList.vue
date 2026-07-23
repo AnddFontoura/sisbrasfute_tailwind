@@ -227,9 +227,8 @@ import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
-import stateSelectComponent from "@/components/form/StateSelectComponent.vue";
-import citySelectComponent from "@/components/form/CitySelectComponent.vue";
 import OrangeButton from "@/components/button/OrangeButton.vue";
+import Swal from "sweetalert2";
 
 export default {
   name: "MatchesList",
@@ -293,7 +292,14 @@ export default {
 
       } catch (err) {
         console.error(err);
-        alert("Erro ao puxar lista do time");
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro ao puxar lista do time',
+          showConfirmButton: false,
+          timer: 3000,
+        })
       } finally {
         this.loading = false;
       }
