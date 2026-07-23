@@ -56,13 +56,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -89,13 +89,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -122,13 +122,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -181,13 +181,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -214,13 +214,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -260,13 +260,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -284,7 +284,7 @@
         </div>
 
         <div class="mt-20 col-span-2">
-          <button type="submit" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700">
+          <button type="submit" class="w-full rounded-md bg-orange-500 px-4 py-2 text-white font-semibold hover:bg-orange-600">
             Salvar partida
           </button>
         </div>
@@ -303,7 +303,7 @@ import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserCom
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "MatchesForm",

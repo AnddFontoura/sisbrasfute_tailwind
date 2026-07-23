@@ -2,7 +2,7 @@
 import PlayerPositionSelect from "@/components/form/GamePositionSelect.vue";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import api from "@/services/api";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "TeamPlayerRecruitamentForm",
@@ -168,7 +168,7 @@ export default {
                 justify-center
                 gap-2
                 rounded-md
-                bg-indigo-600
+                bg-orange-500
                 px-4
                 py-2
                 text-sm
@@ -176,9 +176,9 @@ export default {
                 text-white
                 shadow-sm
                 transition
-                hover:bg-indigo-700
+                hover:bg-orange-600
                 disabled:cursor-not-allowed
-                disabled:bg-indigo-400
+                disabled:bg-orange-400
                 disabled:opacity-80
               "
               :disabled="loading || form.gamePositionIds.length === 0"

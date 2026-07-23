@@ -22,7 +22,7 @@
             id="email"
             required
             placeholder="seu@email.com"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
@@ -41,14 +41,14 @@
             id="password"
             required
             placeholder="********"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
         <!-- Botão -->
         <button
           type="submit"
-          class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
         >
           Entrar
         </button>
@@ -57,7 +57,7 @@
       <!-- Link Cadastro -->
       <p class="mt-4 text-center text-sm text-gray-600">
         Não tem conta?
-        <a href="/register" class="text-indigo-600 hover:underline ml-1">Cadastre-se</a>
+        <a href="/register" class="text-orange-500 hover:underline ml-1">Cadastre-se</a>
       </p>
     </div>
   </div>
@@ -65,7 +65,7 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth.js";
-import Swal from 'sweetalert2'
+import Swal from "@/services/swal.js"
 
 export default {
   name: "Login",

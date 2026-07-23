@@ -23,7 +23,7 @@
             id="name"
             required
             placeholder="Seu nome completo"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
@@ -42,7 +42,7 @@
             id="email"
             required
             placeholder="seu@email.com"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
@@ -61,7 +61,7 @@
             id="password"
             required
             placeholder="********"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
@@ -80,14 +80,14 @@
             id="password_confirmation"
             required
             placeholder="********"
-            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2"
           />
         </div>
 
         <!-- Botão -->
         <button
           type="submit"
-          class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
         >
           Cadastrar
         </button>
@@ -96,7 +96,7 @@
       <!-- Link Login -->
       <p class="mt-4 text-center text-sm text-gray-600">
         Já tem conta?
-        <a href="/login" class="text-indigo-600 hover:underline ml-1">Entrar</a>
+        <a href="/login" class="text-orange-500 hover:underline ml-1">Entrar</a>
       </p>
     </div>
   </div>
@@ -104,7 +104,7 @@
 
 <script>
 import api  from '@/services/api.js'
-import Swal from "sweetalert2"
+import Swal from "@/services/swal.js"
 
 export default {
   name: "Register",

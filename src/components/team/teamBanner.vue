@@ -1,6 +1,6 @@
 <script>
 import api from "@/services/api";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "teamBanner",

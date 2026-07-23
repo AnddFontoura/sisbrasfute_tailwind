@@ -32,7 +32,7 @@
         <div class="mx-auto">
           <div class="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
             <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="MapIcon" class="h-7 w-5 flex-none text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <component is="MapIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
               <div class="text-base/7">
                 <h3 class="font-semibold text-gray-900 dark:text-white"> Estado </h3>
                 <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.city_info?.state_info?.name ?? 'Desconhecido' }}</p>
@@ -40,7 +40,7 @@
             </div>
 
             <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="MapPinIcon" class="h-7 w-5 flex-none text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <component is="MapPinIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
               <div class="text-base/7">
                 <h3 class="font-semibold text-gray-900 dark:text-white"> Cidade </h3>
                 <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.city_info?.name ?? 'Desconhecido' }}</p>
@@ -48,7 +48,7 @@
             </div>
 
             <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="CalendarIcon" class="h-7 w-5 flex-none text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <component is="CalendarIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
               <div class="text-base/7">
                 <h3 class="font-semibold text-gray-900 dark:text-white">Fundado em</h3>
                 <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.foundation_date_br }}</p>
@@ -210,7 +210,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import { MapIcon, MapPinIcon, CalendarIcon } from '@heroicons/vue/20/solid'
-import Swal from 'sweetalert2'
+import Swal from "@/services/swal.js"
 
 export default {
   name: "teamList",

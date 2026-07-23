@@ -228,7 +228,7 @@ import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 import OrangeButton from "@/components/button/OrangeButton.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "MatchesList",

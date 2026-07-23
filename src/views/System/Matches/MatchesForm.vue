@@ -79,13 +79,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -114,13 +114,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -149,13 +149,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -212,13 +212,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -248,13 +248,13 @@
                   placeholder:text-gray-400
                   focus:outline-2
                   focus:-outline-offset-2
-                  focus:outline-indigo-600
+                  focus:outline-orange-500
                   sm:text-sm/6
                   dark:bg-white/5
                   dark:text-white
                   dark:outline-white/10
                   dark:placeholder:text-gray-500
-                  dark:focus:outline-indigo-500
+                  dark:focus:outline-orange-500
                 "
             />
           </div>
@@ -299,13 +299,13 @@
                 placeholder:text-gray-400
                 focus:outline-2
                 focus:-outline-offset-2
-                focus:outline-indigo-600
+                focus:outline-orange-500
                 sm:text-sm/6
                 dark:bg-white/5
                 dark:text-white
                 dark:outline-white/10
                 dark:placeholder:text-gray-500
-                dark:focus:outline-indigo-500
+                dark:focus:outline-orange-500
               "
           />
         </div>
@@ -354,7 +354,7 @@
                 type="number"
                 min="1"
                 max="30"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
@@ -366,7 +366,7 @@
                 v-model.number="form.teamsCount"
                 type="number"
                 min="1"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
           </div>
@@ -451,7 +451,7 @@
                 min="0"
                 step="0.5"
                 placeholder="Valor em R$"
-                class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
@@ -531,7 +531,7 @@ import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
 import { fetchGamePositions } from "@/services/gamePositionService.js";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "MatchesForm",

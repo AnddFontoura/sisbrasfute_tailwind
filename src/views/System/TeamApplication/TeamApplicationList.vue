@@ -346,7 +346,7 @@ import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 import TeamBanner from "@/components/team/teamBanner.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "teamList",

@@ -126,7 +126,7 @@
 <script>
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "PlayerProfileShow",

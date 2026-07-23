@@ -41,14 +41,14 @@
 
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900/40">
+            <thead class="bg-gray-900 dark:bg-black">
               <tr>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Jogo</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Jogador</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Descrição</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Valor</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Tipo</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Origem</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Jogo</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Jogador</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Descrição</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Valor</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Tipo</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-orange-400 dark:text-orange-300">Origem</th>
               </tr>
             </thead>
 
@@ -57,7 +57,7 @@
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                   <button
                     type="button"
-                    class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+                    class="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600"
                     @click="$router.push({ name: 'matches-show', params: { id: finance.match_id } })"
                   >
                     Ver jogo #{{ finance.match_id }}
@@ -122,7 +122,7 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TeamBanner from "@/components/team/teamBanner.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "FinancesList",

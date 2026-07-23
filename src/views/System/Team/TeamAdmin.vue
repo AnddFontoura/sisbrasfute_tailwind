@@ -91,7 +91,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import TeamBanner from "@/components/team/teamBanner.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "teamList",

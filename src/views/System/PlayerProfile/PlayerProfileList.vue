@@ -147,7 +147,7 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import OrangeButton from "@/components/button/OrangeButton.vue";
-import Swal from "sweetalert2";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "playerProfileList",
