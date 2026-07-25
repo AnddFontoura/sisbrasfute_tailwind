@@ -30,12 +30,6 @@ export default [
     meta: { requiresAuth: true }
   },
   {
-    path: '/team/:teamId/matches/:matchId/manage',
-    name: 'team-matches-manage',
-    component: () => import('../views/System/Team/TeamMatchManage.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/team/show/:id',
     name: 'team-show',
     component: () => import('../views/System/Team/TeamShow.vue'),

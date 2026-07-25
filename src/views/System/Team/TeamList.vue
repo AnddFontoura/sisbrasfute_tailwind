@@ -103,7 +103,7 @@
                     text-gray-900
                   "
               >
-                CURITIBA
+                {{ team.city_name ?? 'Desconhecido'}}
               </p>
             </div>
             <div>
@@ -121,7 +121,7 @@
                     text-gray-900
                   "
               >
-                PARANÁ
+                {{ team.state_name ?? 'Desconhecido'}}
               </p>
             </div>
           </div>
@@ -131,61 +131,19 @@
             class="px-4 pb-4 grid gap-2"
             :class="team.user_id === user.id ? 'grid-cols-2' : 'grid-cols-1'"
           >
-            <button
+            <orange-button
               v-if="team.user_id === user.id"
-              @click="$router.push({ name: 'team-show', params: { id: team.id } })"
-              class="
-                  w-full
-                  inline-flex
-                  items-center
-                  justify-center
-                  rounded-xl
-                  px-5
-                  py-3
-                  text-sm
-                  font-semibold
-                  text-white
-                  shadow-sm
-                  transition
-                  duration-200
-                  bg-orange-500
-                  hover:bg-orange-600
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-orange-300
-                  focus:ring-offset-2
-              "
+              :url="{ name: 'team-show', params: { id: team.id }}"
+              text="Visualizar"
             >
-              Visualizar
-            </button>
+            </orange-button>
 
-            <button
+            <orange-button
               v-if="team.user_id === user.id"
-              @click="$router.push({ name: 'team-admin', params: { id: team.id } })"
-              class="
-                w-full
-                inline-flex
-                items-center
-                justify-center
-                rounded-xl
-                px-5
-                py-3
-                text-sm
-                font-semibold
-                text-white
-                shadow-sm
-                transition
-                duration-200
-                bg-orange-500
-                hover:bg-orange-600
-                focus:outline-none
-                focus:ring-2
-                focus:ring-orange-300
-                focus:ring-offset-2
-              "
+              :url="{ name: 'team-admin', params: { id: team.id }}"
+              text="Administrar"
             >
-              Administrar
-            </button>
+            </orange-button>
           </div>
         </div>
       </div>
@@ -198,11 +156,14 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import Swal from "@/services/swal.js";
+import OrangeButton from "@/components/button/OrangeButton.vue";
 
 export default {
   name: "teamList",
-  components: {systemLayout},
-
+  components: {
+    systemLayout,
+    OrangeButton,
+  },
   data() {
     return {
       teams: [],
