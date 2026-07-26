@@ -12,7 +12,7 @@
           <div class="">
             {{ matchInfo.visitor_team_name ?? 'Desconhecido' }}
 
-            {{ matchInfo.visitor_score ?? ''}}
+            {{ matchInfo.visitor_score ?? '' }}
 
           </div>
 
@@ -26,13 +26,13 @@
           <div
             class=""
           >
-            {{ matchInfo.city_info?.name}} / {{ matchInfo.city_info?.state_info?.name}}
+            {{ matchInfo.city_info?.name }} / {{ matchInfo.city_info?.state_info?.name }}
           </div>
 
           <div
             class=""
           >
-            {{ matchInfo.schedule_br}}
+            {{ matchInfo.schedule_br }}
           </div>
 
           <div

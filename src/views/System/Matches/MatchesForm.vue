@@ -530,7 +530,7 @@ import TeamsManagedByUserComponent from "@/components/form/TeamsManagedByUserCom
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import {QuillEditor} from "@vueup/vue-quill";
-import { fetchGamePositions } from "@/services/gamePositionService.js";
+import {fetchGamePositions} from "@/services/gamePositionService.js";
 import Swal from "@/services/swal.js";
 
 export default {

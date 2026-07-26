@@ -12,8 +12,9 @@
         v-if="teamId"
         :url="{ name: 'team-matches-form', params: { teamId: this.teamId } }"
         text="Registrar nova partida"
+        class="mt-3"
       >
-    
+
       </orange-button>
 
       <!-- FILTROS -->
@@ -38,7 +39,8 @@
 
           <!-- Nome do time -->
           <div class="lg:col-span-2 mt-3">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do time</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do
+              time</label>
             <input
               v-model="filters.team_name"
               type="text"
@@ -54,7 +56,8 @@
 
           <!-- Range -->
           <div class="lg:col-span-2 mt-3">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Período</label>
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-200">Período</label>
 
             <div class="flex items-center gap-2 mt-1">
               <input
@@ -144,7 +147,8 @@
                     text-gray-900
                   "
               >
-                {{ matchInformation.home_team_name }} <b> VS </b> {{ matchInformation.visitor_team_name}}
+                {{ matchInformation.home_team_name }} <b> VS </b>
+                {{ matchInformation.visitor_team_name }}
               </p>
 
               <p> {{ matchInformation.schedule_br }}</p>
@@ -200,12 +204,14 @@
             </orange-button>
 
             <orange-button
+              v-if="matchInformation.created_by_team_id === this.teamId"
               :url="{ name: 'matches-edit', params: { id: matchInformation.id } }"
               text="Editar"
             >
             </orange-button>
 
             <orange-button
+              v-if="matchInformation.created_by_team_id === this.teamId"
               :url="{ name: 'team-matches-manage', params: { teamId: matchInformation.created_by_team_id, matchId: matchInformation.id } }"
               text="Administrar"
             >
