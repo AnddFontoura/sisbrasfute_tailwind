@@ -24,6 +24,11 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/matches/:matchId/manage',
+    name: 'team-matches-manage',
+    component: () => import('../views/System/Team/TeamMatchesAdmin.vue')
+  },
+  {
     path: '/team/:teamId/matches/form',
     name: 'team-matches-form',
     component: () => import('../views/System/Matches/MatchesForm.vue'),

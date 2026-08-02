@@ -204,14 +204,14 @@
             </orange-button>
 
             <orange-button
-              v-if="matchInformation.created_by_team_id === this.teamId"
+              @v-if="isSameTeam(matchInformation.created_by_team_id)"
               :url="{ name: 'matches-edit', params: { id: matchInformation.id } }"
               text="Editar"
             >
             </orange-button>
 
             <orange-button
-              v-if="matchInformation.created_by_team_id === this.teamId"
+              @v-if="isSameTeam(matchInformation.created_by_team_id)"
               :url="{ name: 'team-matches-manage', params: { teamId: matchInformation.created_by_team_id, matchId: matchInformation.id } }"
               text="Administrar"
             >
@@ -326,7 +326,12 @@ export default {
       }
 
       this.getMatchesList(1)
-    }
+    },
+
+    isSameTeam(createdByTeamId) {
+      return createdByTeamId === this.teamId
+    },
   },
+
 };
 </script>
