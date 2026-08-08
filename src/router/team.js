@@ -26,7 +26,8 @@ export default [
   {
     path: '/team/:teamId/matches/:matchId/manage',
     name: 'team-matches-manage',
-    component: () => import('../views/System/Team/TeamMatchesAdmin.vue')
+    component: () => import('../views/System/Matches/MatchPositions.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/team/:teamId/matches/form',

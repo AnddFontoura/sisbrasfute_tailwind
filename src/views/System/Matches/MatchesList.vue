@@ -204,14 +204,14 @@
             </orange-button>
 
             <orange-button
-              @v-if="isSameTeam(matchInformation.created_by_team_id)"
+              v-if="isSameTeam(matchInformation.created_by_team_id)"
               :url="{ name: 'matches-edit', params: { id: matchInformation.id } }"
               text="Editar"
             >
             </orange-button>
 
             <orange-button
-              @v-if="isSameTeam(matchInformation.created_by_team_id)"
+              v-if="isSameTeam(matchInformation.created_by_team_id)"
               :url="{ name: 'team-matches-manage', params: { teamId: matchInformation.created_by_team_id, matchId: matchInformation.id } }"
               text="Administrar"
             >
@@ -329,7 +329,16 @@ export default {
     },
 
     isSameTeam(createdByTeamId) {
-      return createdByTeamId === this.teamId
+      if (!createdByTeamId) return false;
+
+      // If we're in a team context (route has teamId), check if it matches
+      if (this.teamId) {
+        return Number(createdByTeamId) === Number(this.teamId);
+      }
+
+      // If no team context in route, show buttons for all matches
+      // the user can see (the backend will enforce permissions)
+      return true;
     },
   },
 

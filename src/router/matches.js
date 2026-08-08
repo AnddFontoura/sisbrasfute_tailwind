@@ -23,4 +23,16 @@ export default [
     component: () => import('../views/System/Matches/MatchesForm.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/matches/:id/positions',
+    name: 'matches-positions',
+    component: () => import('../views/System/Matches/MatchPositions.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/matches/:id/choose-position',
+    name: 'matches-choose-position',
+    component: () => import('../views/System/Matches/ChoosePosition.vue'),
+    meta: { requiresAuth: true }
+  },
 ]
