@@ -23,6 +23,25 @@
           </div>
         </div>
 
+        <!-- Tag restriction banner -->
+        <div v-if="matchInfo.tag_id" class="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/20">
+          <span class="text-amber-600 dark:text-amber-400">⚠️</span>
+          <div>
+            <p class="text-sm font-medium text-amber-800 dark:text-amber-300">
+              Partida restrita
+              <span v-if="matchInfo.tag"
+                class="inline-flex items-center ml-1 px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                :style="{ backgroundColor: matchInfo.tag?.color || '#6b7280' }"
+              >
+                {{ matchInfo.tag?.name }}
+              </span>
+            </p>
+            <p class="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+              Apenas jogadores com esta tag podem se inscrever nesta partida.
+            </p>
+          </div>
+        </div>
+
         <!-- Loading indicator -->
         <div v-if="loading" class="flex items-center justify-center py-12">
           <svg
@@ -387,6 +406,16 @@ export default {
           await this.loadPositions();
         } else if (err.response?.status === 422) {
           const message = err.response.data?.message || "Erro de validação";
+          await Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "error",
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+          });
+        } else if (err.response?.status === 403) {
+          const message = err.response.data?.message || "Sem permissão";
           await Swal.fire({
             toast: true,
             position: "top-end",

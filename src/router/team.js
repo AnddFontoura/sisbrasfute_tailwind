@@ -12,6 +12,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/players/:playerId/edit',
+    name: 'team-player-edit',
+    component: () => import('../views/System/Team/TeamPlayerEdit.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team/:teamId/players/form',
     name: 'team-players-form',
     component: () => import('../views/System/Team/TeamPlayerRecruitamentForm.vue'),
@@ -51,6 +57,12 @@ export default [
     path: '/team/edit/:id',
     name: 'team-edit',
     component: () => import('../views/System/Team/TeamForm.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/team/:teamId/tags',
+    name: 'team-tags',
+    component: () => import('../views/System/Team/TeamTagManagement.vue'),
     meta: { requiresAuth: true }
   },
   {

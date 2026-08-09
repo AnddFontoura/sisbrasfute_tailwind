@@ -47,6 +47,14 @@
         >
           <span> Recrutas </span>
         </router-link>
+
+        <router-link
+          :to="{ name: 'team-tags', params: { teamId: this.teamId } }"
+          type="button"
+          class="inline-flex justify-center rounded-md bg-orange-500 hover:bg-orange-700 px-3 py-2 text-sm font-semibold text-white shadow-xs"
+        >
+          <span>Gerenciar Tags</span>
+        </router-link>
       </div>
 
       <div class="flex flex-col gap-4 mt-6">
@@ -105,27 +113,31 @@
                     <b>Posições:</b> {{ formatPositions(player) }}
                   </span>
                 </div>
+
+                <div v-if="player.tags && player.tags.length" class="mt-2 flex flex-wrap gap-1">
+                  <span
+                    v-for="tag in player.tags"
+                    :key="tag.id"
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                    :style="{ backgroundColor: tag.color || '#6b7280' }"
+                  >
+                    {{ tag.name }}
+                  </span>
+                </div>
               </div>
 
-              <div class="flex-shrink-0">
+              <div class="flex-shrink-0 flex gap-2">
                 <router-link
                   :to="{ name: 'player-profile-show', params: { id: player.id } }"
-                  class="
-                    inline-flex
-                    justify-center
-                    rounded-md
-                    bg-orange-500
-                    hover:bg-orange-600
-                    px-4
-                    py-2
-                    text-sm
-                    font-semibold
-                    text-black
-                    shadow-sm
-                    transition-colors
-                  "
+                  class="inline-flex justify-center rounded-md bg-orange-500 hover:bg-orange-600 px-4 py-2 text-sm font-semibold text-black shadow-sm transition-colors"
                 >
                   Visualizar
+                </router-link>
+                <router-link
+                  :to="{ name: 'team-player-edit', params: { teamId: teamId, playerId: player.id } }"
+                  class="inline-flex justify-center rounded-md bg-gray-500 hover:bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors"
+                >
+                  Editar
                 </router-link>
               </div>
             </div>

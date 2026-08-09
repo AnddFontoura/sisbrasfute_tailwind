@@ -353,6 +353,22 @@
           />
         </div>
 
+        <div class="mt-3 p-2 col-span-2" v-if="form.teamId">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tag da partida (opcional)</label>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Selecione uma tag para restringir quais jogadores podem se inscrever.</p>
+          <Multiselect
+            v-model="form.tagId"
+            :options="teamTags"
+            track-by="name"
+            label="name"
+            value-prop="id"
+            :searchable="true"
+            :can-clear="true"
+            placeholder="Nenhuma restrição (todos podem participar)"
+            class="mt-2"
+          />
+        </div>
+
         <div v-if="form.indicatePositions" class="mt-3 p-2 col-span-2">
           <div class="mt-3 grid gap-4 md:grid-cols-2">
             <div>
@@ -557,9 +573,10 @@ export default {
   data() {
     return {
       form: {
-
+        tagId: null,
       },
       gamePositions: [],
+      teamTags: [],
     }
   },
   async mounted() {
@@ -568,12 +585,20 @@ export default {
     this.isEditing = !!this.matchId
 
     await this.loadGamePositions()
+    await this.loadTeamTags()
 
     if (this.isEditing) {
       await this.getMatchInfo()
     }
   },
   watch: {
+    'form.teamId'(newValue) {
+      if (newValue) {
+        this.loadTeamTags()
+      } else {
+        this.teamTags = []
+      }
+    },
     'form.playersCount'(newValue, oldValue) {
       // Só reseta posições se estiver criando (não editando com dados carregados)
       if (!this.isEditing || this.form.positions.length === 0) {
@@ -604,6 +629,16 @@ export default {
         console.error("Erro ao carregar posições:", err)
       }
     },
+    async loadTeamTags() {
+      if (!this.form.teamId) return;
+      try {
+        const response = await api.get('/team/' + this.form.teamId + '/tags');
+        this.teamTags = response.data.map(tag => ({ id: tag.id, name: tag.name, color: tag.color }));
+      } catch (err) {
+        console.error('Erro ao carregar tags:', err);
+        this.teamTags = [];
+      }
+    },
     async getMatchInfo() {
       if (!this.matchId) return
 
@@ -630,6 +665,7 @@ export default {
         )?.id ?? null
         this.stateId = data.state_id ?? data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
+        this.form.tagId = data.tag_id ?? null
 
         // Carrega posições corretamente
         const positions = typeof data.positions === 'string'
