@@ -286,8 +286,9 @@ export default {
       this.loading = true;
       const formData = new FormData()
 
-      // 🔹 Campos normais
+      // 🔹 Campos normais (skip image fields — handled separately as file uploads)
       Object.entries(this.form).forEach(([key, value]) => {
+        if (key === 'teamLogo' || key === 'teamBanner') return
         formData.append(key, value ?? "")
       })
 
