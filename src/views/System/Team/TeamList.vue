@@ -132,7 +132,6 @@
             :class="team.user_id === user.id ? 'grid-cols-2' : 'grid-cols-1'"
           >
             <orange-button
-              v-if="team.user_id === user.id"
               :url="{ name: 'team-show', params: { id: team.id }}"
               text="Visualizar"
             >

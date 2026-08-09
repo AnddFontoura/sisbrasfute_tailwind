@@ -63,7 +63,7 @@
               <input v-model="form.playerBirthdate" type="date" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Exibir perfil?</label>
               <Multiselect id="statusSelect" v-model="form.playerStatus" :options="this.status" track-by="name" label="name" :search="true" value-prop="id" :preselect-first="true" class="mt-1" />
             </div>
           </div>
