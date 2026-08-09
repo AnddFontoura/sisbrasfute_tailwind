@@ -1,520 +1,291 @@
 <template>
   <system-layout>
-    <form @submit.prevent="handleSubmit" class="space-y-4">
-      <div class="grid grid-cols-2 mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+    <form @submit.prevent="handleSubmit">
+      <div class="mx-auto max-w-3xl space-y-6">
 
-        <div class="col-span-2">
-          <TeamsManagedByUserComponent v-model="this.form.teamId">
-          </TeamsManagedByUserComponent>
+        <!-- Page Header -->
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            {{ isEditing ? 'Editar Partida' : 'Nova Partida' }}
+          </h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Preencha as informações da partida abaixo.
+          </p>
         </div>
 
-        <div class="mt-3 p-2 col-span-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo de
-            partida</label>
-          <Multiselect
-            v-model="form.matchType"
-            :options="matchTypeOptions"
-            track-by="id"
-            label="name"
-            :search="true"
-            value-prop="id"
-            :preselect-first="true"
-            class="mt-2"
-          />
-        </div>
-
-        <div
-          class="grid col-span-2"
-          v-if="!isTeamMatch()"
-        >
+        <!-- Section 1: Info Básica -->
+        <div class="relative rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <!-- Loading overlay -->
           <div
-            class="mt-3 p-2"
+            v-if="loading"
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
           >
-            <label
-              class="
-                block
-                text-sm
-                font-medium
-                text-gray-700
-                dark:text-gray-200
-              "
-              aria-label="statusSelect"
-            >
-              Seu time é mandante ou visitante?
-            </label>
-
-            <Multiselect
-              id="statusSelect"
-              v-model="form.myTeamIs"
-              :options="this.homeOrVisitor"
-              track-by="name"
-              label="name"
-              :search="true"
-              value-prop="id"
-              :preselect-first="true"
-            />
+            <svg class="h-10 w-10 animate-spin text-orange-500 dark:text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+            <p class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Carregando...</p>
           </div>
 
-          <div
-            class="mt-3 p-2"
-          >
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Nome do Time Adversário
-            </label>
-            <input
-              v-model="form.enemyTeamName"
-              type="text"
-              class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-orange-500
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-orange-500
-                "
-            />
-          </div>
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Informações Básicas</h2>
 
-          <div
-            class="mt-3 p-2"
-          >
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Placar do seu time
-            </label>
-            <input
-              v-model="form.myTeamScore"
-              type="number"
-              class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-orange-500
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-orange-500
-                "
-            />
-          </div>
-
-          <div
-            class="mt-3 p-2"
-          >
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Placar Adversário
-            </label>
-            <input
-              v-model="form.enemyTeamScore"
-              type="number"
-              class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-orange-500
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-orange-500
-                "
-            />
-          </div>
-
-          <div
-            class="mt-3 p-2 col-span-2"
-          >
-            <label
-              class="
-                block
-                text-sm
-                font-medium
-                text-gray-700
-                dark:text-gray-200
-              "
-              aria-label="statusSelect"
-            >
-              Decisão por pênaltis?
-            </label>
-
-            <Multiselect
-              id="statusSelect"
-              v-model="form.hasPenalties"
-              :options="this.penalties"
-              track-by="name"
-              label="name"
-              :search="true"
-              value-prop="id"
-              :preselect-first="true"
-            />
-          </div>
-
-          <div
-            class="mt-3 p-2" v-if="form.hasPenalties"
-          >
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Placares Penalidades a favor
-            </label>
-            <input
-              v-model="form.myTeamPenaltyScore"
-              type="number"
-              class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-orange-500
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-orange-500
-                "
-            />
-          </div>
-
-          <div
-            class="mt-3 p-2"
-            v-if="form.hasPenalties"
-          >
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Placar das penalidades contra
-            </label>
-            <input
-              v-model="form.enemyTeamPenaltyScore"
-              type="number"
-              class="
-                  block
-                  w-full
-                  rounded-md
-                  bg-white
-                  px-3
-                  py-1.5
-                  text-base
-                  text-gray-900
-                  outline-1
-                  -outline-offset-1
-                  outline-gray-300
-                  placeholder:text-gray-400
-                  focus:outline-2
-                  focus:-outline-offset-2
-                  focus:outline-orange-500
-                  sm:text-sm/6
-                  dark:bg-white/5
-                  dark:text-white
-                  dark:outline-white/10
-                  dark:placeholder:text-gray-500
-                  dark:focus:outline-orange-500
-                "
-            />
-          </div>
-        </div>
-
-        <div class="p-2">
-          <StateSelectComponent
-            v-model="this.stateId"
-            label-name="Estado onde acontecerá o jogo"
-          >
-          </StateSelectComponent>
-        </div>
-
-        <div class="p-2">
-          <city-select-component
-            label-name="Cidade onde acontecerá o jogo"
-            :state-id="this.stateId"
-            v-model="this.cityId"
-          >
-          </city-select-component>
-        </div>
-
-        <div class="mt-3 col-span-2 p-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-            Horario do jogo
-          </label>
-          <input
-            v-model="form.matchSchedule"
-            type="datetime-local"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <!-- Descrição -->
-        <div class="mt-3 col-span-2 p-2">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-200"
-          >
-            Descrição
-          </label>
-
-          <QuillEditor
-            v-model:content="form.matchLocation"
-            content-type="html"
-            theme="snow"
-            class="bg-white rounded border"
-          />
-        </div>
-
-        <div class="mt-20 col-span-2 p-2">
-          <label class="block text-sm font-semibold text-slate-900 dark:text-white">
-            Indicar posições de jogadores?
-          </label>
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">Ative essa opção para abrir a
-            configuração detalhada da partida.</p>
-          <Multiselect
-            v-model="form.indicatePositions"
-            :options="positionToggleOptions"
-            track-by="id"
-            label="name"
-            :search="true"
-            value-prop="id"
-            :preselect-first="true"
-            class="mt-2"
-          />
-        </div>
-
-        <div v-if="form.indicatePositions" class="mt-3 p-2 col-span-2">
-          <div class="mt-3 grid gap-4 md:grid-cols-2">
+          <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Quantidade de jogadores</label>
-              <input
-                v-model.number="form.playersCount"
-                type="number"
-                min="1"
-                max="30"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
-              />
+              <TeamsManagedByUserComponent v-model="form.teamId" />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Quantidade de times
-              </label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo de partida</label>
+              <Multiselect
+                v-model="form.matchType"
+                :options="matchTypeOptions"
+                track-by="id"
+                label="name"
+                :search="true"
+                value-prop="id"
+                :preselect-first="true"
+                class="mt-1"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <StateSelectComponent v-model="stateId" label-name="Estado do jogo" />
+              <city-select-component label-name="Cidade do jogo" :state-id="stateId" v-model="cityId" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Horário do jogo</label>
               <input
-                v-model.number="form.teamsCount"
-                type="number"
-                min="1"
-                class="mt-2 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                v-model="form.matchSchedule"
+                type="datetime-local"
+                class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
               />
             </div>
           </div>
+        </div>
 
-          <div
-            class="mt-3"
-          >
-            <div class="flex items-center justify-between gap-3">
+        <!-- Section 2: Placar (apenas para partidas que não são entre o time) -->
+        <div v-if="!isTeamMatch()" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Placar</h2>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">
-                  Os campos abaixo usam o seletor de posições do sistema para definir quais
-                  funções os jogadores podem ocupar.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                @click="addPosition"
-                class="
-                    inline-flex
-                    items-center
-                    justify-center
-                    rounded-xl
-                    px-5
-                    py-3
-                    text-sm
-                    font-semibold
-                    text-white
-                    shadow-sm
-                    transition
-                    duration-200
-                    bg-orange-500
-                    hover:bg-orange-600
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-orange-300
-                    focus:ring-offset-2
-                  "
-              >
-                Adicionar posição
-              </button>
-            </div>
-          </div>
-
-          <div
-            v-for="(position, index) in form.positions"
-            :key="index"
-            class="grid gap-3 md:grid-cols-[1.1fr_180px_auto] items-end"
-          >
-            <!-- Posição -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Posição
-              </label>
-
-              <div class="pt-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Seu time é</label>
                 <Multiselect
-                  v-model="position.game_position_id"
-                  mode="single"
-                  :options="gamePositions"
+                  v-model="form.myTeamIs"
+                  :options="homeOrVisitor"
                   track-by="name"
                   label="name"
+                  :search="true"
                   value-prop="id"
-                  :searchable="true"
-                  :close-on-select="false"
-                  :clear-on-select="false"
+                  :preselect-first="true"
+                  class="mt-1"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do Time Adversário</label>
+                <input
+                  v-model="form.enemyTeamName"
+                  type="text"
+                  placeholder="Nome do adversário"
+                  class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
                 />
               </div>
             </div>
 
-            <!-- Valor -->
-            <div>
-              <label
-                class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300"
-              >
-                Valor em R$
-              </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Placar do seu time</label>
+                <input
+                  v-model="form.myTeamScore"
+                  type="number"
+                  placeholder="0"
+                  class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Placar Adversário</label>
+                <input
+                  v-model="form.enemyTeamScore"
+                  type="number"
+                  placeholder="0"
+                  class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                />
+              </div>
+            </div>
 
-              <input
-                v-model.number="position.price"
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder="Valor em R$"
-                class="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Decisão por pênaltis?</label>
+              <Multiselect
+                v-model="form.hasPenalties"
+                :options="penalties"
+                track-by="name"
+                label="name"
+                :search="true"
+                value-prop="id"
+                :preselect-first="true"
+                class="mt-1"
               />
             </div>
 
-            <!-- Botão -->
-            <div>
-              <button
-                type="button"
-                @click="removePosition(index)"
-                class="
-                  inline-flex
-                  h-10
-                  w-full
-                  items-center
-                  justify-center
-                  rounded-md
-                  border
-                  border-red-200
-                  bg-red-500
-                  px-3
-                  py-2
-                  text-sm
-                  font-semibold
-                  text-white
-                  hover:bg-red-600
-                  dark:border-red-400/30
-                  dark:bg-red-500/10
-                  dark:text-red-200
-                "
-              >
-                Remover #{{ index + 1 }}
-              </button>
+            <div v-if="form.hasPenalties" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Pênaltis a favor</label>
+                <input
+                  v-model="form.myTeamPenaltyScore"
+                  type="number"
+                  placeholder="0"
+                  class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Pênaltis contra</label>
+                <input
+                  v-model="form.enemyTeamPenaltyScore"
+                  type="number"
+                  placeholder="0"
+                  class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="mt-20 col-span-2">
+        <!-- Section 3: Descrição -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Descrição</h2>
+          <QuillEditor
+            v-model:content="form.matchLocation"
+            content-type="html"
+            theme="snow"
+            class="bg-white rounded border dark:bg-white/5"
+          />
+        </div>
+
+        <!-- Section 4: Configuração de Posições -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Configuração de Posições</h2>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Indicar posições de jogadores?</label>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ative essa opção para configurar quais posições estarão disponíveis na partida.</p>
+              <Multiselect
+                v-model="form.indicatePositions"
+                :options="positionToggleOptions"
+                track-by="id"
+                label="name"
+                :search="true"
+                value-prop="id"
+                :preselect-first="true"
+                class="mt-2"
+              />
+            </div>
+
+            <div v-if="form.indicatePositions" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Quantidade de jogadores</label>
+                  <input
+                    v-model.number="form.playersCount"
+                    type="number"
+                    min="1"
+                    max="30"
+                    class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Quantidade de times</label>
+                  <input
+                    v-model.number="form.teamsCount"
+                    type="number"
+                    min="1"
+                    class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                  />
+                </div>
+              </div>
+
+              <!-- Posições list -->
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Defina as posições e valores para cada jogador na partida.
+                  </p>
+                  <button
+                    type="button"
+                    @click="addPosition"
+                    class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors"
+                  >
+                    Adicionar posição
+                  </button>
+                </div>
+
+                <div class="space-y-3">
+                  <div
+                    v-for="(position, index) in form.positions"
+                    :key="index"
+                    class="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-3 items-end rounded-lg border border-gray-100 dark:border-gray-700 p-3"
+                  >
+                    <div>
+                      <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Posição</label>
+                      <Multiselect
+                        v-model="position.game_position_id"
+                        mode="single"
+                        :options="gamePositions"
+                        track-by="name"
+                        label="name"
+                        value-prop="id"
+                        :searchable="true"
+                        :close-on-select="true"
+                        class="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Valor (R$)</label>
+                      <input
+                        v-model.number="position.price"
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        placeholder="0,00"
+                        class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
+                      />
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        @click="removePosition(index)"
+                        class="mt-1 inline-flex h-9 w-full items-center justify-center rounded-md border border-red-300 px-3 text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
           <button
             type="submit"
-            class="
-              w-full
-              inline-flex
-              items-center
-              justify-center
-              rounded-xl
-              px-5
-              py-3
-              text-sm
-              font-semibold
-              text-white
-              shadow-sm
-              transition
-              duration-200
-              bg-orange-500
-              hover:bg-orange-600
-              focus:outline-none
-              focus:ring-2
-              focus:ring-orange-300
-              focus:ring-offset-2
-            "
+            class="rounded-xl bg-orange-500 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-orange-600 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:bg-orange-400 disabled:opacity-80"
+            :disabled="loading"
           >
-            Salvar partida
+            <span v-if="loading" class="flex items-center gap-2">
+              <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Salvando...
+            </span>
+            <span v-else>{{ isEditing ? 'Atualizar partida' : 'Salvar partida' }}</span>
           </button>
         </div>
+
       </div>
     </form>
   </system-layout>
@@ -603,7 +374,6 @@ export default {
   },
   watch: {
     'form.playersCount'(newValue, oldValue) {
-      // Só reseta posições se estiver criando (não editando com dados carregados)
       if (!this.isEditing || this.form.positions.length === 0) {
         this.form.positions = Array.from(
           {length: newValue},
@@ -659,7 +429,6 @@ export default {
         this.stateId = data.state_id ?? data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
 
-        // Carrega posições corretamente
         const positions = typeof data.positions === 'string'
           ? JSON.parse(data.positions)
           : data.positions
@@ -705,7 +474,6 @@ export default {
 
       formData.append("cityId", this.cityId ?? "")
 
-      // Inclui o ID da partida para o backend diferenciar criação/atualização
       if (this.matchId) {
         formData.append("matchId", this.matchId)
       }
