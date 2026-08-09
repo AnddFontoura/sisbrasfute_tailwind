@@ -2,11 +2,15 @@
   <system-layout>
     <main>
         <div class="rounded">
-          <img class="h-32 w-full object-cover lg:h-48" :src="team.banner_url" alt="" />
+          <img class="h-32 w-full object-cover lg:h-48 rounded-t-xl" :src="team.banner_url || fallbackImage" @error="$event.target.src = fallbackImage" alt="" />
           <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
               <div class="flex">
-                <img class="size-24 rounded-full ring-4 ring-white sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" :src="team.logo_url" alt="" />
+                <img class="size-24 rounded-full ring-4 ring-white sm:size-32 dark:ring-gray-900 cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
+                     :src="team.logo_url || fallbackImage"
+                     @error="$event.target.src = fallbackImage"
+                     alt=""
+                     @click="openLightbox()" />
               </div>
               <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                 <div class="mt-6 min-w-0 flex-1 sm:hidden md:block">
@@ -28,7 +32,7 @@
           </div>
       </div>
 
-      <div class="relative isolate overflow-hidden dark:bg-gray-900">
+      <div class="relative isolate dark:bg-gray-900">
         <div class="mx-auto">
           <div class="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
             <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
@@ -203,6 +207,17 @@
       >
       </div>
     </main>
+
+    <!-- Lightbox -->
+    <Transition name="fade">
+      <div v-if="isLightboxOpen"
+           class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer"
+           @click.self="closeLightbox">
+        <img :src="team.logo_url"
+             class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg cursor-pointer"
+             @click="closeLightbox" />
+      </div>
+    </Transition>
   </system-layout>
 </template>
 
@@ -227,6 +242,7 @@ export default {
       recruitGamePositionId: 0,
       showInterestModal: false,
       loading: false,
+      isLightboxOpen: false,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
     }
   },
@@ -234,7 +250,23 @@ export default {
     this.teamId = this.$route.params.id
     this.getTeamInformation()
   },
+  mounted() {
+    this._escHandler = (e) => { if (e.key === 'Escape' && this.isLightboxOpen) this.closeLightbox(); };
+    document.addEventListener('keydown', this._escHandler);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this._escHandler);
+  },
   methods: {
+    openLightbox() {
+      if (!this.team?.logo_url) return;
+      this.isLightboxOpen = true;
+      document.body.classList.add('overflow-hidden');
+    },
+    closeLightbox() {
+      this.isLightboxOpen = false;
+      document.body.classList.remove('overflow-hidden');
+    },
     async getTeamInformation() {
       if (this.teamId !== 0) {
         this.loading = true;
@@ -317,3 +349,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>
