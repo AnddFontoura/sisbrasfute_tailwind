@@ -1,130 +1,120 @@
 <template>
   <system-layout>
-    <main>
-        <div class="rounded">
-          <img class="h-32 w-full object-cover lg:h-48 rounded-t-xl" :src="team.banner_url || fallbackImage" @error="$event.target.src = fallbackImage" alt="" />
-          <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-              <div class="flex">
-                <img class="size-24 rounded-full ring-4 ring-white sm:size-32 dark:ring-gray-900 cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
-                     :src="team.logo_url || fallbackImage"
-                     @error="$event.target.src = fallbackImage"
-                     alt=""
-                     @click="openLightbox()" />
-              </div>
-              <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-                <div class="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                  <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">{{ team.name }}</h1>
-                </div>
-                <div class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-                  <button type="button" class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5 dark:hover:bg-white/20">
-                    <span> Amistoso </span>
-                  </button>
-                  <button type="button" class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5 dark:hover:bg-white/20">
-                    <span> Favoritar </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-              <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">{{ team.name }}</h1>
-            </div>
-          </div>
+    <main class="space-y-6">
+      <!-- Loading -->
+      <div v-if="loading && !team.name" class="flex items-center justify-center py-20">
+        <svg class="animate-spin h-8 w-8 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
       </div>
 
-      <div class="relative isolate dark:bg-gray-900">
-        <div class="mx-auto">
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
-            <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="MapIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
-              <div class="text-base/7">
-                <h3 class="font-semibold text-gray-900 dark:text-white"> Estado </h3>
-                <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.city_info?.state_info?.name ?? 'Desconhecido' }}</p>
-              </div>
-            </div>
+      <!-- Header Card -->
+      <div v-else class="rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+        <!-- Banner -->
+        <img class="h-40 w-full object-cover lg:h-56" :src="team.banner_url || fallbackImage" @error="$event.target.src = fallbackImage" alt="" />
 
-            <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="MapPinIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
-              <div class="text-base/7">
-                <h3 class="font-semibold text-gray-900 dark:text-white"> Cidade </h3>
-                <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.city_info?.name ?? 'Desconhecido' }}</p>
-              </div>
+        <!-- Profile area -->
+        <div class="px-4 sm:px-6 lg:px-8 pb-6">
+          <div class="-mt-14 sm:-mt-18 sm:flex sm:items-end sm:space-x-5">
+            <div class="flex">
+              <img class="size-28 rounded-full ring-4 ring-white sm:size-36 dark:ring-gray-800 object-cover cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200 shadow-lg"
+                   :src="team.logo_url || fallbackImage"
+                   @error="$event.target.src = fallbackImage"
+                   alt=""
+                   @click="openLightbox()" />
             </div>
-
-            <div class="flex gap-x-4 rounded-xl bg-white/30 p-6 ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-white/5 dark:inset-ring dark:inset-ring-white/5">
-              <component is="CalendarIcon" class="h-7 w-5 flex-none text-orange-500 dark:text-orange-400" aria-hidden="true" />
-              <div class="text-base/7">
-                <h3 class="font-semibold text-gray-900 dark:text-white">Fundado em</h3>
-                <p class="mt-2 text-gray-700 dark:text-gray-300">{{ team.foundation_date_br }}</p>
+            <div class="mt-4 sm:mt-0 sm:flex sm:min-w-0 sm:flex-1 sm:items-end sm:justify-between sm:pb-2">
+              <div class="min-w-0 flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white truncate">{{ team.name }}</h1>
+                <p v-if="team.city_info" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  📍 {{ team.city_info?.name }} / {{ team.city_info?.state_info?.name }}
+                </p>
+              </div>
+              <div class="mt-4 sm:mt-0 flex gap-2">
+                <button type="button" class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors">
+                  Amistoso
+                </button>
+                <button type="button" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors">
+                  Favoritar
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Info Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
+            <component is="MapIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ team.city_info?.state_info?.name ?? 'Desconhecido' }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
+            <component is="MapPinIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cidade</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ team.city_info?.name ?? 'Desconhecido' }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
+            <component is="CalendarIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fundação</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ team.foundation_date_br ?? 'Não informado' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recruiting Section -->
       <div
         v-if="team.isRecruiting"
-        class="
-          mt-3
-          flex items-center justify-between
-          rounded-2xl
-          border border-orange-200
-          bg-black
-          px-6 py-5
-          shadow-lg
-          transition-all
-          duration-300
-          hover:border-orange-400
-          hover:shadow-2xl
-        "
+        class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 px-6 py-5 shadow-lg border border-gray-700"
       >
         <div class="flex items-center gap-4">
-          <div
-            class="
-              flex h-14 w-14 items-center justify-center
-              rounded-2xl
-              bg-orange-500
-              text-2xl
-              shadow-md
-            "
-          >
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500 text-xl shadow-md">
             ⚽
           </div>
-
           <div>
-            <h3 class="text-lg font-bold text-white p-2">
-              Esse time está recrutando jogadores!
+            <h3 class="text-base font-bold text-white">
+              Recrutando jogadores!
             </h3>
-
-            <p class="text-sm text-gray-300 p-2">
-              <span v-for="(item, index) in team.isRecruiting" :key="index">
-                 | {{ item.game_position_info.name }}
+            <div class="mt-1 flex flex-wrap gap-1">
+              <span v-for="(item, index) in team.isRecruiting" :key="index"
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                {{ item.game_position_info.name }}
               </span>
-                |
-            </p>
+            </div>
           </div>
         </div>
 
         <button
           @click="handleInterestClick"
-          class="
-            rounded-xl
-            bg-orange-500
-            px-5 py-3
-            font-semibold
-            text-white
-            shadow-md
-            transition-all
-            duration-200
-            hover:bg-orange-400
-            hover:shadow-xl
-            active:scale-95
-          "
+          class="rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-orange-400 hover:shadow-lg active:scale-95 whitespace-nowrap"
         >
           Tenho interesse
         </button>
       </div>
 
+      <!-- Description Section -->
+      <div v-if="team.description" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Sobre o time</h2>
+        <div v-html="team.description" class="prose dark:prose-invert prose-sm max-w-none text-gray-700 dark:text-gray-300"></div>
+      </div>
+
+      <!-- Interest Modal -->
       <div
         v-if="showInterestModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
@@ -197,14 +187,6 @@
             </button>
           </div>
         </div>
-      </div>
-
-      <div
-        v-html="team.description"
-        class="
-          mt-10
-        "
-      >
       </div>
     </main>
 
