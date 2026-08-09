@@ -254,7 +254,10 @@ export default {
       try {
         let response = await api.get("/player-profile/show")
         let data = response.data
-        let socialProfiles = data.social_profiles
+
+        if (!data) return  // No profile yet — leave form empty
+
+        let socialProfiles = data.social_profiles || {}
 
         this.form.playerName = data.name ?? null
         this.form.playerNickName = data.nickname ?? null
@@ -276,10 +279,9 @@ export default {
         this.form.playerFacebook = socialProfiles.facebook ?? null
         this.form.playerGDA = socialProfiles.gda ?? null
 
-        if (data.photo) {
-          const baseUrl = import.meta.env.VITE_API_BASE_URL
-          this.existingPhotoUrl = `${baseUrl}/${data.photo}`
-          this.photoPreviewUrl = this.existingPhotoUrl
+        if (data.photo_url) {
+          this.existingPhotoUrl = data.photo_url
+          this.photoPreviewUrl = data.photo_url
         }
 
       } finally {
@@ -355,26 +357,38 @@ export default {
         await api.post('/player-profile/save', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        this.$router.push('/player-profile/form')
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Perfil salvo com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+
+        // Reload profile data to reflect changes
+        await this.getPlayerProfileInfo()
       } catch (err) {
+        console.error(err)
         let data = err.response?.data
-        let mensagens = ''
+        let mensagens = 'Erro ao salvar o perfil.'
 
         if (data?.errors) {
-          // Extrai erro específico da foto
           const photoErrorMsg = data.errors.playerPhoto?.[0] || data.errors.photo?.[0]
           if (photoErrorMsg) {
             this.photoError = photoErrorMsg
           }
-
-          mensagens = Object.values(data.errors).flat().join('<br> <br>')
+          mensagens = Object.values(data.errors).flat().join('<br><br>')
+        } else if (data?.message) {
+          mensagens = data.message
         }
 
         await Swal.fire({
           toast: true,
           position: 'top-end',
           icon: 'error',
-          title: 'Erro encontrado!',
+          title: 'Erro ao salvar!',
           html: mensagens,
           showConfirmButton: true,
         })
