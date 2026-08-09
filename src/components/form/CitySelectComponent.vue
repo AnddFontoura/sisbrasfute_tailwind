@@ -37,6 +37,18 @@ export default {
       internalValue: this.modelValue,
     }
   },
+  async mounted() {
+    if (this.stateId) {
+      try {
+        const { data } = await api.get("/cities/list", {
+          params: { stateId: this.stateId },
+        })
+        this.cities = data.cities
+      } catch (err) {
+        console.error("Erro ao carregar cidades:", err)
+      }
+    }
+  },
   watch: {
     modelValue(val) {
       this.internalValue = val
@@ -44,18 +56,26 @@ export default {
     internalValue(val) {
       this.$emit("update:modelValue", val)
     },
-    async stateId(newVal) {
-      this.cities = []
-      this.internalValue = null
+    async stateId(newVal, oldVal) {
       if (newVal) {
         try {
           const { data } = await api.get("/cities/list", {
             params: { stateId: newVal },
           })
           this.cities = data.cities
+
+          // If the current internalValue is not in the new cities list, clear it
+          // This handles the case where user changes state (should clear city)
+          // But preserves the city when loading for the first time (edit mode)
+          if (this.internalValue && !this.cities.some(c => c.id === this.internalValue)) {
+            this.internalValue = null
+          }
         } catch (err) {
           console.error("Erro ao carregar cidades:", err)
         }
+      } else {
+        this.cities = []
+        this.internalValue = null
       }
     },
   },

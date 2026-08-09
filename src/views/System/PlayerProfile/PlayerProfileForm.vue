@@ -271,6 +271,7 @@ export default {
         this.form.playerUniformSize = data.uniform_size ?? null
         this.form.playerStatus = data.status ?? null
         this.cityId = data.city_id ?? null
+        this.stateId = data.city_info?.state_id ?? data.city_info?.state_info?.id ?? null
         this.form.playerYoutube = socialProfiles.youtube ?? null
         this.form.playerTiktok = socialProfiles.tiktok ?? null
         this.form.playerInstagram = socialProfiles.instagram ?? null
