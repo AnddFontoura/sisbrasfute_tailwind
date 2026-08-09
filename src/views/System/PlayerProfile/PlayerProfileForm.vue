@@ -1,523 +1,187 @@
 <template>
   <system-layout>
-    <form @submit.prevent="handleSubmit" class="space-y-4">
-      <div class="mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Atualizar Perfil de Jogador</h1>
+    <form @submit.prevent="handleSubmit">
+      <div class="mx-auto max-w-3xl space-y-6">
 
-        <div class="relative">
+        <!-- Page Header -->
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Meu Perfil</h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Atualize suas informações pessoais e preferências de jogador.</p>
+        </div>
+
+        <!-- Section 1: Photo -->
+        <div class="relative rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <!-- Loading overlay -->
           <div
             v-if="loading"
-            class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-white/70 backdrop-blur-sm dark:bg-gray-900/60"
           >
-            <svg
-              class="h-10 w-10 animate-spin text-orange-500 dark:text-orange-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
+            <svg class="h-10 w-10 animate-spin text-orange-500 dark:text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
             </svg>
-
-            <p class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-200">
-              Salvando time...
-            </p>
+            <p class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Salvando...</p>
           </div>
 
-        <player-position-select v-model="form.playerPositions" is-multiselect="multiple"></player-position-select>
-
-        <modalities-select v-model="form.playerModalities" is-multiselect="multiple"></modalities-select>
-
-        <StateSelectComponent
-          v-model="this.stateId"
-          label-name="Estado onde mora"
-        >
-
-        </StateSelectComponent>
-
-        <city-select-component
-          label-name="Cidade onde mora"
-          :state-id="this.stateId"
-          v-model="this.cityId"
-        >
-
-        </city-select-component>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-            Foto de Apresentação
-          </label>
-          <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25">
-            <div class="text-center">
-              <!-- Imagem: preview, foto existente ou placeholder -->
-              <div class="mx-auto h-24 w-24 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-                <img
-                  v-if="photoPreviewUrl"
-                  :src="photoPreviewUrl"
-                  alt="Foto do jogador"
-                  class="h-full w-full object-cover"
-                  @error="photoPreviewUrl = null; existingPhotoUrl = null"
-                />
-                <svg
-                  v-else
-                  class="h-full w-full text-gray-300 dark:text-gray-500"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-                </svg>
-              </div>
-
-              <!-- Nome do arquivo -->
-              <p v-if="photoFileName" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {{ photoFileName }}
-              </p>
-
-              <!-- Input de upload -->
-              <div class="mt-4 flex justify-center text-sm text-gray-600 dark:text-gray-400">
-                <label
-                  for="photo-upload"
-                  class="relative cursor-pointer rounded-md font-semibold text-orange-500 hover:text-orange-500 dark:text-orange-400"
-                  :class="{ 'pointer-events-none opacity-50': loading }"
-                >
-                  <span>Escolher arquivo</span>
-                  <input
-                    id="photo-upload"
-                    type="file"
-                    class="sr-only"
-                    accept="image/png,image/jpeg,image/gif"
-                    :disabled="loading"
-                    @change="onPhotoChange"
-                  />
-                </label>
-              </div>
-              <p class="text-xs text-gray-600 dark:text-gray-400">PNG, JPG, GIF até 10MB</p>
-
-              <!-- Botão remover -->
-              <button
-                v-if="photoPreviewUrl || existingPhotoUrl"
-                type="button"
-                class="mt-2 text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
-                :disabled="loading"
-                @click="onRemovePhoto"
-              >
-                Remover foto
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Foto de Perfil</h2>
+          <div class="flex flex-col items-center">
+            <div class="h-28 w-28 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-4 ring-gray-200 dark:ring-gray-600">
+              <img v-if="photoPreviewUrl" :src="photoPreviewUrl" alt="Foto" class="h-full w-full object-cover" @error="photoPreviewUrl = null; existingPhotoUrl = null" />
+              <svg v-else class="h-full w-full text-gray-300 dark:text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+              </svg>
+            </div>
+            <p v-if="photoFileName" class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ photoFileName }}</p>
+            <div class="mt-3 flex gap-3">
+              <label for="photo-upload" class="cursor-pointer rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 transition-colors" :class="{ 'pointer-events-none opacity-50': loading }">
+                <span>Escolher foto</span>
+                <input id="photo-upload" type="file" class="sr-only" accept="image/png,image/jpeg,image/gif" :disabled="loading" @change="onPhotoChange" />
+              </label>
+              <button v-if="photoPreviewUrl || existingPhotoUrl" type="button" class="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors" :disabled="loading" @click="onRemovePhoto">
+                Remover
               </button>
+            </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF até 10MB</p>
+            <p v-if="photoError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ photoError }}</p>
+          </div>
+        </div>
 
-              <!-- Erro inline -->
-              <p v-if="photoError" class="mt-2 text-sm text-red-600 dark:text-red-400">
-                {{ photoError }}
-              </p>
+        <!-- Section 2: Personal Info -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Informações Pessoais</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
+              <input v-model="form.playerName" type="text" placeholder="Seu nome completo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Apelido</label>
+              <input v-model="form.playerNickName" type="text" placeholder="Como te chamam em campo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data de Nascimento</label>
+              <input v-model="form.playerBirthdate" type="date" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
+              <Multiselect id="statusSelect" v-model="form.playerStatus" :options="this.status" track-by="name" label="name" :search="true" value-prop="id" :preselect-first="true" class="mt-1" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div>
+              <player-position-select v-model="form.playerPositions" is-multiselect="multiple"></player-position-select>
+            </div>
+            <div>
+              <modalities-select v-model="form.playerModalities" is-multiselect="multiple"></modalities-select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <StateSelectComponent v-model="this.stateId" label-name="Estado onde mora" />
+            <city-select-component label-name="Cidade onde mora" :state-id="this.stateId" v-model="this.cityId" />
+          </div>
+        </div>
+
+        <!-- Section 3: Physical Data -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Dados Físicos</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Altura (cm)</label>
+              <input v-model="form.playerHeight" type="number" placeholder="175" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Peso (kg)</label>
+              <input v-model="form.playerWeight" type="number" placeholder="70" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Uniforme</label>
+              <input v-model="form.playerUniformSize" type="text" placeholder="M" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Chuteira</label>
+              <input v-model="form.playerFootSize" type="number" placeholder="42" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Luva</label>
+              <input v-model="form.playerGloveSize" type="number" placeholder="9" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
             </div>
           </div>
         </div>
 
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do Jogador</label>
-          <input
-            v-model="form.playerName"
-            type="text"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Apelido do Jogador</label>
-          <input
-            v-model="form.playerNickName"
-            type="text"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data de nascimento</label>
-          <input
-            v-model="form.playerBirthdate"
-            type="date"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Altura (Cm)</label>
-          <input
-            v-model="form.playerHeight"
-            type="number"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Peso (Kg)</label>
-          <input
-            v-model="form.playerWeight"
-            type="number"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho da chuteira</label>
-          <input
-            v-model="form.playerFootSize"
-            type="number"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho da luva</label>
-          <input
-            v-model="form.playerGloveSize"
-            type="number"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho do Uniforme</label>
-          <input
-            v-model="form.playerUniformSize"
-            type="text"
-            class="
-                block
-                w-full
-                rounded-md
-                bg-white
-                px-3
-                py-1.5
-                text-base
-                text-gray-900
-                outline-1
-                -outline-offset-1
-                outline-gray-300
-                placeholder:text-gray-400
-                focus:outline-2
-                focus:-outline-offset-2
-                focus:outline-orange-500
-                sm:text-sm/6
-                dark:bg-white/5
-                dark:text-white
-                dark:outline-white/10
-                dark:placeholder:text-gray-500
-                dark:focus:outline-orange-500
-              "
-          />
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Youtube</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://youtube.com/</div>
-                <input v-model="form.playerYoutube" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
+        <!-- Section 4: Social Links -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Redes Sociais</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Instagram</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">instagram.com/</span>
+                <input v-model="form.playerInstagram" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="usuario" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">YouTube</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">youtube.com/</span>
+                <input v-model="form.playerYoutube" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="canal" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">TikTok</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">tiktok.com/</span>
+                <input v-model="form.playerTiktok" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="usuario" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Facebook</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">facebook.com/</span>
+                <input v-model="form.playerFacebook" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="usuario" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">X (Twitter)</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">x.com/</span>
+                <input v-model="form.playerX" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="usuario" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Kwai</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">kwai.com/</span>
+                <input v-model="form.playerKwaii" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="usuario" />
+              </div>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Goleiro de Aluguel</label>
+              <div class="mt-1 flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10">
+                <span class="shrink-0 pl-3 text-xs text-gray-400 dark:text-gray-500">goleiro.app/</span>
+                <input v-model="form.playerGDA" type="text" class="block min-w-0 grow bg-transparent py-2 pr-3 pl-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white" placeholder="perfil" />
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Facebook</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://facebook.com/</div>
-                <input v-model="form.playerFacebook" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">X (Antigo Twitter)</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://x.com/</div>
-                <input v-model="form.playerX" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Instagram</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.instagram.com/</div>
-                <input v-model="form.playerInstagram" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Tiktok</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://tiktok.com/</div>
-                <input v-model="form.playerTiktok" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Kwai</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://www.kwai.com/</div>
-                <input v-model="form.playerKwaii" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <div class="sm:col-span-4">
-            <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Goleiro de Aluguel</label>
-            <div class="mt-2">
-              <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-orange-500 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-orange-500">
-                <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">https://goleiro.app/</div>
-                <input v-model="form.playerGDA" type="text" name="username" id="username" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" placeholder="janesmith" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="statusSelect">Exibir na lista de jogadores ativos?</label>
-          <Multiselect
-            id="statusSelect"
-            v-model="form.playerStatus"
-            :options="this.status"
-            track-by="name"
-            label="name"
-            :search="true"
-            value-prop="id"
-            :preselect-first="true"
-          />
-        </div>
-
-        <div class="pt-4">
+        <!-- Submit Button -->
+        <div class="flex justify-end">
           <button
             type="submit"
-            class="
-                inline-flex
-                w-full
-                items-center
-                justify-center
-                gap-2
-                rounded-md
-                bg-orange-500
-                px-4
-                py-2
-                font-semibold
-                text-white
-                transition
-                hover:bg-orange-600
-                disabled:cursor-not-allowed
-                disabled:bg-orange-400
-                disabled:opacity-80
-              "
-            :disabled="this.loading"
+            class="rounded-xl bg-orange-500 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-orange-600 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:bg-orange-400 disabled:opacity-80"
+            :disabled="loading"
           >
-            <svg
-              v-if="loading"
-              class="h-5 w-5 animate-spin text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
-            </svg>
-
-            <span>{{ loading ? "Salvando..." : "Salvar dados do perfil" }}</span>
+            <span v-if="loading" class="flex items-center gap-2">
+              <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Salvando...
+            </span>
+            <span v-else>Salvar perfil</span>
           </button>
         </div>
-      </div>
+
       </div>
     </form>
   </system-layout>
