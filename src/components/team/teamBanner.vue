@@ -24,6 +24,7 @@ export default {
       teamId: 0,
       team: {},
       loading: false,
+      showLogoModal: false,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
     }
   },
@@ -112,14 +113,26 @@ export default {
     <!-- Info section -->
     <div class="relative bg-white dark:bg-gray-800 px-4 pb-4 sm:px-6 lg:px-8">
       <div class="-mt-12 sm:-mt-14 flex items-end gap-4 sm:gap-5">
-        <!-- Logo -->
+        <!-- Logo (arredondado e clicável) -->
         <div class="flex-shrink-0">
-          <img
-            class="h-20 w-20 rounded-xl border-4 border-white shadow-lg sm:h-24 sm:w-24 dark:border-gray-800"
-            :src="logoUrl"
-            alt="Logo do time"
-            @error="$event.target.src = fallbackImage"
-          />
+          <button
+            type="button"
+            class="group relative h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg transition hover:ring-4 hover:ring-orange-500/30 sm:h-24 sm:w-24 dark:border-gray-800"
+            @click="showLogoModal = true"
+            title="Clique para ampliar"
+          >
+            <img
+              :src="logoUrl"
+              alt="Logo do time"
+              class="h-full w-full object-cover"
+              @error="$event.target.src = fallbackImage"
+            />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/20">
+              <svg class="h-5 w-5 text-white opacity-0 transition group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+              </svg>
+            </div>
+          </button>
         </div>
 
         <!-- Name -->
@@ -157,6 +170,29 @@ export default {
           {{ item.label }}
         </router-link>
       </nav>
+    </div>
+
+    <!-- Modal de logo ampliada -->
+    <div
+      v-if="showLogoModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      @click.self="showLogoModal = false"
+    >
+      <div class="relative max-h-[80vh] max-w-[80vw]">
+        <button
+          type="button"
+          class="absolute -top-3 -right-3 flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-white shadow-lg hover:bg-gray-700"
+          @click="showLogoModal = false"
+        >
+          ✕
+        </button>
+        <img
+          :src="logoUrl"
+          alt="Logo do time ampliada"
+          class="max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl"
+          @error="$event.target.src = fallbackImage"
+        />
+      </div>
     </div>
   </div>
 </template>
