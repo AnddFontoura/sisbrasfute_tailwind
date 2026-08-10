@@ -87,11 +87,11 @@
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Altura (cm)</label>
-              <input v-model="form.playerHeight" type="number" placeholder="175" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <input v-model.number="form.playerHeight" type="number" placeholder="175" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Peso (kg)</label>
-              <input v-model="form.playerWeight" type="number" placeholder="70" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <input v-model.number="form.playerWeight" type="number" placeholder="70" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Uniforme</label>
@@ -99,11 +99,11 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Chuteira</label>
-              <input v-model="form.playerFootSize" type="number" placeholder="42" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <input v-model.number="form.playerFootSize" type="number" placeholder="42" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Luva</label>
-              <input v-model="form.playerGloveSize" type="number" placeholder="9" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <input v-model.number="form.playerGloveSize" type="number" placeholder="9" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
             </div>
           </div>
         </div>
@@ -340,8 +340,11 @@ export default {
           value.forEach(item => {
             formData.append(`${key}[]`, item)
           })
+        } else if (value === null || value === undefined || value === '') {
+          // Não envia campos vazios — evita que o backend receba "" como string em campos numéricos
+          return
         } else {
-          formData.append(key, value ?? '')
+          formData.append(key, value)
         }
       })
 
