@@ -154,18 +154,11 @@ export default {
 
   methods: {
     getPlayerPhoto(player) {
-      // Tenta URL completa primeiro (campo _url do Laravel accessor)
-      const fullUrl = player.player_info?.photo_url || player.photo_url
-      if (fullUrl) return fullUrl
+      // O backend agora retorna photo_url completa via accessor
+      if (player.photo_url) return player.photo_url
 
-      // Se tem caminho relativo, constrói a URL completa com a base
-      const relativePath = player.player_info?.photo || player.photo
-      if (relativePath) {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
-        // Remove /api do final se existir, pois o storage normalmente está na raiz
-        const storageBase = baseUrl.replace(/\/api\/?$/, '')
-        return `${storageBase}/storage/${relativePath}`
-      }
+      // Fallback: player_info pode ter a URL
+      if (player.player_info?.photo_url) return player.player_info.photo_url
 
       return this.fallbackAvatar
     },
@@ -184,26 +177,12 @@ export default {
     },
 
     getPlayerPosition(player) {
-      // Posição atribuída no time (game_position_info)
+      // Posição atribuída no time (vem do eager load gamePositionInfo)
       if (player.game_position_info?.name) {
         return player.game_position_info.name
       }
 
-      // Posição vinda de game_position
-      if (player.game_position?.name) {
-        return player.game_position.name
-      }
-
-      // Array de posições do perfil do jogador
-      if (player.player_info?.positions && player.player_info.positions.length) {
-        return player.player_info.positions.map(p => p.name || p).join(', ')
-      }
-
-      if (Array.isArray(player.positions) && player.positions.length) {
-        return player.positions.map(p => p.name || p).join(', ')
-      }
-
-      return player.position_name || player.position || null
+      return null
     },
 
     async getTeamPlayerList(page = 1) {
@@ -216,10 +195,6 @@ export default {
         })
         this.players = response.data.data
         this.pagination = response.data
-        // DEBUG: remover após verificar estrutura dos dados
-        if (this.players.length) {
-          console.log('[TeamPlayerList] Estrutura do primeiro jogador:', JSON.parse(JSON.stringify(this.players[0])))
-        }
       } catch (err) {
         console.error(err)
         await Swal.fire({
