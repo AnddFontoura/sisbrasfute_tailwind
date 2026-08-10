@@ -18,7 +18,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "@vueform/multiselect": "^2.6.11",
     "@vueup/vue-quill": "^1.2.0",
-    "axios": "^1.11.0",
+    "axios": "^1.16.0",
     "pinia": "^3.0.3",
     "sweetalert2": "^11.26.17",
     "tailwindcss": "^4.1.13",
