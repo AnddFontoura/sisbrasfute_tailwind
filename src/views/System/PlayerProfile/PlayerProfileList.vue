@@ -1,140 +1,67 @@
 <template>
   <system-layout>
     <main>
-      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div class="mb-6">
+        <h1 class="text-2xl font-black text-gray-900 dark:text-white">Jogadores</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Jogadores cadastrados na plataforma.</p>
+      </div>
+
+      <!-- Empty state -->
+      <div v-if="players.length === 0 && !loading" class="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+        Nenhum jogador encontrado.
+      </div>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div
-          v-for="(player, key) in players"
-          class="
-              mt-3
-              max-w-xs
-              rounded-xl
-              shadow-lg
-              overflow-hidden
-              bg-white
-              border
-              border-orange-500
-            "
+          v-for="player in players"
+          :key="player.id"
+          class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-orange-500/40 hover:shadow-md dark:border-white/10 dark:bg-gray-800"
         >
-          <!-- Título -->
-          <div
-            class="
-                text-white
-                bg-orange-500
-                text-center
-                py-3
-              "
-          >
-            <h2
-              class="
-                  text-xl
-                  font-bold
-                "
-            >
+          <!-- Header com gradiente escuro -->
+          <div class="relative h-20 bg-gradient-to-br from-gray-900 to-gray-800">
+            <div class="absolute -bottom-8 left-4">
+              <div class="h-16 w-16 overflow-hidden rounded-full border-2 border-white bg-gray-100 shadow-md dark:border-gray-700">
+                <img
+                  :src="player.photo_url || fallbackAvatar"
+                  :alt="player.name"
+                  class="h-full w-full object-cover"
+                  @error="$event.target.src = fallbackAvatar"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="px-4 pb-4 pt-10">
+            <h3 class="text-base font-bold text-gray-900 truncate dark:text-white">
               {{ player.name }}
-            </h2>
-          </div>
+            </h3>
+            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+              {{ player.nickname || 'Sem apelido' }}
+            </p>
 
-          <!-- Banner com grama -->
-          <div
-            class="
-                h-20
-                bg-cover
-                bg-center
-              "
-            :style="{
-                backgroundImage: `url(${player?.banner_url || fallbackImage})`
-              }"
-          >
-
-          </div>
-
-          <!-- Logo -->
-          <div
-            class="
-                flex
-                justify-center
-                -mt-8
-              "
-          >
-            <div
-              class="
-                  bg-white
-                  p-2
-                  rounded-lg
-                  shadow-md
-                  border
-                  border-orange-500
-                "
-            >
-              <img
-                :src="player?.photo_url || fallbackImage"
-                alt="Logo"
-                class="
-                    h-20
-                    w-20
-                    object-contain
-                  "
-              >
+            <!-- Infos -->
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <div class="rounded-lg bg-gray-50 px-2 py-1.5 text-center dark:bg-gray-700/50">
+                <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.name || '—' }}</p>
+              </div>
+              <div class="rounded-lg bg-gray-50 px-2 py-1.5 text-center dark:bg-gray-700/50">
+                <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.state_info?.name || '—' }}</p>
+              </div>
             </div>
-          </div>
 
-          <!-- Infos -->
-          <div
-            class="
-                px-4
-                py-4
-                grid
-                grid-cols-2
-                text-center
-              "
-          >
-            <div>
-              <p
-                class="
-                    font-semibold
-                    text-gray-700
-                  "
+            <!-- Ação -->
+            <div class="mt-4">
+              <router-link
+                :to="{ name: 'player-profile-show', params: { id: player.id } }"
+                class="w-full inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
               >
-                Cidade
-              </p>
-              <p
-                class="
-                    text-sm
-                    text-gray-900
-                  "
-              >
-                CURITIBA
-              </p>
+                Ver perfil
+              </router-link>
             </div>
-            <div>
-              <p
-                class="
-                    font-semibold
-                    text-gray-700
-                  "
-              >
-                Estado
-              </p>
-              <p
-                class="
-                    text-sm
-                    text-gray-900
-                  "
-              >
-                PARANÁ
-              </p>
-            </div>
-          </div>
-
-          <!-- Botões -->
-          <div
-            class="px-4 pb-4 grid gap-2 grid-cols-1"
-          >
-            <orange-button
-              :url="{ name: 'player-profile-show', params: { id: player.id } }"
-              text="Visualizar"
-            >
-            </orange-button>
           </div>
         </div>
       </div>
@@ -145,53 +72,54 @@
 <script>
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
-import {useAuthStore} from "@/stores/auth.js";
-import OrangeButton from "@/components/button/OrangeButton.vue";
+import { useAuthStore } from "@/stores/auth.js";
 import Swal from "@/services/swal.js";
 
 export default {
-  name: "playerProfileList",
+  name: "PlayerProfileList",
   components: {
     systemLayout,
-    OrangeButton
   },
 
   data() {
     return {
       players: [],
-      payload: {},
-      fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg'
+      loading: false,
+      fallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
     }
   },
+
   created() {
     this.auth = useAuthStore()
-    this.getTeamsList()
+    this.getPlayersList()
   },
+
   computed: {
     user() {
       return this.auth.user
     }
   },
+
   methods: {
-    async getTeamsList() {
-      this.loading = true;
+    async getPlayersList() {
+      this.loading = true
       try {
-        let response = await api.get("/player-profile", this.payload);
+        const response = await api.get("/player-profile")
         this.players = response.data.data
       } catch (err) {
-        console.error(err);
+        console.error(err)
         await Swal.fire({
           toast: true,
           position: 'top-end',
           icon: 'error',
-          title: 'Erro ao puxar lista do time',
+          title: 'Erro ao carregar jogadores',
           showConfirmButton: false,
           timer: 3000,
         })
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     }
   },
-};
+}
 </script>
