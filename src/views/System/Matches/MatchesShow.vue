@@ -97,17 +97,104 @@
           </div>
         </div>
 
+        <!-- SEÇÃO VAGAS DISPONÍVEIS -->
+        <div v-if="hasPositions" class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h2 class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+            <span>⚽</span> Vagas Disponíveis
+          </h2>
+
+          <!-- Tag info banner -->
+          <div v-if="matchTagName" class="mb-4 rounded-lg px-4 py-3 text-sm"
+            :class="playerHasRequiredTag
+              ? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300'
+              : 'border border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'"
+          >
+            <span v-if="playerHasRequiredTag">
+              ✓ Você possui a tag <strong>{{ matchTagName }}</strong> necessária para esta partida.
+            </span>
+            <span v-else>
+              ⚠️ Esta partida exige a tag <strong>{{ matchTagName }}</strong>. Você não possui essa tag e não pode se inscrever.
+            </span>
+          </div>
+
+          <!-- Loading -->
+          <div v-if="positionsLoading" class="flex items-center justify-center py-8">
+            <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Carregando posições...</span>
+          </div>
+
+          <!-- Error -->
+          <div v-else-if="positionsError" class="text-center py-6">
+            <p class="text-sm text-red-600 dark:text-red-400">Erro ao carregar posições.</p>
+            <button @click="loadPositions" class="mt-3 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 transition">
+              Tentar novamente
+            </button>
+          </div>
+
+          <!-- Positions grid -->
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div
+              v-for="position in positionsData"
+              :key="position.game_position_id"
+              class="rounded-xl border p-4 transition"
+              :class="getPositionClasses(position)"
+            >
+              <!-- Position name + price -->
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-bold text-gray-900 dark:text-white">
+                  {{ position.game_position_name }}
+                </span>
+                <span class="text-xs font-semibold text-orange-600 dark:text-orange-400">
+                  {{ formatCurrency(position.value) }}
+                </span>
+              </div>
+
+              <!-- State: Available -->
+              <div v-if="getPositionState(position) === 'available'">
+                <p class="text-xs text-green-700 dark:text-green-400 font-medium mb-2">Disponível</p>
+                <button
+                  v-if="!currentAssignment && playerHasRequiredTag"
+                  @click="handleChoose(position)"
+                  class="w-full rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+                >
+                  Escolher
+                </button>
+                <p v-else-if="!playerHasRequiredTag" class="text-xs text-amber-600 dark:text-amber-400 italic">
+                  Tag necessária ausente
+                </p>
+              </div>
+
+              <!-- State: Mine -->
+              <div v-else-if="getPositionState(position) === 'mine'">
+                <p class="text-xs text-orange-700 dark:text-orange-300 font-semibold mb-2">✓ Sua posição</p>
+                <button
+                  @click="handleRelease(position)"
+                  class="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                >
+                  Liberar posição
+                </button>
+              </div>
+
+              <!-- State: Occupied -->
+              <div v-else>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ position.player_name }}
+                  <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- SEÇÃO BOTÕES -->
         <div class="mt-6 flex flex-wrap gap-3 justify-center">
           <router-link v-if="matchInfo.positions && matchInfo.positions.length > 0"
             :to="{ name: 'matches-positions', params: { id: matchId } }"
             class="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2">
             Gerenciar Posições
-          </router-link>
-          <router-link v-if="matchInfo.positions && matchInfo.positions.length > 0"
-            :to="{ name: 'matches-choose-position', params: { id: matchId } }"
-            class="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2">
-            Escolher Minha Posição
           </router-link>
         </div>
         </template>
@@ -146,6 +233,13 @@ export default {
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
       isLightboxOpen: false,
       lightboxImageUrl: null,
+      positionsData: [],
+      positionsLoading: false,
+      positionsError: false,
+      currentTeamPlayerId: null,
+      currentAssignment: null,
+      playerHasRequiredTag: true,
+      matchTagName: null,
     }
   },
   computed: {
@@ -168,9 +262,13 @@ export default {
     showPenalties() {
       return this.matchInfo.has_penalties === true || this.matchInfo.has_penalties === 1;
     },
+    hasPositions() {
+      return this.matchInfo.positions && this.matchInfo.positions.length > 0;
+    },
   },
   created() {
     this.matchId = this.$route.params.id
+    this.identifyCurrentPlayer()
     this.getMatchInformation()
   },
   mounted() {
@@ -181,6 +279,183 @@ export default {
     document.removeEventListener('keydown', this._escHandler);
   },
   methods: {
+    identifyCurrentPlayer() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'))
+        this.currentTeamPlayerId = user?.team_player_id || null
+      } catch {
+        this.currentTeamPlayerId = null
+      }
+    },
+
+    async checkTagEligibility() {
+      // Se a partida não exige tag, qualquer jogador pode participar
+      if (!this.matchInfo.tag_id) {
+        this.playerHasRequiredTag = true
+        this.matchTagName = null
+        return
+      }
+
+      // Busca nome da tag da partida
+      this.matchTagName = this.matchInfo.tag?.name || 'Tag necessária'
+
+      // Verifica se o jogador tem a tag
+      if (!this.currentTeamPlayerId) {
+        this.playerHasRequiredTag = false
+        return
+      }
+
+      try {
+        // Busca dados do jogador no time (com tags) para verificar elegibilidade
+        const teamId = this.matchInfo.created_by_team_id
+        if (!teamId) {
+          this.playerHasRequiredTag = false
+          return
+        }
+
+        const response = await api.get(`/team-player/${teamId}/show/${this.currentTeamPlayerId}`)
+        const playerTags = response.data?.tags || []
+        this.playerHasRequiredTag = playerTags.some(tag => tag.id === this.matchInfo.tag_id)
+      } catch {
+        // Se não conseguiu verificar, deixa o backend validar
+        this.playerHasRequiredTag = true
+      }
+    },
+
+    findCurrentAssignment() {
+      if (!this.currentTeamPlayerId) {
+        this.currentAssignment = null
+        return
+      }
+      this.currentAssignment = this.positionsData.find(
+        p => p.team_player_id === this.currentTeamPlayerId
+      ) || null
+    },
+
+    getPositionState(position) {
+      if (!position.team_player_id) return 'available'
+      if (position.team_player_id === this.currentTeamPlayerId) return 'mine'
+      return 'occupied'
+    },
+
+    getPositionClasses(position) {
+      const state = this.getPositionState(position)
+      const classes = {
+        available: 'border-green-300 bg-green-50 dark:border-green-500/30 dark:bg-green-500/10',
+        mine: 'border-orange-400 bg-orange-50 ring-2 ring-orange-300 dark:border-orange-500/40 dark:bg-orange-500/10 dark:ring-orange-500/30',
+        occupied: 'border-gray-300 bg-gray-50 opacity-60 dark:border-gray-600 dark:bg-gray-700/50',
+      }
+      return classes[state]
+    },
+
+    formatCurrency(value) {
+      const number = Number(value || 0)
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number)
+    },
+
+    async loadPositions() {
+      this.positionsLoading = true
+      this.positionsError = false
+      try {
+        const response = await api.get(`/match-positions/${this.matchId}`)
+        this.positionsData = response.data
+        this.findCurrentAssignment()
+      } catch (err) {
+        console.error(err)
+        this.positionsError = true
+      } finally {
+        this.positionsLoading = false
+      }
+    },
+
+    async handleChoose(position) {
+      const result = await Swal.fire({
+        title: 'Confirmar escolha',
+        text: `Deseja se atribuir à posição "${position.game_position_name}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, escolher',
+        cancelButtonText: 'Cancelar',
+      })
+
+      if (!result.isConfirmed) return
+
+      try {
+        await api.post(`/match-positions/${this.matchId}/self-assign`, {
+          game_position_id: position.game_position_id,
+        })
+
+        // Atualiza estado local
+        const user = JSON.parse(localStorage.getItem('user'))
+        position.team_player_id = this.currentTeamPlayerId
+        position.player_name = user?.name || 'Você'
+        position.player_nickname = user?.nickname || null
+        this.currentAssignment = position
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Posição escolhida com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        const status = err.response?.status
+        const message = err.response?.data?.message || 'Erro ao escolher posição.'
+
+        if (status === 409) {
+          await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Posição já ocupada por outro jogador.', showConfirmButton: false, timer: 3000 })
+          this.loadPositions()
+        } else if (status === 422) {
+          await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: message, showConfirmButton: false, timer: 3000 })
+          this.loadPositions()
+        } else if (status === 403) {
+          await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: message, showConfirmButton: false, timer: 3000 })
+        } else if (!err.response) {
+          await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Erro de conexão.', showConfirmButton: false, timer: 3000 })
+        } else {
+          await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: message, showConfirmButton: false, timer: 3000 })
+        }
+      }
+    },
+
+    async handleRelease(position) {
+      const result = await Swal.fire({
+        title: 'Liberar posição?',
+        text: 'Outro jogador poderá ocupar esta vaga.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, liberar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc2626',
+      })
+
+      if (!result.isConfirmed) return
+
+      try {
+        await api.delete(`/match-positions/${this.matchId}/self-assign`)
+
+        // Limpa estado local
+        position.team_player_id = null
+        position.player_name = null
+        position.player_nickname = null
+        this.currentAssignment = null
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Posição liberada com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        const message = err.response?.data?.message || 'Erro ao liberar posição.'
+        await Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: message, showConfirmButton: false, timer: 3000 })
+      }
+    },
+
     openLightbox(imageUrl) {
       if (!imageUrl || imageUrl === this.fallbackImage) return;
       this.lightboxImageUrl = imageUrl;
@@ -199,6 +474,12 @@ export default {
         try {
           let response = await api.get("/matches/show/" + this.matchId);
           this.matchInfo = response.data
+
+          // Carrega posições detalhadas se a partida tem posições configuradas
+          if (this.matchInfo.positions && this.matchInfo.positions.length > 0) {
+            this.loadPositions()
+            this.checkTagEligibility()
+          }
 
         } catch (err) {
           console.error(err);

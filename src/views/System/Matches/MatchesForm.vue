@@ -168,6 +168,24 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Configuração de Posições</h2>
 
           <div class="space-y-4">
+            <!-- Tag da partida -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tag da partida (opcional)</label>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Se uma tag for selecionada, apenas jogadores com essa tag poderão se inscrever.</p>
+              <Multiselect
+                v-model="form.tagId"
+                :options="availableTags"
+                mode="single"
+                track-by="name"
+                label="name"
+                value-prop="id"
+                :searchable="true"
+                placeholder="Sem restrição de tag"
+                :allow-empty="true"
+                class="mt-2"
+              />
+            </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Indicar posições de jogadores?</label>
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ative essa opção para configurar quais posições estarão disponíveis na partida.</p>
@@ -334,9 +352,11 @@ export default {
         playersCount: 1,
         teamsCount: 1,
         matchType: null,
+        tagId: null,
         positions: [],
       },
       gamePositions: [],
+      availableTags: [],
       stateId: null,
       cityId: null,
       matchId: null,
@@ -367,6 +387,7 @@ export default {
     this.isEditing = !!this.matchId
 
     await this.loadGamePositions()
+    await this.loadAvailableTags()
 
     if (this.isEditing) {
       await this.getMatchInfo()
@@ -402,6 +423,15 @@ export default {
         console.error("Erro ao carregar posições:", err)
       }
     },
+    async loadAvailableTags() {
+      if (!this.form.teamId) return
+      try {
+        const response = await api.get(`/team/${this.form.teamId}/tags`)
+        this.availableTags = response.data ?? []
+      } catch (err) {
+        console.error("Erro ao carregar tags:", err)
+      }
+    },
     async getMatchInfo() {
       if (!this.matchId) return
 
@@ -426,6 +456,7 @@ export default {
         this.form.matchType = this.matchTypeOptions.find(
           (option) => option.id === (data.match_type ?? data.type)
         )?.id ?? null
+        this.form.tagId = data.tag_id ?? null
         this.stateId = data.state_id ?? data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
 
