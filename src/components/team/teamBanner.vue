@@ -91,7 +91,19 @@ export default {
       }
     },
     isActive(routeName) {
-      return this.$route.name === routeName
+      const current = this.$route.name
+      if (current === routeName) return true
+
+      // Marca como ativo se está em sub-rotas relacionadas
+      const relatedRoutes = {
+        'team-players-list': ['team-players-list', 'team-players-form', 'team-player-edit', 'team-application-list'],
+        'team-matches-list': ['team-matches-list', 'team-matches-form', 'team-matches-manage', 'matches-edit'],
+        'team-finance-list': ['team-finance-list', 'team-finance-form'],
+        'team-edit': ['team-edit'],
+      }
+
+      const related = relatedRoutes[routeName] || []
+      return related.includes(current)
     },
   },
 };

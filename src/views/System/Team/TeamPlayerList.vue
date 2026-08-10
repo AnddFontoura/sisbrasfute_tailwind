@@ -23,11 +23,66 @@
         </router-link>
       </div>
 
-      <!-- Lista de jogadores -->
-      <div v-if="players.length === 0 && !loading" class="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
-        Nenhum jogador cadastrado neste time.
+      <!-- Filtros -->
+      <div class="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-gray-800 dark:text-white">Filtros</h2>
+          <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">
+            Limpar
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Nome -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
+            <input
+              v-model="filters.name"
+              type="text"
+              placeholder="Buscar por nome..."
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              @input="debounceSearch"
+            />
+          </div>
+
+          <!-- Posição -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Posição</label>
+            <select
+              v-model="filters.game_position_id"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              @change="applyFilters"
+            >
+              <option :value="null">Todas as posições</option>
+              <option v-for="pos in gamePositions" :key="pos.id" :value="pos.id">
+                {{ pos.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Tags -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tag</label>
+            <select
+              v-model="filters.tag_id"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              @change="applyFilters"
+            >
+              <option :value="null">Todas as tags</option>
+              <option v-for="tag in availableTags" :key="tag.id" :value="tag.id">
+                {{ tag.name }}
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
 
+      <!-- Empty state -->
+      <div v-if="players.length === 0 && !loading" class="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+        Nenhum jogador encontrado.
+      </div>
+
+      <!-- Grid de jogadores -->
       <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div
           v-for="player in players"
@@ -37,7 +92,7 @@
           <!-- Header com foto -->
           <div class="relative h-20 bg-gradient-to-br from-gray-900 to-gray-800">
             <div class="absolute -bottom-8 left-4">
-              <div class="h-16 w-16 overflow-hidden rounded-xl border-2 border-white bg-gray-100 shadow-md dark:border-gray-700">
+              <div class="h-16 w-16 overflow-hidden rounded-full border-2 border-white bg-gray-100 shadow-md dark:border-gray-700">
                 <img
                   :src="getPlayerPhoto(player)"
                   :alt="getPlayerName(player)"
@@ -134,8 +189,16 @@ export default {
         current_page: 1,
         last_page: 1
       },
+      filters: {
+        name: '',
+        game_position_id: null,
+        tag_id: null,
+      },
+      gamePositions: [],
+      availableTags: [],
       teamId: null,
       loading: false,
+      searchTimeout: null,
       fallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
     }
   },
@@ -143,6 +206,7 @@ export default {
   created() {
     this.auth = useAuthStore()
     this.teamId = this.$route.params.teamId ?? null
+    this.loadFilterOptions()
     this.getTeamPlayerList()
   },
 
@@ -153,13 +217,40 @@ export default {
   },
 
   methods: {
+    async loadFilterOptions() {
+      if (!this.teamId) return
+
+      try {
+        const [positionsRes, tagsRes] = await Promise.all([
+          api.get('/game-positions/list'),
+          api.get(`/team/${this.teamId}/tags`),
+        ])
+        this.gamePositions = positionsRes.data?.gamePositions ?? positionsRes.data ?? []
+        this.availableTags = tagsRes.data ?? []
+      } catch (err) {
+        console.error('Erro ao carregar filtros:', err)
+      }
+    },
+
+    debounceSearch() {
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.applyFilters()
+      }, 400)
+    },
+
+    applyFilters() {
+      this.getTeamPlayerList(1)
+    },
+
+    resetFilters() {
+      this.filters = { name: '', game_position_id: null, tag_id: null }
+      this.getTeamPlayerList(1)
+    },
+
     getPlayerPhoto(player) {
-      // O backend agora retorna photo_url completa via accessor
       if (player.photo_url) return player.photo_url
-
-      // Fallback: player_info pode ter a URL
       if (player.player_info?.photo_url) return player.player_info.photo_url
-
       return this.fallbackAvatar
     },
 
@@ -177,11 +268,9 @@ export default {
     },
 
     getPlayerPosition(player) {
-      // Posição atribuída no time (vem do eager load gamePositionInfo)
       if (player.game_position_info?.name) {
         return player.game_position_info.name
       }
-
       return null
     },
 
@@ -191,7 +280,12 @@ export default {
       this.loading = true
       try {
         const response = await api.get(`/team-player/${this.teamId}/list`, {
-          params: { page }
+          params: {
+            page,
+            name: this.filters.name || undefined,
+            game_position_id: this.filters.game_position_id || undefined,
+            tag_id: this.filters.tag_id || undefined,
+          }
         })
         this.players = response.data.data
         this.pagination = response.data

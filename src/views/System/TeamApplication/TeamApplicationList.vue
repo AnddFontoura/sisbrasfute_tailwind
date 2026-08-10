@@ -4,50 +4,7 @@
       <team-banner
         v-if="teamId"
         :teamInfoId="teamId"
-      >
-      </team-banner>
-
-      <div class="mt-3 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-        <router-link
-          :to="{ name: 'team-players-form', params: { teamId: this.teamId } }"
-          type="button"
-          class="
-            inline-flex
-            justify-center
-            rounded-md
-            bg-orange-500
-            hover:bg-orange-700
-            px-3
-            py-2
-            text-sm
-            font-semibold
-            text-white
-            shadow-xs
-          "
-        >
-          <span> Recrutamento </span>
-        </router-link>
-
-        <router-link
-          :to="{ name: 'team-application-list', params: { teamId: this.teamId } }"
-          type="button"
-          class="
-          inline-flex
-          justify-center
-          rounded-md
-          bg-orange-500
-          hover:bg-orange-700
-          px-3
-          py-2
-          text-sm
-          font-semibold
-          text-white
-          shadow-xs
-        "
-        >
-          <span> Recrutas </span>
-        </router-link>
-      </div>
+      />
 
       <div class="flex flex-col gap-4 mt-6">
         <div
