@@ -56,6 +56,72 @@
             </div>
 
             <form @submit.prevent="handleSubmit">
+              <!-- Section: Foto do Jogador no Time -->
+              <div class="mb-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Foto do Jogador no Time
+                </h2>
+                <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                  Esta foto é exclusiva para a apresentação do jogador neste time. Não altera a foto do perfil pessoal.
+                </p>
+
+                <div class="flex items-start gap-4">
+                  <!-- Preview -->
+                  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-700">
+                    <img
+                      v-if="photoPreviewUrl"
+                      :src="photoPreviewUrl"
+                      alt="Foto do jogador no time"
+                      class="h-full w-full object-cover"
+                      @error="photoPreviewUrl = null"
+                    />
+                    <svg
+                      v-else
+                      class="h-full w-full text-gray-300 dark:text-gray-500"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+                    </svg>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex flex-col gap-2">
+                    <label
+                      for="team-player-photo"
+                      class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-semibold text-orange-600 transition hover:bg-orange-500/20 dark:text-orange-400"
+                      :class="{ 'pointer-events-none opacity-50': saving }"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Escolher foto
+                      <input
+                        id="team-player-photo"
+                        type="file"
+                        class="sr-only"
+                        accept="image/png,image/jpeg,image/gif"
+                        :disabled="saving"
+                        @change="onPhotoChange"
+                      />
+                    </label>
+
+                    <button
+                      v-if="photoPreviewUrl"
+                      type="button"
+                      class="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+                      :disabled="saving"
+                      @click="onRemovePhoto"
+                    >
+                      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      Remover foto
+                    </button>
+
+                    <p v-if="photoFileName" class="text-xs text-gray-500">{{ photoFileName }}</p>
+                    <p v-if="photoError" class="text-xs text-red-600">{{ photoError }}</p>
+                    <p class="text-xs text-gray-400">PNG, JPG ou GIF até 10MB</p>
+                  </div>
+                </div>
+              </div>
+
               <!-- Section: Informações Pessoais -->
               <div class="mb-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -332,8 +398,8 @@
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho da Luva</label>
                     <input
-                      v-model="form.glove_size"
-                      type="text"
+                      v-model.number="form.glove_size"
+                      type="number"
                       class="
                         mt-1
                         block
@@ -529,6 +595,11 @@ export default {
         glove_size: null,
         game_position_id: null,
       },
+      photoFile: null,
+      photoPreviewUrl: null,
+      photoFileName: null,
+      photoError: null,
+      removePhoto: false,
       gamePositions: [],
       availableTags: [],
       selectedTagIds: [],
@@ -571,12 +642,66 @@ export default {
         if (this.player.tags && Array.isArray(this.player.tags)) {
           this.selectedTagIds = this.player.tags.map(tag => tag.id);
         }
+
+        // Carregar foto do jogador no time (se existir)
+        const teamPhoto = this.player.team_photo_url || this.player.team_photo
+        if (teamPhoto) {
+          if (teamPhoto.startsWith('http')) {
+            this.photoPreviewUrl = teamPhoto
+          } else {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+            const storageBase = baseUrl.replace(/\/api\/?$/, '')
+            this.photoPreviewUrl = `${storageBase}/storage/${teamPhoto}`
+          }
+        }
       } catch (err) {
         console.error(err);
         this.error = "Erro ao carregar dados do jogador.";
       } finally {
         this.loading = false;
       }
+    },
+
+    onPhotoChange(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/gif']
+      const maxSize = 10 * 1024 * 1024
+
+      if (file.size > maxSize) {
+        this.photoError = 'O arquivo excede o tamanho máximo de 10MB.'
+        event.target.value = ''
+        return
+      }
+
+      if (!allowedTypes.includes(file.type)) {
+        this.photoError = 'Formato não permitido. Use PNG, JPG ou GIF.'
+        event.target.value = ''
+        return
+      }
+
+      // Revoga URL anterior se era blob
+      if (this.photoPreviewUrl && this.photoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.photoPreviewUrl)
+      }
+
+      this.photoFile = file
+      this.photoPreviewUrl = URL.createObjectURL(file)
+      this.photoFileName = file.name
+      this.photoError = null
+      this.removePhoto = false
+    },
+
+    onRemovePhoto() {
+      if (this.photoPreviewUrl && this.photoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.photoPreviewUrl)
+      }
+      this.photoPreviewUrl = null
+      this.photoFile = null
+      this.photoFileName = null
+      this.photoError = null
+      this.removePhoto = true
     },
 
     async handleCreateTag(query) {
@@ -635,18 +760,32 @@ export default {
         // Filter out any non-numeric values (safety measure for tags)
         const validTagIds = this.selectedTagIds.filter(id => Number.isInteger(id) || (typeof id === 'number'));
 
-        await api.post(`/team-player/${this.teamId}/update/${this.playerId}`, {
-          name: this.form.name,
-          nickname: this.form.nickname,
-          birthdate: this.form.birthdate,
-          number: this.form.number,
-          uniform_size: this.form.uniform_size,
-          height: this.form.height,
-          weight: this.form.weight,
-          foot_size: this.form.foot_size,
-          glove_size: this.form.glove_size,
-          game_position_id: this.form.game_position_id,
-          tag_ids: validTagIds,
+        const formData = new FormData()
+
+        // Campos do formulário
+        if (this.form.name) formData.append('name', this.form.name)
+        if (this.form.nickname) formData.append('nickname', this.form.nickname)
+        if (this.form.birthdate) formData.append('birthdate', this.form.birthdate)
+        if (this.form.number) formData.append('number', this.form.number)
+        if (this.form.uniform_size) formData.append('uniform_size', this.form.uniform_size)
+        if (this.form.height) formData.append('height', this.form.height)
+        if (this.form.weight) formData.append('weight', this.form.weight)
+        if (this.form.foot_size) formData.append('foot_size', this.form.foot_size)
+        if (this.form.glove_size) formData.append('glove_size', this.form.glove_size)
+        if (this.form.game_position_id) formData.append('game_position_id', this.form.game_position_id)
+
+        // Tags
+        validTagIds.forEach(id => formData.append('tag_ids[]', id))
+
+        // Foto — armazenada em player_team_profile/
+        if (this.removePhoto) {
+          formData.append('removeTeamPhoto', '1')
+        } else if (this.photoFile) {
+          formData.append('teamPlayerPhoto', this.photoFile)
+        }
+
+        await api.post(`/team-player/${this.teamId}/update/${this.playerId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         });
 
         await Swal.fire({
@@ -668,6 +807,12 @@ export default {
         let mensagem = "Não foi possível salvar os dados do jogador.";
 
         if (err.response?.data?.errors) {
+          // Verifica erro específico da foto
+          const photoErr = err.response.data.errors.teamPlayerPhoto?.[0]
+          if (photoErr) {
+            this.photoError = photoErr
+          }
+
           mensagem = Object.values(err.response.data.errors).flat().join("<br><br>");
         } else if (err.response?.data?.message) {
           mensagem = err.response.data.message;

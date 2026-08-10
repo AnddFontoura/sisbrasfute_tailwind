@@ -154,12 +154,20 @@ export default {
 
   methods: {
     getPlayerPhoto(player) {
-      // Tenta várias possibilidades de onde a foto pode vir
-      return player.player_info?.photo_url
-        || player.photo_url
-        || player.player_info?.photo
-        || player.photo
-        || this.fallbackAvatar
+      // Tenta URL completa primeiro (campo _url do Laravel accessor)
+      const fullUrl = player.player_info?.photo_url || player.photo_url
+      if (fullUrl) return fullUrl
+
+      // Se tem caminho relativo, constrói a URL completa com a base
+      const relativePath = player.player_info?.photo || player.photo
+      if (relativePath) {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+        // Remove /api do final se existir, pois o storage normalmente está na raiz
+        const storageBase = baseUrl.replace(/\/api\/?$/, '')
+        return `${storageBase}/storage/${relativePath}`
+      }
+
+      return this.fallbackAvatar
     },
 
     getPlayerName(player) {
@@ -208,6 +216,10 @@ export default {
         })
         this.players = response.data.data
         this.pagination = response.data
+        // DEBUG: remover após verificar estrutura dos dados
+        if (this.players.length) {
+          console.log('[TeamPlayerList] Estrutura do primeiro jogador:', JSON.parse(JSON.stringify(this.players[0])))
+        }
       } catch (err) {
         console.error(err)
         await Swal.fire({

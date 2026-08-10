@@ -1,6 +1,7 @@
 <script>
 import api from "@/services/api";
 import Swal from "@/services/swal.js";
+import { useAuthStore } from "@/stores/auth.js";
 
 export default {
   name: "teamBanner",
@@ -12,6 +13,10 @@ export default {
     teamData: {
       default: null,
       type: Object,
+    },
+    showNav: {
+      default: true,
+      type: Boolean,
     },
   },
   data() {
@@ -35,9 +40,28 @@ export default {
     teamName() {
       return this.displayTeam.name || ''
     },
+    resolvedTeamId() {
+      return this.teamId || this.teamInfoId || this.displayTeam.id
+    },
+    isOwner() {
+      const auth = useAuthStore()
+      const userId = auth.user?.id
+      if (!userId) return false
+      return this.displayTeam.user_id === userId
+    },
+    navItems() {
+      const id = this.resolvedTeamId
+      if (!id) return []
+
+      return [
+        { label: 'Jogadores', to: { name: 'team-players-list', params: { teamId: id } }, icon: 'users' },
+        { label: 'Partidas', to: { name: 'team-matches-list', params: { teamId: id } }, icon: 'calendar' },
+        { label: 'Financeiro', to: { name: 'team-finance-list', params: { teamId: id } }, icon: 'dollar' },
+        { label: 'Editar', to: { name: 'team-edit', params: { id: id } }, icon: 'pencil' },
+      ]
+    },
   },
   created() {
-    // Só busca na API se não receber dados via prop
     if (!this.teamData) {
       this.teamId = this.$route.params.id ?? this.$route.params.teamId ?? this.teamInfoId
       this.getTeamInformation()
@@ -64,38 +88,75 @@ export default {
       } finally {
         this.loading = false
       }
-    }
+    },
+    isActive(routeName) {
+      return this.$route.name === routeName
+    },
   },
 };
 </script>
 
 <template>
-  <div class="rounded">
-    <img
-      class="h-32 w-full object-cover lg:h-48"
-      :src="bannerUrl"
-      alt="Banner do time"
-      @error="$event.target.src = fallbackImage"
-    />
-    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-      <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-        <div class="flex">
+  <div class="rounded-xl overflow-hidden">
+    <!-- Banner image -->
+    <div class="relative h-32 lg:h-48">
+      <img
+        class="h-full w-full object-cover"
+        :src="bannerUrl"
+        alt="Banner do time"
+        @error="$event.target.src = fallbackImage"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+    </div>
+
+    <!-- Info section -->
+    <div class="relative bg-white dark:bg-gray-800 px-4 pb-4 sm:px-6 lg:px-8">
+      <div class="-mt-12 sm:-mt-14 flex items-end gap-4 sm:gap-5">
+        <!-- Logo -->
+        <div class="flex-shrink-0">
           <img
-            class="size-24 rounded-full ring-4 ring-white sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10"
+            class="h-20 w-20 rounded-xl border-4 border-white shadow-lg sm:h-24 sm:w-24 dark:border-gray-800"
             :src="logoUrl"
             alt="Logo do time"
             @error="$event.target.src = fallbackImage"
           />
         </div>
-        <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-          <div class="mt-6 min-w-0 flex-1 sm:hidden md:block">
-            <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">{{ teamName }}</h1>
-          </div>
-        </div>
-        <div class="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-          <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">{{ teamName }}</h1>
+
+        <!-- Name -->
+        <div class="min-w-0 pt-4 sm:pt-6">
+          <h1 class="truncate text-xl font-black text-gray-900 sm:text-2xl dark:text-white">
+            {{ teamName }}
+          </h1>
         </div>
       </div>
+
+      <!-- Navigation buttons (only for team owner) -->
+      <nav v-if="showNav && isOwner && resolvedTeamId" class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4 dark:border-gray-700">
+        <router-link
+          v-for="item in navItems"
+          :key="item.label"
+          :to="item.to"
+          class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition"
+          :class="isActive(item.to.name)
+            ? 'bg-orange-500 text-white shadow-sm'
+            : 'text-gray-600 hover:bg-orange-500/10 hover:text-orange-600 dark:text-gray-300 dark:hover:text-orange-400'"
+        >
+          <!-- Icons inline -->
+          <svg v-if="item.icon === 'users'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          <svg v-if="item.icon === 'calendar'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <svg v-if="item.icon === 'dollar'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <svg v-if="item.icon === 'pencil'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          {{ item.label }}
+        </router-link>
+      </nav>
     </div>
   </div>
 </template>
