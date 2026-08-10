@@ -47,12 +47,154 @@
               </TransitionChild>
 
               <aside class="flex min-h-full grow flex-col border-r border-white/10 bg-[#070707]">
-                <div
-                  :navigation="navigation"
-                  :user="user"
-                  :user-navigation="userNavigation"
-                >
+                <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-6">
+                  <div class="flex size-10 items-center justify-center rounded-sm bg-orange-500 shadow-[0_0_24px_rgba(249,115,22,0.35)]">
+                    <BoltIcon class="size-6 text-white" aria-hidden="true" />
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-black leading-4 tracking-tight text-white">
+                      SisBrasFute
+                    </p>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+                      Gestão de Clubes
+                    </p>
+                  </div>
                 </div>
+
+                <nav class="flex flex-1 flex-col overflow-y-auto px-4 py-6">
+                  <div class="space-y-7">
+                    <div>
+                      <p class="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-zinc-600">
+                        Navegação
+                      </p>
+
+                      <ul role="list" class="space-y-1">
+                        <li v-for="item in navigation" :key="item.name">
+                          <a
+                            v-if="!item.children"
+                            @click.prevent="$router.push(item.href); isSidebarOpen = false"
+                            :href="item.href"
+                            :class="[
+                              isCurrentRoute(item.href)
+                                ? 'bg-orange-500 text-white shadow-[0_0_26px_rgba(249,115,22,0.28)]'
+                                : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white',
+                              'group flex items-center gap-x-3 px-3 py-3 text-sm font-black transition-all cursor-pointer'
+                            ]"
+                          >
+                            <component
+                              :is="item.icon"
+                              :class="[
+                                isCurrentRoute(item.href)
+                                  ? 'text-white'
+                                  : 'text-zinc-500 group-hover:text-orange-400',
+                                'size-5 shrink-0 transition-colors'
+                              ]"
+                              aria-hidden="true"
+                            />
+
+                            {{ item.name }}
+                          </a>
+
+                          <Disclosure v-else as="div" v-slot="{ open }">
+                            <DisclosureButton
+                              :class="[
+                                item.children.some((child) => isCurrentRoute(child.href))
+                                  ? 'bg-orange-500 text-white shadow-[0_0_26px_rgba(249,115,22,0.28)]'
+                                  : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white',
+                                'group flex w-full items-center gap-x-3 px-3 py-3 text-left text-sm font-black transition-all'
+                              ]"
+                            >
+                              <component
+                                :is="item.icon"
+                                :class="[
+                                  item.children.some((child) => isCurrentRoute(child.href))
+                                    ? 'text-white'
+                                    : 'text-zinc-500 group-hover:text-orange-400',
+                                  'size-5 shrink-0 transition-colors'
+                                ]"
+                                aria-hidden="true"
+                              />
+
+                              {{ item.name }}
+
+                              <ChevronRightIcon
+                                :class="[
+                                  open ? 'rotate-90 text-orange-400' : 'text-zinc-600',
+                                  'ml-auto size-4 shrink-0 transition-transform'
+                                ]"
+                                aria-hidden="true"
+                              />
+                            </DisclosureButton>
+
+                            <DisclosurePanel as="ul" class="mt-1 space-y-1 border-l border-white/10 pl-4">
+                              <li v-for="subItem in item.children" :key="subItem.name">
+                                <DisclosureButton
+                                  as="a"
+                                  :href="subItem.href"
+                                  @click.prevent="$router.push(subItem.href); isSidebarOpen = false"
+                                  :class="[
+                                    isCurrentRoute(subItem.href)
+                                      ? 'bg-orange-500/15 text-orange-400'
+                                      : 'text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-200',
+                                    'block px-3 py-2 text-sm font-bold transition-colors cursor-pointer'
+                                  ]"
+                                >
+                                  {{ subItem.name }}
+                                </DisclosureButton>
+                              </li>
+                            </DisclosurePanel>
+                          </Disclosure>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="mt-auto border-t border-white/10 pt-4">
+                    <Menu as="div" class="relative">
+                      <MenuButton class="flex w-full items-center gap-3 bg-white/[0.04] p-3 text-left hover:bg-white/[0.07]">
+                        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white">
+                          {{ userInitials }}
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate text-sm font-black text-white">
+                            {{ user.name || 'Usuário' }}
+                          </p>
+                          <p class="truncate text-xs font-semibold text-zinc-500">
+                            Gestor do Clube
+                          </p>
+                        </div>
+
+                        <ChevronDownIcon class="size-4 text-zinc-500" aria-hidden="true" />
+                      </MenuButton>
+
+                      <transition
+                        enter-active-class="transition ease-out duration-100"
+                        enter-from-class="transform opacity-0 scale-95"
+                        enter-to-class="transform scale-100"
+                        leave-active-class="transition ease-in duration-75"
+                        leave-from-class="transform scale-100"
+                        leave-to-class="transform opacity-0 scale-95"
+                      >
+                        <MenuItems class="absolute bottom-full left-0 z-10 mb-2 w-full origin-bottom-left border border-white/10 bg-[#111111] py-2 shadow-2xl">
+                          <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                            <a
+                              :href="item.href"
+                              @click.prevent="$router.push(item.href); isSidebarOpen = false"
+                              :class="[
+                                active ? 'bg-orange-500 text-white' : 'text-zinc-300',
+                                'block px-4 py-2 text-sm font-bold cursor-pointer'
+                              ]"
+                            >
+                              {{ item.name }}
+                            </a>
+                          </MenuItem>
+                        </MenuItems>
+                      </transition>
+                    </Menu>
+                  </div>
+                </nav>
               </aside>
             </DialogPanel>
           </TransitionChild>
@@ -346,7 +488,7 @@ export default {
   data() {
     return {
       user: {},
-      isSidebarOpen: true,
+      isSidebarOpen: false,
       userInitials: 'A',
       navigation: [
         { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
