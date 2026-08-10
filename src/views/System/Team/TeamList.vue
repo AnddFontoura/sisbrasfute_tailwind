@@ -155,6 +155,8 @@
         </div>
       </div>
     </main>
+
+    <pagination-component :pagination="pagination" @change="getTeamsList"></pagination-component>
   </system-layout>
 </template>
 
@@ -165,6 +167,7 @@ import { useAuthStore } from "@/stores/auth.js";
 import Swal from "@/services/swal.js";
 import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
 import CitySelectComponent from "@/components/form/CitySelectComponent.vue";
+import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 
 export default {
   name: "TeamList",
@@ -172,10 +175,16 @@ export default {
     systemLayout,
     StateSelectComponent,
     CitySelectComponent,
+    PaginationComponent,
   },
   data() {
     return {
       teams: [],
+      pagination: {
+        data: [],
+        current_page: 1,
+        last_page: 1,
+      },
       loading: false,
       searchTimeout: null,
       filters: {
@@ -205,7 +214,7 @@ export default {
     },
 
     applyFilters() {
-      this.getTeamsList()
+      this.getTeamsList(1)
     },
 
     onStateChange() {
@@ -220,21 +229,23 @@ export default {
         city_id: null,
         modality_id: null,
       }
-      this.getTeamsList()
+      this.getTeamsList(1)
     },
 
-    async getTeamsList() {
+    async getTeamsList(page = 1) {
       this.loading = true
       try {
         const response = await api.get("/team", {
           params: {
+            page,
             name: this.filters.name || undefined,
             state_id: this.filters.state_id || undefined,
             city_id: this.filters.city_id || undefined,
             modality_id: this.filters.modality_id || undefined,
           }
         })
-        this.teams = response.data
+        this.teams = response.data.data
+        this.pagination = response.data
       } catch (err) {
         console.error(err)
         await Swal.fire({

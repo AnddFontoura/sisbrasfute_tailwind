@@ -71,6 +71,8 @@
         </div>
       </div>
     </main>
+
+    <pagination-component :pagination="pagination" @change="getPlayersList"></pagination-component>
   </system-layout>
 </template>
 
@@ -79,16 +81,23 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import { useAuthStore } from "@/stores/auth.js";
 import Swal from "@/services/swal.js";
+import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 
 export default {
   name: "PlayerProfileList",
   components: {
     systemLayout,
+    PaginationComponent,
   },
 
   data() {
     return {
       players: [],
+      pagination: {
+        data: [],
+        current_page: 1,
+        last_page: 1,
+      },
       loading: false,
       fallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
     }
@@ -106,11 +115,14 @@ export default {
   },
 
   methods: {
-    async getPlayersList() {
+    async getPlayersList(page = 1) {
       this.loading = true
       try {
-        const response = await api.get("/player-profile")
+        const response = await api.get("/player-profile", {
+          params: { page }
+        })
         this.players = response.data.data
+        this.pagination = response.data
       } catch (err) {
         console.error(err)
         await Swal.fire({
