@@ -12,56 +12,52 @@
       </div>
 
       <!-- Grid -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <div
           v-for="player in players"
           :key="player.id"
           class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-orange-500/40 hover:shadow-md dark:border-white/10 dark:bg-gray-800"
         >
-          <!-- Header com gradiente escuro -->
-          <div class="relative h-20 bg-gradient-to-br from-gray-900 to-gray-800">
-            <div class="absolute -bottom-8 left-4">
-              <div class="h-16 w-16 overflow-hidden rounded-full border-2 border-white bg-gray-100 shadow-md dark:border-gray-700">
-                <img
-                  :src="player.photo_url || fallbackAvatar"
-                  :alt="player.name"
-                  class="h-full w-full object-cover"
-                  @error="$event.target.src = fallbackAvatar"
-                />
+          <!-- Header escuro com nome -->
+          <div class="bg-gray-900 px-4 py-3 dark:bg-black">
+            <h3 class="text-sm font-bold text-white truncate">{{ player.name }}</h3>
+            <p class="text-xs text-zinc-400 truncate">{{ player.nickname || 'Sem apelido' }}</p>
+          </div>
+
+          <!-- Foto centralizada -->
+          <div class="flex justify-center py-4">
+            <div class="h-20 w-20 overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100 shadow dark:border-gray-700">
+              <img
+                :src="player.photo_url || fallbackAvatar"
+                :alt="player.name"
+                class="h-full w-full object-cover"
+                @error="$event.target.src = fallbackAvatar"
+              />
+            </div>
+          </div>
+
+          <!-- Infos -->
+          <div class="px-4 pb-2">
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-gray-700/50">
+                <p class="text-[10px] font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.name || '—' }}</p>
+              </div>
+              <div class="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-gray-700/50">
+                <p class="text-[10px] font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.state_info?.name || '—' }}</p>
               </div>
             </div>
           </div>
 
-          <!-- Content -->
-          <div class="px-4 pb-4 pt-10">
-            <h3 class="text-base font-bold text-gray-900 truncate dark:text-white">
-              {{ player.name }}
-            </h3>
-            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-              {{ player.nickname || 'Sem apelido' }}
-            </p>
-
-            <!-- Infos -->
-            <div class="mt-3 grid grid-cols-2 gap-2">
-              <div class="rounded-lg bg-gray-50 px-2 py-1.5 text-center dark:bg-gray-700/50">
-                <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</p>
-                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.name || '—' }}</p>
-              </div>
-              <div class="rounded-lg bg-gray-50 px-2 py-1.5 text-center dark:bg-gray-700/50">
-                <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</p>
-                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.state_info?.name || '—' }}</p>
-              </div>
-            </div>
-
-            <!-- Ação -->
-            <div class="mt-4">
-              <router-link
-                :to="{ name: 'player-profile-show', params: { id: player.id } }"
-                class="w-full inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
-              >
-                Ver perfil
-              </router-link>
-            </div>
+          <!-- Ação -->
+          <div class="px-4 pb-4 pt-2">
+            <router-link
+              :to="{ name: 'player-profile-show', params: { id: player.id } }"
+              class="w-full inline-flex items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+            >
+              Ver perfil
+            </router-link>
           </div>
         </div>
       </div>
