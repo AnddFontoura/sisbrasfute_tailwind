@@ -72,6 +72,11 @@
         </button>
       </form>
 
+      <!-- Link Esqueceu senha -->
+      <p class="mt-3 text-center">
+        <router-link to="/forgot-password" class="text-sm text-center text-orange-500 hover:underline">Esqueceu sua senha?</router-link>
+      </p>
+
       <!-- Link Cadastro -->
       <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
         Não tem conta?
