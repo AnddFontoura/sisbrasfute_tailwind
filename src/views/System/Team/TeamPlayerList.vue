@@ -21,6 +21,21 @@
         >
           Recrutas
         </router-link>
+
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+          @click="openInviteModal"
+        >
+          Convidar Jogador
+        </button>
+
+        <router-link
+          :to="{ name: 'player-invitation-list', params: { teamId: teamId } }"
+          class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+        >
+          Convites Enviados
+        </router-link>
       </div>
 
       <!-- Filtros -->
@@ -168,6 +183,79 @@
           </div>
         </div>
       </div>
+      <!-- Modal Convidar Jogador -->
+      <div
+        v-if="showInviteModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      >
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Convidar Jogador
+              </h2>
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                Digite o email do jogador que deseja convidar para o time.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="rounded-lg px-2 py-1 text-xl font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
+              @click="closeInviteModal"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="mt-6">
+            <label for="inviteEmailInput" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+              Email
+            </label>
+            <input
+              id="inviteEmailInput"
+              v-model="inviteEmail"
+              type="email"
+              maxlength="254"
+              placeholder="jogador@email.com"
+              class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              @keyup.enter="submitInvite"
+            />
+            <p v-if="inviteError" class="mt-2 text-sm text-red-600 dark:text-red-400">
+              {{ inviteError }}
+            </p>
+          </div>
+
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              class="rounded-xl border border-gray-300 bg-white px-5 py-2 font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+              @click="closeInviteModal"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2 font-semibold text-white shadow-md transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-orange-300"
+              :disabled="inviteLoading"
+              @click="submitInvite"
+            >
+              <svg
+                v-if="inviteLoading"
+                class="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Enviar Convite
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <pagination-component :pagination="pagination" @change="getTeamPlayerList"></pagination-component>
@@ -208,6 +296,10 @@ export default {
       teamId: null,
       loading: false,
       searchTimeout: null,
+      showInviteModal: false,
+      inviteEmail: '',
+      inviteLoading: false,
+      inviteError: '',
       fallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
     }
   },
@@ -310,6 +402,68 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+
+    openInviteModal() {
+      this.inviteEmail = ''
+      this.inviteError = ''
+      this.inviteLoading = false
+      this.showInviteModal = true
+    },
+
+    closeInviteModal() {
+      this.showInviteModal = false
+      this.inviteEmail = ''
+      this.inviteError = ''
+      this.inviteLoading = false
+    },
+
+    async submitInvite() {
+      this.inviteError = ''
+
+      if (!this.inviteEmail || !this.inviteEmail.trim()) {
+        this.inviteError = 'O campo email é obrigatório.'
+        return
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(this.inviteEmail.trim())) {
+        this.inviteError = 'Digite um email válido.'
+        return
+      }
+
+      this.inviteLoading = true
+
+      try {
+        await api.post(`/player-invitation/${this.teamId}/send`, {
+          email: this.inviteEmail.trim()
+        })
+
+        this.closeInviteModal()
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Convite enviado com sucesso!',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } catch (err) {
+        let mensagem = 'Não foi possível enviar o convite.'
+
+        if (err.response?.data?.message) {
+          mensagem = err.response.data.message
+        }
+
+        if (err.response?.data?.errors) {
+          mensagem = Object.values(err.response.data.errors).flat().join(' ')
+        }
+
+        this.inviteError = mensagem
+      } finally {
+        this.inviteLoading = false
       }
     }
   },
