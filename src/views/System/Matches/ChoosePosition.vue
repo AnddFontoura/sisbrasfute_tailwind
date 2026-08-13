@@ -90,16 +90,15 @@
         </div>
 
         <!-- Positions list -->
-        <div v-else class="space-y-3">
+        <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
           <div
             v-for="position in positions"
             :key="position.id"
-            class="rounded-lg border p-4 flex items-center justify-between gap-4"
-            :class="getPositionClasses(position)"
+            class="py-3 flex items-center justify-between gap-4"
           >
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">
+              <div class="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-0.5">
+                <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">
                   {{ position.game_position_name }}
                 </span>
                 <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
@@ -146,7 +145,7 @@
                 v-if="getPositionState(position) === 'available'"
                 type="button"
                 @click="handleChoose(position)"
-                class="inline-flex items-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
               >
                 Escolher
               </button>
@@ -156,7 +155,7 @@
                 v-else-if="getPositionState(position) === 'mine'"
                 type="button"
                 @click="handleRelease(position)"
-                class="inline-flex items-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
               >
                 Liberar posição
               </button>
@@ -324,20 +323,6 @@ export default {
         return 'mine';
       }
       return 'occupied';
-    },
-
-    getPositionClasses(position) {
-      const state = this.getPositionState(position);
-      switch (state) {
-        case 'available':
-          return 'border-green-300 bg-green-50 dark:bg-green-900/10 dark:border-green-700';
-        case 'mine':
-          return 'border-orange-400 bg-orange-50 ring-2 ring-orange-300 dark:bg-orange-900/10 dark:border-orange-600';
-        case 'occupied':
-          return 'border-gray-300 bg-gray-50 opacity-60 dark:bg-gray-700/30 dark:border-gray-600';
-        default:
-          return '';
-      }
     },
 
     async handleChoose(position) {
