@@ -8,6 +8,35 @@
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Acesse rapidamente as funcionalidades do sistema.</p>
         </div>
 
+        <!-- Email Verification Warning Banner -->
+        <div
+          v-if="!isEmailVerified"
+          class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-500/30 dark:bg-amber-500/10"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p class="text-sm text-amber-800 dark:text-amber-200">
+              ⚠️ Você precisa verificar seu email para criar times, jogadores e partidas. Verifique sua caixa de entrada ou clique no botão abaixo.
+            </p>
+            <button
+              @click="handleResendVerification"
+              :disabled="resendingVerification"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg
+                v-if="resendingVerification"
+                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Reenviar email de verificação
+            </button>
+          </div>
+        </div>
+
         <!-- Grid de acessos rápidos -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <div
@@ -54,12 +83,12 @@
                   {{ item.description }}
                 </p>
 
-                <!-- Badge "Em breve" -->
+                <!-- Badge "Em breve" or "Verifique seu email" -->
                 <div
                   v-if="item.disabled"
                   class="absolute top-3 right-3 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-orange-400 dark:bg-orange-500/20"
                 >
-                  Em breve
+                  {{ item.disabledReason === 'verification' ? 'Verifique seu email' : 'Em breve' }}
                 </div>
               </div>
             </component>
@@ -72,6 +101,9 @@
 
 <script>
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import { useAuthStore } from "@/stores/auth.js";
+import api from "@/services/api.js";
+import Swal from "@/services/swal.js";
 
 export default {
   name: "Dashboard",
@@ -80,6 +112,7 @@ export default {
   },
   data() {
     return {
+      resendingVerification: false,
       icons: {
         team: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>',
         players: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>',
@@ -92,6 +125,10 @@ export default {
     }
   },
   computed: {
+    isEmailVerified() {
+      const authStore = useAuthStore()
+      return authStore.isEmailVerified
+    },
     menuItems() {
       return [
         {
@@ -100,7 +137,8 @@ export default {
           description: 'Gerencie seus times',
           icon: this.icons.team,
           to: '/team/list',
-          disabled: false,
+          disabled: !this.isEmailVerified,
+          disabledReason: !this.isEmailVerified ? 'verification' : null,
         },
         {
           key: 'players',
@@ -109,6 +147,7 @@ export default {
           icon: this.icons.players,
           to: '/player-profile/list',
           disabled: false,
+          disabledReason: null,
         },
         {
           key: 'friendly',
@@ -117,6 +156,7 @@ export default {
           icon: this.icons.friendly,
           to: '/friendly-matches/list',
           disabled: true,
+          disabledReason: 'coming_soon',
         },
         {
           key: 'trophy',
@@ -125,6 +165,7 @@ export default {
           icon: this.icons.trophy,
           to: '/championships/list',
           disabled: true,
+          disabledReason: 'coming_soon',
         },
         {
           key: 'field',
@@ -133,6 +174,7 @@ export default {
           icon: this.icons.field,
           to: '/fields/list',
           disabled: true,
+          disabledReason: 'coming_soon',
         },
         {
           key: 'settings',
@@ -141,6 +183,7 @@ export default {
           icon: this.icons.settings,
           to: '/configuration',
           disabled: false,
+          disabledReason: null,
         },
         {
           key: 'profile',
@@ -148,9 +191,38 @@ export default {
           description: 'Seus dados e foto',
           icon: this.icons.profile,
           to: '/player-profile/form',
-          disabled: false,
+          disabled: !this.isEmailVerified,
+          disabledReason: !this.isEmailVerified ? 'verification' : null,
         },
       ]
+    },
+  },
+  methods: {
+    async handleResendVerification() {
+      this.resendingVerification = true
+      try {
+        await api.post('/email/resend-verification')
+        await Swal.fire({
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          title: 'Email de verificação reenviado!',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } catch (err) {
+        const message = err.response?.data?.message || 'Erro ao reenviar email de verificação.'
+        await Swal.fire({
+          icon: 'error',
+          toast: true,
+          position: 'top-end',
+          title: message,
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.resendingVerification = false
+      }
     },
   },
 }

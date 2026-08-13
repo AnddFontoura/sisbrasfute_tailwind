@@ -22,6 +22,11 @@ export default [
     component: () => import('../views/Auth/ResetPassword.vue')
   },
   {
+    path: '/verify-email',
+    name: 'verify-email',
+    component: () => import('../views/Auth/VerifyEmail.vue')
+  },
+  {
     path: "/logout",
     name: "logout",
     beforeEnter: async (to, from, next) => {
