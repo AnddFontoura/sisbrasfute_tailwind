@@ -327,6 +327,62 @@
             </div>
           </div>
 
+          <!-- Admin Section -->
+          <div v-if="user.is_admin" class="mt-6">
+            <p class="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-red-500">
+              Administração
+            </p>
+
+            <Disclosure as="div" v-slot="{ open }">
+              <DisclosureButton
+                :class="[
+                  adminChildren.some((child) => isCurrentRoute(child.href))
+                    ? 'bg-red-600 text-white shadow-[0_0_26px_rgba(220,38,38,0.28)]'
+                    : 'text-red-400 hover:bg-red-500/10 hover:text-red-300',
+                  'group flex w-full items-center gap-x-3 px-3 py-3 text-left text-sm font-black transition-all'
+                ]"
+              >
+                <Cog6ToothIcon
+                  :class="[
+                    adminChildren.some((child) => isCurrentRoute(child.href))
+                      ? 'text-white'
+                      : 'text-red-500 group-hover:text-red-400',
+                    'size-5 shrink-0 transition-colors'
+                  ]"
+                  aria-hidden="true"
+                />
+
+                Painel Admin
+
+                <ChevronRightIcon
+                  :class="[
+                    open ? 'rotate-90 text-red-400' : 'text-red-600',
+                    'ml-auto size-4 shrink-0 transition-transform'
+                  ]"
+                  aria-hidden="true"
+                />
+              </DisclosureButton>
+
+              <DisclosurePanel as="ul" class="mt-1 space-y-1 border-l border-red-500/30 pl-4">
+                <li v-for="subItem in adminChildren" :key="subItem.name">
+                  <DisclosureButton
+                    as="a"
+                    :href="subItem.href"
+                    @click.prevent="$router.push(subItem.href)"
+                    :class="[
+                      isCurrentRoute(subItem.href)
+                        ? 'bg-red-500/15 text-red-400'
+                        : 'text-zinc-500 hover:bg-red-500/5 hover:text-red-300',
+                      'block px-3 py-2 text-sm font-bold transition-colors cursor-pointer'
+                    ]"
+                  >
+                    {{ subItem.name }}
+                  </DisclosureButton>
+                </li>
+              </DisclosurePanel>
+            </Disclosure>
+          </div>
+
           <div class="mt-auto border-t border-white/10 pt-4">
             <Menu as="div" class="relative">
               <MenuButton class="flex w-full items-center gap-3 bg-white/[0.04] p-3 text-left hover:bg-white/[0.07]">
@@ -528,6 +584,12 @@ export default {
         { name: "Meus Times", href: "#" },
         { name: "Meu Perfil", href: "/player-profile/form" },
         { name: "Sair", href: "/logout" },
+      ],
+      adminChildren: [
+        { name: "Dashboard", href: "/admin" },
+        { name: "Usuários", href: "/admin/users" },
+        { name: "Times", href: "/admin/teams" },
+        { name: "Partidas", href: "/admin/matches" },
       ],
       currentPageName: false,
     };
