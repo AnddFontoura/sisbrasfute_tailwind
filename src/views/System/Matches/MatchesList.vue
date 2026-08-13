@@ -1,6 +1,6 @@
 <template>
   <system-layout>
-    <main>
+    <main class="mx-auto max-w-7xl">
       <team-banner
         v-if="teamId"
         :teamInfoId="teamId"
@@ -16,60 +16,76 @@
         </router-link>
       </div>
 
-      <!-- FILTROS -->
-      <div class="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-800">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-bold text-gray-800 dark:text-white">Filtros</h2>
-          <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">
-            Limpar filtros
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do time</label>
-            <input
-              v-model="filters.team_name"
-              type="text"
-              placeholder="Ex: Flamengo"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
+      <!-- FILTROS (colapsável) -->
+      <div class="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <button
+          type="button"
+          @click="showFilters = !showFilters"
+          class="flex w-full items-center justify-between px-5 py-4"
+        >
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+            </svg>
+            <span class="text-sm font-bold text-gray-800 dark:text-white">Filtros</span>
+            <span v-if="hasActiveFilters" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">!</span>
           </div>
+          <svg
+            class="h-4 w-4 text-gray-500 transition-transform duration-200"
+            :class="{ 'rotate-180': showFilters }"
+            fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
 
-          <state-select v-model="filters.state_id"></state-select>
-          <city-select :stateId="filters.state_id" v-model="filters.city_id"></city-select>
-
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Período</label>
-            <div class="flex items-center gap-2 mt-1">
+        <div v-show="showFilters" class="border-t border-gray-200 dark:border-white/10 px-5 pb-5 pt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome do time</label>
               <input
-                v-model="filters.date_start"
-                type="date"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-              />
-              <span class="text-gray-400 text-xs">até</span>
-              <input
-                v-model="filters.date_end"
-                type="date"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                v-model="filters.team_name"
+                type="text"
+                placeholder="Ex: Flamengo"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
-          </div>
-        </div>
 
-        <div class="flex justify-end gap-2 mt-5">
-          <button
-            @click="resetFilters"
-            class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:hover:bg-white/5"
-          >
-            Limpar
-          </button>
-          <button
-            @click="applyFilters"
-            class="px-4 py-2 text-sm rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 shadow-sm transition"
-          >
-            Aplicar filtros
-          </button>
+            <state-select v-model="filters.state_id"></state-select>
+            <city-select :stateId="filters.state_id" v-model="filters.city_id"></city-select>
+
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Período</label>
+              <div class="flex items-center gap-2 mt-1">
+                <input
+                  v-model="filters.date_start"
+                  type="date"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                />
+                <span class="text-gray-400 text-xs shrink-0">até</span>
+                <input
+                  v-model="filters.date_end"
+                  type="date"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 mt-4">
+            <button
+              @click="resetFilters"
+              class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:hover:bg-white/5 dark:text-gray-300"
+            >
+              Limpar
+            </button>
+            <button
+              @click="applyFilters"
+              class="px-4 py-2 text-sm rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 shadow-sm transition"
+            >
+              Aplicar filtros
+            </button>
+          </div>
         </div>
       </div>
 
@@ -188,6 +204,7 @@ export default {
       },
       teamId: null,
       loading: false,
+      showFilters: false,
     }
   },
   created() {
@@ -198,6 +215,9 @@ export default {
   computed: {
     user() {
       return this.auth.user
+    },
+    hasActiveFilters() {
+      return !!(this.filters.team_name || this.filters.state_id || this.filters.city_id || this.filters.date_start || this.filters.date_end)
     }
   },
   methods: {

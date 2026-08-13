@@ -1,73 +1,87 @@
 <template>
   <system-layout>
-    <main>
-      <div class="flex items-center justify-between mb-6">
+    <main class="mx-auto max-w-7xl">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 class="text-2xl font-black text-gray-900 dark:text-white">Meus Times</h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Gerencie e visualize seus times cadastrados.</p>
         </div>
         <router-link
           :to="{ name: 'team-form' }"
-          class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 w-full sm:w-auto"
         >
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           Criar Time
         </router-link>
       </div>
 
-      <!-- Filtros -->
-      <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-800">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-bold text-gray-800 dark:text-white">Filtros</h2>
-          <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">Limpar</button>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Nome -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
-            <input
-              v-model="filters.name"
-              type="text"
-              placeholder="Buscar por nome..."
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-              @input="debounceSearch"
-            />
+      <!-- Filtros (colapsável) -->
+      <div class="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <button
+          type="button"
+          @click="showFilters = !showFilters"
+          class="flex w-full items-center justify-between px-5 py-4"
+        >
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+            </svg>
+            <span class="text-sm font-bold text-gray-800 dark:text-white">Filtros</span>
+            <span v-if="hasActiveFilters" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">!</span>
           </div>
+          <svg
+            class="h-4 w-4 text-gray-500 transition-transform duration-200"
+            :class="{ 'rotate-180': showFilters }"
+            fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
 
-          <!-- Estado -->
-          <div>
-            <state-select-component
-              v-model="filters.state_id"
-              label-name="Estado"
-              @update:modelValue="onStateChange"
-            />
+        <div v-show="showFilters" class="border-t border-gray-200 dark:border-white/10 px-5 pb-5 pt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
+              <input
+                v-model="filters.name"
+                type="text"
+                placeholder="Buscar por nome..."
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                @input="debounceSearch"
+              />
+            </div>
+            <div>
+              <state-select-component
+                v-model="filters.state_id"
+                label-name="Estado"
+                @update:modelValue="onStateChange"
+              />
+            </div>
+            <div>
+              <city-select-component
+                v-model="filters.city_id"
+                label-name="Cidade"
+                :state-id="filters.state_id"
+                @update:modelValue="applyFilters"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Modalidade</label>
+              <select
+                v-model="filters.modality_id"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                @change="applyFilters"
+              >
+                <option :value="null">Todas</option>
+                <option :value="1">Futsal</option>
+                <option :value="2">Fut7/Fut5</option>
+                <option :value="3">Suíço</option>
+                <option :value="4">Campo de 11</option>
+              </select>
+            </div>
           </div>
-
-          <!-- Cidade -->
-          <div>
-            <city-select-component
-              v-model="filters.city_id"
-              label-name="Cidade"
-              :state-id="filters.state_id"
-              @update:modelValue="applyFilters"
-            />
-          </div>
-
-          <!-- Modalidade -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Modalidade</label>
-            <select
-              v-model="filters.modality_id"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-              @change="applyFilters"
-            >
-              <option :value="null">Todas</option>
-              <option :value="1">Futsal</option>
-              <option :value="2">Fut7/Fut5</option>
-              <option :value="3">Suíço</option>
-              <option :value="4">Campo de 11</option>
-            </select>
+          <div class="flex justify-end mt-4">
+            <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">Limpar filtros</button>
           </div>
         </div>
       </div>
@@ -186,6 +200,7 @@ export default {
         last_page: 1,
       },
       loading: false,
+      showFilters: false,
       searchTimeout: null,
       filters: {
         name: '',
@@ -203,6 +218,9 @@ export default {
   computed: {
     user() {
       return this.auth.user
+    },
+    hasActiveFilters() {
+      return !!(this.filters.name || this.filters.state_id || this.filters.city_id || this.filters.modality_id)
     }
   },
   methods: {
