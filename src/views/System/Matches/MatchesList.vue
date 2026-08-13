@@ -1,6 +1,6 @@
 <template>
   <system-layout>
-    <main class="mx-auto max-w-7xl">
+    <main>
       <team-banner
         v-if="teamId"
         :teamInfoId="teamId"
@@ -107,7 +107,7 @@
       </div>
 
       <!-- Cards de partidas -->
-      <div v-else class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-else class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <div
           v-for="match in matches.data"
           :key="match.id"

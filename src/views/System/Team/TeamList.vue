@@ -1,6 +1,6 @@
 <template>
   <system-layout>
-    <main class="mx-auto max-w-7xl">
+    <main>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 class="text-2xl font-black text-gray-900 dark:text-white">Meus Times</h1>
@@ -101,7 +101,7 @@
       </div>
 
       <!-- Grid de times -->
-      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <div
           v-for="team in teams"
           :key="team.id"

@@ -1,7 +1,10 @@
 <template>
   <system-layout>
+    <!-- Team Banner (edit mode) -->
+    <team-banner v-if="isEditMode" :team-info-id="teamId" />
+
     <form @submit.prevent="handleSubmit">
-      <div class="mx-auto max-w-3xl space-y-6">
+      <div class="space-y-6" :class="isEditMode ? 'mt-6' : ''">
 
         <!-- Page Header -->
         <div>
@@ -175,6 +178,7 @@ import api from "@/services/api";
 import StateSelect from "@/components/form/StateSelectComponent.vue"
 import CitySelect from "@/components/form/CitySelectComponent.vue"
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import TeamBanner from "@/components/team/teamBanner.vue";
 import {QuillEditor} from "@vueup/vue-quill";
 import Swal from "@/services/swal.js";
 
@@ -183,6 +187,7 @@ export default {
   components: {
     CitySelect,
     StateSelect,
+    TeamBanner,
     systemLayout,
     QuillEditor,
   },
