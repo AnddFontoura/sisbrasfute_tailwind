@@ -357,7 +357,7 @@ export default {
       this.positionsLoading = true
       this.positionsError = false
       try {
-        const response = await api.get(`/match-positions/${this.matchId}`)
+        const response = await api.get(`/matches/${this.matchId}/players`)
         this.positionsData = response.data
         this.findCurrentAssignment()
       } catch (err) {
@@ -381,7 +381,7 @@ export default {
       if (!result.isConfirmed) return
 
       try {
-        await api.post(`/match-positions/${this.matchId}/self-assign`, {
+        await api.post(`/matches/${this.matchId}/players/self-assign`, {
           game_position_id: position.game_position_id,
         })
 
@@ -434,7 +434,7 @@ export default {
       if (!result.isConfirmed) return
 
       try {
-        await api.delete(`/match-positions/${this.matchId}/self-assign`)
+        await api.delete(`/matches/${this.matchId}/players/self-assign`)
 
         // Limpa estado local
         position.team_player_id = null

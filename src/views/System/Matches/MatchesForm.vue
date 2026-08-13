@@ -444,7 +444,7 @@ export default {
         this.form.myTeamIs = data.my_team_is ?? data.home_away ?? null
         this.form.enemyTeamId = data.enemy_team_id ?? null
         this.form.enemyTeamName = data.enemy_team_name ?? data.visitor_team_name ?? null
-        this.form.matchLocation = data.match_location ?? data.description ?? null
+        this.form.matchLocation = data.location ?? data.match_location ?? null
         this.form.myTeamScore = data.my_team_score ?? data.home_team_score ?? null
         this.form.enemyTeamScore = data.enemy_team_score ?? data.visitor_team_score ?? null
         this.form.hasPenalties = data.has_penalties ?? null

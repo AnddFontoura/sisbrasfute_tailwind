@@ -80,7 +80,7 @@
 
       <!-- Recruiting Section -->
       <div
-        v-if="team.isRecruiting"
+        v-if="team.isRecruiting && team.isRecruiting.length > 0"
         class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 px-6 py-5 shadow-lg border border-gray-700"
       >
         <div class="flex items-center gap-4">
