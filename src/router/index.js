@@ -7,6 +7,7 @@ import matches from './matches.js'
 import playerProfile from './player-profile.js'
 import teamApplication from './team-application.js'
 import playerInvitation from './player-invitation.js'
+import admin from './admin.js'
 
 
 const router = createRouter({
@@ -36,6 +37,7 @@ const router = createRouter({
     ...matches,
     ...teamApplication,
     ...playerInvitation,
+    ...admin,
   ],
 })
 
@@ -52,6 +54,14 @@ router.beforeEach((to, from, next) => {
   // Impede usuário logado de acessar login
   if (to.name === "login" && isLoggedIn) {
     return next({ name: "dashboard" })
+  }
+
+  // Bloqueia rota que precisa de admin
+  if (to.meta.requiresAdmin) {
+    const authStore = useAuthStore()
+    if (!authStore.isAdmin) {
+      return next({ name: 'dashboard' })
+    }
   }
 
   // Se rota exige role específica

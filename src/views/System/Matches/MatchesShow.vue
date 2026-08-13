@@ -189,14 +189,7 @@
           </div>
         </div>
 
-        <!-- SEÇÃO BOTÕES -->
-        <div class="mt-6 flex flex-wrap gap-3 justify-center">
-          <router-link v-if="matchInfo.positions && matchInfo.positions.length > 0"
-            :to="{ name: 'matches-positions', params: { id: matchId } }"
-            class="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2">
-            Gerenciar Posições
-          </router-link>
-        </div>
+
         </template>
       </div>
     </main>
