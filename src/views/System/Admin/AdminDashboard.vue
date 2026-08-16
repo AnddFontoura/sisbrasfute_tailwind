@@ -1,7 +1,7 @@
 <template>
   <system-layout>
     <main class="py-8">
-      <div class="max-w-5xl mx-auto">
+      <div class="w-full">
         <!-- Header -->
         <div class="mb-8">
           <h1 class="text-2xl font-black text-gray-900 dark:text-white">Painel Administrativo</h1>

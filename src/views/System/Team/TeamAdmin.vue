@@ -3,7 +3,7 @@
     <!-- Team Banner -->
     <team-banner :team-data="team" />
 
-    <div class="mx-auto max-w-5xl space-y-6 mt-6">
+    <div class="w-full space-y-6 mt-6">
 
       <!-- Page Header -->
       <div>
