@@ -510,7 +510,8 @@ export default {
       }
 
       try {
-        await api.post("/matches/save", formData, {
+        const url = this.matchId ? `/matches/save/${this.matchId}` : '/matches/save'
+        await api.post(url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
