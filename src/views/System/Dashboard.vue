@@ -211,6 +211,14 @@ export default {
       ]
     },
   },
+  async mounted() {
+    const authStore = useAuthStore()
+    try {
+      await authStore.refreshUser()
+    } catch (err) {
+      console.error('Erro ao atualizar dados do usuário:', err)
+    }
+  },
   methods: {
     async handleResendVerification() {
       this.resendingVerification = true
