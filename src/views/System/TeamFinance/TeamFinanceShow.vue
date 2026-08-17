@@ -4,15 +4,15 @@
       <div class="rounded">
         <div class="grid grid-cols-2">
           <div class="">
-            {{ matchInfo.home_team_name ?? 'Desconhecido' }}
+            {{ matchInfo.my_team_name ?? 'Desconhecido' }}
 
-            {{ matchInfo.home_score ?? '' }}
+            {{ matchInfo.my_team_score ?? '' }}
           </div>
 
           <div class="">
-            {{ matchInfo.visitor_team_name ?? 'Desconhecido' }}
+            {{ matchInfo.enemy_team_name ?? 'Desconhecido' }}
 
-            {{ matchInfo.visitor_score ?? ''}}
+            {{ matchInfo.enemy_team_score ?? ''}}
 
           </div>
 
@@ -20,7 +20,7 @@
             class="col-span-2"
             v-if="matchInfo.has_penalties"
           >
-            {{ matchInfo.home_penalty_score }} vs {{ matchInfo.visitor_penalty_score }}
+            {{ matchInfo.my_team_penalty_score }} vs {{ matchInfo.enemy_team_penalty_score }}
           </div>
 
           <div

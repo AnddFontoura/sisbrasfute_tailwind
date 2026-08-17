@@ -151,9 +151,9 @@
                   <li v-for="match in matches" :key="match.id" class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-md px-2 -mx-2 transition-colors duration-150">
                     <div class="flex items-center justify-between">
                       <div class="text-sm text-gray-700 dark:text-gray-300">
-                        <span class="font-medium">{{ match.home_team_name }}</span>
-                        <span class="mx-1 text-gray-900 dark:text-white font-bold">{{ match.home_score }} a {{ match.visitor_score }}</span>
-                        <span class="font-medium">{{ match.visitor_team_name }}</span>
+                        <span class="font-medium">{{ match.my_team_name }}</span>
+                        <span class="mx-1 text-gray-900 dark:text-white font-bold">{{ match.my_team_score }} a {{ match.enemy_team_score }}</span>
+                        <span class="font-medium">{{ match.enemy_team_name }}</span>
                       </div>
                       <span class="text-xs text-gray-500 dark:text-gray-400">{{ match.schedule_br }}</span>
                     </div>

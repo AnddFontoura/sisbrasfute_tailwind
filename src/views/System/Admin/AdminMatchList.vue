@@ -98,8 +98,8 @@
         <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Time mandante</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Time visitante</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Meu time</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Adversário</th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Data</th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</th>
@@ -108,8 +108,8 @@
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-white/5">
             <tr v-for="match in matches.data" :key="match.id" class="hover:bg-gray-50 dark:hover:bg-white/5 transition">
-              <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ match.home_team_name }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ match.visitor_team_name }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ match.my_team_name }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ match.enemy_team_name }}</td>
               <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ match.schedule_br || '—' }}</td>
               <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ match.city_name || '—' }}</td>
               <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ match.state_name || '—' }}</td>

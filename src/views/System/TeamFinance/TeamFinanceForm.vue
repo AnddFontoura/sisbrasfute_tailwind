@@ -213,7 +213,7 @@ export default {
         const matchesData = response.data?.data || response.data || []
         this.matches = matchesData.map(m => ({
           ...m,
-          display_name: `#${m.id} - ${m.home_team_name || 'Time'} vs ${m.visitor_team_name || 'Adversário'} (${m.schedule_br || 'Sem data'})`,
+          display_name: `#${m.id} - ${m.my_team_name || 'Time'} vs ${m.enemy_team_name || 'Adversário'} (${m.schedule_br || 'Sem data'})`,
         }))
       } catch (err) {
         console.error("Erro ao carregar partidas:", err)

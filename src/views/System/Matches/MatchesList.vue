@@ -116,9 +116,9 @@
           <!-- Header escuro -->
           <div class="bg-gray-900 px-4 py-3 text-center dark:bg-black">
             <p class="text-sm font-bold text-white">
-              {{ match.home_team_name || 'Time A' }}
+              {{ match.my_team_name || 'Meu Time' }}
               <span class="mx-2 text-orange-400">VS</span>
-              {{ match.visitor_team_name || 'Time B' }}
+              {{ match.enemy_team_name || 'Adversário' }}
             </p>
             <p class="mt-1 text-xs text-zinc-400">{{ match.schedule_br || 'Data não definida' }}</p>
           </div>

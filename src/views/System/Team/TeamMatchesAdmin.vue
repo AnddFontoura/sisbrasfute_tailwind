@@ -647,23 +647,23 @@ export default {
         const response = await api.get("/matches/show/" + this.matchId)
         const data = response.data
 
-        this.form.teamId = data.team_id ?? data.created_by_team_id ?? this.form.teamId
-        this.form.myTeamIs = data.my_team_is ?? data.home_away ?? null
+        this.form.teamId = data.created_by_team_id ?? this.form.teamId
+        this.form.myTeamIs = data.my_team_is ?? null
         this.form.enemyTeamId = data.enemy_team_id ?? null
-        this.form.enemyTeamName = data.enemy_team_name ?? data.visitor_team_name ?? null
-        this.form.matchLocation = data.match_location ?? data.description ?? null
-        this.form.myTeamScore = data.my_team_score ?? data.home_team_score ?? null
-        this.form.enemyTeamScore = data.enemy_team_score ?? data.visitor_team_score ?? null
+        this.form.enemyTeamName = data.enemy_team_name ?? null
+        this.form.matchLocation = data.location ?? null
+        this.form.myTeamScore = data.my_team_score ?? null
+        this.form.enemyTeamScore = data.enemy_team_score ?? null
         this.form.hasPenalties = data.has_penalties ?? null
         this.form.enemyTeamPenaltyScore = data.enemy_team_penalty_score ?? null
         this.form.myTeamPenaltyScore = data.my_team_penalty_score ?? null
-        this.form.matchSchedule = data.match_schedule ?? data.schedule ?? null
-        this.form.playersCount = data.players_count ?? data.playersCount ?? 1
-        this.form.teamsCount = data.teams_count ?? data.teamsCount ?? 1
+        this.form.matchSchedule = data.schedule ?? null
+        this.form.playersCount = data.players_count ?? 1
+        this.form.teamsCount = data.teams_count ?? 1
         this.form.matchType = this.matchTypeOptions.find(
           (option) => option.id === (data.match_type ?? data.type)
         )?.id ?? null
-        this.stateId = data.state_id ?? data.city_info?.state_id ?? null
+        this.stateId = data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
         this.form.tagId = data.tag_id ?? null
 

@@ -135,7 +135,7 @@
                     class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 font-medium underline-offset-2 hover:underline"
                     @click="$router.push({ name: 'matches-show', params: { id: finance.match_id } })"
                   >
-                    {{ finance.match_info.home_team_name || 'Time' }} vs {{ finance.match_info.visitor_team_name || 'Adv.' }}
+                    {{ finance.match_info.my_team_name || 'Time' }} vs {{ finance.match_info.enemy_team_name || 'Adv.' }}
                   </button>
                   <span v-else class="text-gray-400">-</span>
                 </td>

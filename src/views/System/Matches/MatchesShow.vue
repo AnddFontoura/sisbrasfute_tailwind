@@ -24,7 +24,7 @@
           <div class="flex flex-col items-center text-center w-1/3">
             <img :src="homeLogoUrl" @error="$event.target.src = fallbackImage"
                  class="w-24 h-24 sm:w-32 sm:h-32 rounded-full ring-4 ring-gray-200 dark:ring-gray-700 object-cover cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
-                 @click="openLightbox(matchInfo.home_team_info?.logo_url)" />
+                 @click="openLightbox(matchInfo.my_team_info?.logo_url)" />
             <p class="mt-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate max-w-[150px]">
               {{ homeTeamDisplayName }}
             </p>
@@ -33,13 +33,13 @@
           <!-- Placar / VS -->
           <div class="flex flex-col items-center">
             <div v-if="hasScore" class="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-              {{ matchInfo.home_score }} <span class="text-gray-400">x</span> {{ matchInfo.visitor_score }}
+              {{ matchInfo.my_team_score }} <span class="text-gray-400">x</span> {{ matchInfo.enemy_team_score }}
             </div>
             <div v-else class="text-xl sm:text-3xl font-bold text-gray-400 dark:text-gray-500">
               vs
             </div>
             <div v-if="showPenalties" class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              ({{ matchInfo.home_penalty_score }} x {{ matchInfo.visitor_penalty_score }}) pen.
+              ({{ matchInfo.my_team_penalty_score }} x {{ matchInfo.enemy_team_penalty_score }}) pen.
             </div>
           </div>
 
@@ -47,7 +47,7 @@
           <div class="flex flex-col items-center text-center w-1/3">
             <img :src="visitorLogoUrl" @error="$event.target.src = fallbackImage"
                  class="w-24 h-24 sm:w-32 sm:h-32 rounded-full ring-4 ring-gray-200 dark:ring-gray-700 object-cover cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
-                 @click="openLightbox(matchInfo.visitor_team_info?.logo_url)" />
+                 @click="openLightbox(matchInfo.enemy_team_info?.logo_url)" />
             <p class="mt-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate max-w-[150px]">
               {{ visitorTeamDisplayName }}
             </p>
@@ -237,20 +237,20 @@ export default {
   },
   computed: {
     homeLogoUrl() {
-      return this.matchInfo.home_team_info?.logo_url || this.fallbackImage;
+      return this.matchInfo.my_team_info?.logo_url || this.fallbackImage;
     },
     visitorLogoUrl() {
-      return this.matchInfo.visitor_team_info?.logo_url || this.fallbackImage;
+      return this.matchInfo.enemy_team_info?.logo_url || this.fallbackImage;
     },
     homeTeamDisplayName() {
-      return this.matchInfo.home_team_info?.name || this.matchInfo.home_team_name || 'Desconhecido';
+      return this.matchInfo.my_team_info?.name || this.matchInfo.my_team_name || 'Meu Time';
     },
     visitorTeamDisplayName() {
-      return this.matchInfo.visitor_team_info?.name || this.matchInfo.visitor_team_name || 'Desconhecido';
+      return this.matchInfo.enemy_team_info?.name || this.matchInfo.enemy_team_name || 'Adversário';
     },
     hasScore() {
-      return this.matchInfo.home_score !== null && this.matchInfo.home_score !== undefined
-          && this.matchInfo.visitor_score !== null && this.matchInfo.visitor_score !== undefined;
+      return this.matchInfo.my_team_score !== null && this.matchInfo.my_team_score !== undefined
+          && this.matchInfo.enemy_team_score !== null && this.matchInfo.enemy_team_score !== undefined;
     },
     showPenalties() {
       return this.matchInfo.has_penalties === true || this.matchInfo.has_penalties === 1;

@@ -7,18 +7,18 @@
         </h2>
 
         <!-- Team logos -->
-        <div v-if="matchInfo.home_team_name" class="flex items-center justify-center gap-4 sm:gap-6 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+        <div v-if="matchInfo.my_team_name" class="flex items-center justify-center gap-4 sm:gap-6 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
           <div class="flex flex-col items-center text-center">
             <img :src="homeLogoUrl" @error="$event.target.src = fallbackImage"
                  class="w-16 h-16 sm:w-20 sm:h-20 rounded-full ring-2 ring-gray-200 dark:ring-gray-700 object-cover cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
-                 @click="openLightbox(matchInfo.home_team_info?.logo_url)" />
+                 @click="openLightbox(matchInfo.my_team_info?.logo_url)" />
             <p class="mt-1 text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate max-w-[100px]">{{ homeTeamName }}</p>
           </div>
           <span class="text-lg font-bold text-gray-400 dark:text-gray-500">vs</span>
           <div class="flex flex-col items-center text-center">
             <img :src="visitorLogoUrl" @error="$event.target.src = fallbackImage"
                  class="w-16 h-16 sm:w-20 sm:h-20 rounded-full ring-2 ring-gray-200 dark:ring-gray-700 object-cover cursor-pointer hover:scale-105 hover:ring-orange-300 transition-all duration-200"
-                 @click="openLightbox(matchInfo.visitor_team_info?.logo_url)" />
+                 @click="openLightbox(matchInfo.enemy_team_info?.logo_url)" />
             <p class="mt-1 text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate max-w-[100px]">{{ visitorTeamName }}</p>
           </div>
         </div>
@@ -206,16 +206,16 @@ export default {
   },
   computed: {
     homeLogoUrl() {
-      return this.matchInfo.home_team_info?.logo_url || this.fallbackImage;
+      return this.matchInfo.my_team_info?.logo_url || this.fallbackImage;
     },
     visitorLogoUrl() {
-      return this.matchInfo.visitor_team_info?.logo_url || this.fallbackImage;
+      return this.matchInfo.enemy_team_info?.logo_url || this.fallbackImage;
     },
     homeTeamName() {
-      return this.matchInfo.home_team_info?.name || this.matchInfo.home_team_name || 'Mandante';
+      return this.matchInfo.my_team_info?.name || this.matchInfo.my_team_name || 'Meu Time';
     },
     visitorTeamName() {
-      return this.matchInfo.visitor_team_info?.name || this.matchInfo.visitor_team_name || 'Visitante';
+      return this.matchInfo.enemy_team_info?.name || this.matchInfo.enemy_team_name || 'Adversário';
     },
   },
   created() {
