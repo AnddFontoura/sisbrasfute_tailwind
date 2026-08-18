@@ -120,6 +120,16 @@
               <span class="mx-2 text-orange-400">VS</span>
               {{ match.enemy_team_name || 'Adversário' }}
             </p>
+            <!-- Placar -->
+            <p
+              v-if="match.my_team_score !== null && match.enemy_team_score !== null"
+              class="mt-1 text-lg font-black text-white"
+            >
+              {{ match.my_team_score }} <span class="text-orange-400">x</span> {{ match.enemy_team_score }}
+              <span v-if="match.has_penalties" class="text-xs font-medium text-zinc-400 ml-1">
+                ({{ match.my_team_penalty_score }} x {{ match.enemy_team_penalty_score }} pen.)
+              </span>
+            </p>
             <p class="mt-1 text-xs text-zinc-400">{{ match.schedule_br || 'Data não definida' }}</p>
           </div>
 

@@ -442,6 +442,18 @@ export default {
       const map = { 0: 'home', 1: 'visitor' }
       return map[value] ?? null
     },
+    formatScheduleForInput(schedule) {
+      if (!schedule) return null
+      // datetime-local expects "YYYY-MM-DDTHH:mm"
+      const date = new Date(schedule)
+      if (isNaN(date.getTime())) return null
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    },
     async getMatchInfo() {
       if (!this.matchId) return
 
@@ -460,7 +472,7 @@ export default {
         this.form.hasPenalties = data.has_penalties ?? null
         this.form.enemyTeamPenaltyScore = data.enemy_team_penalty_score ?? null
         this.form.myTeamPenaltyScore = data.my_team_penalty_score ?? null
-        this.form.matchSchedule = data.schedule ?? null
+        this.form.matchSchedule = this.formatScheduleForInput(data.schedule)
         this.form.playersCount = data.players_count ?? 1
         this.form.teamsCount = data.teams_count ?? 1
         this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
