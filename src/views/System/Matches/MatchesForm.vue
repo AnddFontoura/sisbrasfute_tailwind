@@ -213,12 +213,12 @@
                     class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
                   />
                 </div>
-                <div>
+                <div v-if="isTeamMatch()">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Quantidade de times</label>
                   <input
                     v-model.number="form.teamsCount"
                     type="number"
-                    min="1"
+                    min="2"
                     class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500"
                   />
                 </div>
@@ -403,6 +403,13 @@ export default {
             price: 0,
           })
         );
+      }
+    },
+    'form.matchType'(newValue) {
+      if (newValue === 'team_match') {
+        if (this.form.teamsCount < 2) this.form.teamsCount = 2
+      } else {
+        this.form.teamsCount = 1
       }
     }
   },
