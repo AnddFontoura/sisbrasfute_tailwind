@@ -213,6 +213,7 @@ export default {
         last_page: 1
       },
       teamId: null,
+      myTeamIds: [],
       loading: false,
       showFilters: false,
     }
@@ -220,6 +221,7 @@ export default {
   created() {
     this.teamId = this.$route.params.teamId ?? null
     this.auth = useAuthStore()
+    this.loadMyTeams()
     this.getMatchesList()
   },
   computed: {
@@ -273,7 +275,17 @@ export default {
     isSameTeam(createdByTeamId) {
       if (!createdByTeamId) return false
       if (this.teamId) return Number(createdByTeamId) === Number(this.teamId)
-      return true
+      return this.myTeamIds.includes(Number(createdByTeamId))
+    },
+
+    async loadMyTeams() {
+      try {
+        const { data } = await api.get('/team/list/my-teams')
+        this.myTeamIds = (data.teams || []).map(t => Number(t.id))
+      } catch (err) {
+        console.error('Erro ao carregar times do usuário:', err)
+        this.myTeamIds = []
+      }
     },
   },
 }
