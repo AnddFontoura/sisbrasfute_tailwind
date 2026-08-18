@@ -219,26 +219,6 @@
           </div>
         </div>
 
-        <div class="px-4 pt-5">
-          <div class="flex items-center gap-3 border border-white/10 bg-white/[0.04] p-3 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
-            <div class="flex size-12 shrink-0 items-center justify-center bg-gradient-to-br from-orange-400 to-orange-700 text-lg font-black text-white shadow-[0_0_24px_rgba(249,115,22,0.35)]">
-              5
-            </div>
-
-            <div class="min-w-0">
-              <p class="truncate text-sm font-black text-white">
-                Quinta Liga FC
-              </p>
-              <div class="mt-1 flex items-center gap-1.5">
-                <span class="size-1.5 rounded-full bg-emerald-400"></span>
-                <span class="truncate text-xs font-medium text-zinc-500">
-                  Temporada 2026 • Ativo
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <nav class="flex flex-1 flex-col overflow-y-auto px-4 py-6">
           <div class="space-y-7">
             <div>
@@ -394,9 +374,6 @@
                   <p class="truncate text-sm font-black text-white">
                     {{ user.name || 'Usuário' }}
                   </p>
-                  <p class="truncate text-xs font-semibold text-zinc-500">
-                    Gestor do Clube
-                  </p>
                 </div>
 
                 <ChevronDownIcon class="size-4 text-zinc-500" aria-hidden="true" />
@@ -457,14 +434,6 @@
             <BellIcon class="size-5" aria-hidden="true" />
             <span class="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-orange-500"></span>
           </button>
-
-          <div class="hidden border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-xs font-black text-orange-400 sm:block">
-            Futebol
-          </div>
-
-          <div class="flex size-8 items-center justify-center rounded-full bg-orange-500 text-sm font-black text-white">
-            5
-          </div>
         </div>
       </header>
 
