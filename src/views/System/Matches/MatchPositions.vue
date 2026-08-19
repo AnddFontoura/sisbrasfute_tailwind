@@ -1,200 +1,276 @@
 <template>
   <system-layout>
     <main>
-      <div class="mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Gerenciar Posições da Partida
-        </h2>
-
-        <!-- Loading indicator -->
-        <div v-if="loading" class="flex items-center justify-center py-12">
-          <svg
-            class="animate-spin h-8 w-8 text-orange-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
+      <div class="w-full">
+        <!-- Header -->
+        <div class="mb-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+              Administrar Partida
+            </h2>
+            <p v-if="matchInfo" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {{ matchInfo.my_team_name }} vs {{ matchInfo.enemy_team_name || 'Adversário' }} — {{ matchInfo.schedule_br }}
+            </p>
+          </div>
+          <router-link
+            v-if="teamId"
+            :to="{ name: 'team-finance-form', params: { teamId: teamId }, query: { matchId: matchId } }"
+            class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
           >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            ></path>
-          </svg>
-          <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando posições...</span>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Nova Movimentação Financeira
+          </router-link>
         </div>
 
-        <!-- Positions list -->
-        <div v-if="!loading" class="space-y-3">
-          <div
-            v-if="positions.length === 0"
-            class="text-center py-8 text-gray-500 dark:text-gray-400"
-          >
-            Nenhuma posição configurada para esta partida.
-          </div>
+        <!-- Layout: Posições + Financeiro lado a lado -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <div
-            v-for="position in positions"
-            :key="position.id"
-            class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between gap-4"
-          >
-            <!-- Position info -->
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                  {{ position.game_position_name }}
-                </span>
-                <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
-                  {{ formatCurrency(position.value) }}
-                </span>
+          <!-- Coluna principal: Posições -->
+          <div class="lg:col-span-2">
+            <div class="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+              <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Posições da Partida</h3>
+
+              <!-- Loading indicator -->
+              <div v-if="loading" class="flex items-center justify-center py-12">
+                <svg class="animate-spin h-8 w-8 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando posições...</span>
               </div>
 
-              <!-- Player assignment area -->
-              <div class="mt-2">
-                <!-- Editing mode: show Multiselect -->
-                <div v-if="editingPosition === position.id">
-                  <Multiselect
-                    v-model="selectedPlayerId"
-                    :options="playerOptions"
-                    :searchable="true"
-                    :close-on-select="true"
-                    :clear-on-select="false"
-                    placeholder="Selecione um jogador"
-                    track-by="label"
-                    label="label"
-                    value-prop="value"
-                    mode="single"
-                    :disabled="!playersLoaded"
-                    class="mt-1"
-                  />
-                  <div class="mt-2 flex gap-2">
-                    <button
-                      type="button"
-                      @click="saveAssignment(position)"
-                      :disabled="!selectedPlayerId"
-                      class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Confirmar
-                    </button>
-                    <button
-                      type="button"
-                      @click="cancelEditing()"
-                      class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
+              <!-- Positions list -->
+              <div v-if="!loading" class="space-y-3">
+                <div v-if="positions.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  Nenhuma posição configurada para esta partida.
                 </div>
 
-                <!-- Display mode: player assigned -->
-                <div v-else-if="position.player_name" class="flex flex-col gap-2">
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">
-                      {{ position.player_name }}
-                      <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
-                        ({{ position.player_nickname }})
-                      </span>
-                    </span>
-                    <button
-                      type="button"
-                      @click="startEditing(position)"
-                      :disabled="!playersLoaded"
-                      class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-orange-600 dark:text-orange-400 border border-orange-300 dark:border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Editar
-                    </button>
-                  </div>
-
-                  <!-- Payment info -->
-                  <div class="flex items-center gap-3 mt-1">
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      Pago: {{ formatCurrency(position.price_payed) }}
-                    </span>
-                    <span
-                      class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                      :class="getPaymentStatusClasses(position)"
-                    >
-                      {{ getPaymentStatusLabel(position) }}
-                    </span>
-                  </div>
-
-                  <!-- Payment editing -->
-                  <div v-if="editingPayment === position.id" class="mt-2">
+                <div
+                  v-for="position in positions"
+                  :key="position.id"
+                  class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between gap-4"
+                >
+                  <!-- Position info -->
+                  <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
-                      <input
-                        v-model="editedPaymentValue"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        class="w-32 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-900 dark:text-white focus:border-orange-500 focus:ring-orange-500"
-                      />
-                      <button
-                        type="button"
-                        @click="updatePayment(position)"
-                        :disabled="!isPaymentValueValid"
-                        class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Salvar
-                      </button>
-                      <button
-                        type="button"
-                        @click="cancelPaymentEditing()"
-                        class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        Cancelar
-                      </button>
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                        {{ position.game_position_name }}
+                      </span>
+                      <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
+                        {{ formatCurrency(position.value) }}
+                      </span>
                     </div>
-                    <p v-if="paymentValidationMessage" class="mt-1 text-xs text-red-600 dark:text-red-400">
-                      {{ paymentValidationMessage }}
-                    </p>
-                  </div>
-                  <div v-else class="mt-1">
-                    <button
-                      type="button"
-                      @click="startPaymentEditing(position)"
-                      class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Editar Pagamento
-                    </button>
-                  </div>
-                </div>
 
-                <!-- Display mode: no player assigned, show Multiselect directly -->
-                <div v-else>
-                  <div v-if="playersLoaded">
-                    <Multiselect
-                      v-model="selectedPlayerId"
-                      :options="playerOptions"
-                      :searchable="true"
-                      :close-on-select="true"
-                      :clear-on-select="false"
-                      placeholder="Selecione um jogador"
-                      track-by="label"
-                      label="label"
-                      value-prop="value"
-                      mode="single"
-                      :disabled="!playersLoaded"
-                      class="mt-1"
-                      @select="onDirectSelect(position)"
-                    />
+                    <!-- Player assignment area -->
+                    <div class="mt-2">
+                      <!-- Editing mode -->
+                      <div v-if="editingPosition === position.id">
+                        <Multiselect
+                          v-model="selectedPlayerId"
+                          :options="playerOptions"
+                          :searchable="true"
+                          :close-on-select="true"
+                          :clear-on-select="false"
+                          placeholder="Selecione um jogador"
+                          track-by="label"
+                          label="label"
+                          value-prop="value"
+                          mode="single"
+                          :disabled="!playersLoaded"
+                          class="mt-1"
+                        />
+                        <div class="mt-2 flex gap-2">
+                          <button
+                            type="button"
+                            @click="saveAssignment(position)"
+                            :disabled="!selectedPlayerId"
+                            class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            type="button"
+                            @click="cancelEditing()"
+                            class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Display mode: player assigned -->
+                      <div v-else-if="position.player_name" class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ position.player_name }}
+                            <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
+                              ({{ position.player_nickname }})
+                            </span>
+                          </span>
+                          <button
+                            type="button"
+                            @click="startEditing(position)"
+                            :disabled="!playersLoaded"
+                            class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-orange-600 dark:text-orange-400 border border-orange-300 dark:border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Editar
+                          </button>
+                        </div>
+
+                        <!-- Payment info -->
+                        <div class="flex items-center gap-3 mt-1">
+                          <span class="text-xs text-gray-500 dark:text-gray-400">
+                            Pago: {{ formatCurrency(position.price_payed) }}
+                          </span>
+                          <span
+                            class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                            :class="getPaymentStatusClasses(position)"
+                          >
+                            {{ getPaymentStatusLabel(position) }}
+                          </span>
+                        </div>
+
+                        <!-- Payment editing -->
+                        <div v-if="editingPayment === position.id" class="mt-2">
+                          <div class="flex items-center gap-2">
+                            <input
+                              v-model="editedPaymentValue"
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              class="w-32 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-900 dark:text-white focus:border-orange-500 focus:ring-orange-500"
+                            />
+                            <button
+                              type="button"
+                              @click="updatePayment(position)"
+                              :disabled="!isPaymentValueValid"
+                              class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Salvar
+                            </button>
+                            <button
+                              type="button"
+                              @click="cancelPaymentEditing()"
+                              class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                          <p v-if="paymentValidationMessage" class="mt-1 text-xs text-red-600 dark:text-red-400">
+                            {{ paymentValidationMessage }}
+                          </p>
+                        </div>
+                        <div v-else class="mt-1">
+                          <button
+                            type="button"
+                            @click="startPaymentEditing(position)"
+                            class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            Editar Pagamento
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Display mode: no player assigned -->
+                      <div v-else>
+                        <div v-if="playersLoaded">
+                          <Multiselect
+                            v-model="selectedPlayerId"
+                            :options="playerOptions"
+                            :searchable="true"
+                            :close-on-select="true"
+                            :clear-on-select="false"
+                            placeholder="Selecione um jogador"
+                            track-by="label"
+                            label="label"
+                            value-prop="value"
+                            mode="single"
+                            :disabled="!playersLoaded"
+                            class="mt-1"
+                            @select="onDirectSelect(position)"
+                          />
+                        </div>
+                        <span v-else class="text-sm italic text-gray-400 dark:text-gray-500">
+                          Vaga Disponível
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <span
-                    v-else
-                    class="text-sm italic text-gray-400 dark:text-gray-500"
-                  >
-                    Vaga Disponível
-                  </span>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Coluna lateral: Resumo Financeiro da Partida -->
+          <div class="lg:col-span-1">
+            <div class="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-6 sticky top-20">
+              <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Financeiro da Partida</h3>
+
+              <!-- Loading -->
+              <div v-if="financeLoading" class="flex items-center justify-center py-8">
+                <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+              </div>
+
+              <div v-else>
+                <!-- Summary cards -->
+                <div class="space-y-3 mb-4">
+                  <div class="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700">
+                    <span class="text-xs font-medium text-green-700 dark:text-green-400">Receitas</span>
+                    <span class="text-sm font-bold text-green-700 dark:text-green-400">{{ formatCurrency(financeCredits) }}</span>
+                  </div>
+                  <div class="flex items-center justify-between p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+                    <span class="text-xs font-medium text-red-700 dark:text-red-400">Despesas</span>
+                    <span class="text-sm font-bold text-red-700 dark:text-red-400">{{ formatCurrency(financeDebits) }}</span>
+                  </div>
+                  <div class="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+                       :class="financeBalance >= 0 ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-amber-50 dark:bg-amber-900/20'">
+                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Saldo</span>
+                    <span class="text-sm font-bold" :class="financeBalance >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
+                      {{ formatCurrency(financeBalance) }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Finance entries list -->
+                <div v-if="financeEntries.length > 0" class="space-y-2 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Movimentações</p>
+                  <div
+                    v-for="entry in financeEntries"
+                    :key="entry.id"
+                    class="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  >
+                    <div class="min-w-0 flex-1">
+                      <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ entry.description || 'Sem descrição' }}</p>
+                      <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ entry.player_name || '—' }}</p>
+                    </div>
+                    <span
+                      class="text-xs font-bold shrink-0 ml-2"
+                      :class="Number(entry.type) === 1 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                    >
+                      {{ Number(entry.type) === 1 ? '+' : '-' }}{{ formatCurrency(entry.value) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div v-else class="text-center py-4">
+                  <p class="text-xs text-gray-400 dark:text-gray-500">Nenhuma movimentação registrada para esta partida.</p>
+                </div>
+
+                <!-- Link to full finance list -->
+                <router-link
+                  v-if="teamId"
+                  :to="{ name: 'team-finance-list', params: { teamId: teamId } }"
+                  class="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Ver todas as movimentações do time
+                </router-link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </main>
@@ -217,6 +293,7 @@ export default {
     return {
       matchId: null,
       teamId: null,
+      matchInfo: null,
       positions: [],
       teamPlayers: [],
       loading: true,
@@ -226,6 +303,11 @@ export default {
       editingPayment: null,
       editedPaymentValue: null,
       paymentValidationMessage: "",
+      financeLoading: true,
+      financeEntries: [],
+      financeCredits: 0,
+      financeDebits: 0,
+      financeBalance: 0,
     };
   },
   computed: {
@@ -286,8 +368,12 @@ export default {
     async loadMatchInfo() {
       try {
         const response = await api.get(`/matches/show/${this.matchId}`);
+        this.matchInfo = response.data;
         this.teamId = response.data.created_by_team_id;
-        await this.loadTeamPlayers();
+        await Promise.all([
+          this.loadTeamPlayers(),
+          this.loadFinanceSummary(),
+        ]);
       } catch (err) {
         console.error(err);
         await Swal.fire({
@@ -309,14 +395,37 @@ export default {
       } catch (err) {
         console.error(err);
         this.playersLoaded = false;
-        await Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "error",
-          title: "Erro ao carregar jogadores do time",
-          showConfirmButton: false,
-          timer: 3000,
-        });
+      }
+    },
+
+    async loadFinanceSummary() {
+      this.financeLoading = true;
+      try {
+        const response = await api.get(`/team-finance/${this.teamId}`);
+        const allFinances = response.data || [];
+
+        // Filter finances related to this match
+        this.financeEntries = allFinances.filter(
+          (f) => f.match_id && Number(f.match_id) === Number(this.matchId)
+        );
+
+        this.financeCredits = this.financeEntries
+          .filter((f) => Number(f.type) === 1)
+          .reduce((sum, f) => sum + Number(f.value || 0), 0);
+
+        this.financeDebits = this.financeEntries
+          .filter((f) => Number(f.type) === 0)
+          .reduce((sum, f) => sum + Number(f.value || 0), 0);
+
+        this.financeBalance = this.financeCredits - this.financeDebits;
+      } catch (err) {
+        console.error("Erro ao carregar financeiro:", err);
+        this.financeEntries = [];
+        this.financeCredits = 0;
+        this.financeDebits = 0;
+        this.financeBalance = 0;
+      } finally {
+        this.financeLoading = false;
       }
     },
 
@@ -347,7 +456,6 @@ export default {
           team_player_id: this.selectedPlayerId,
         });
 
-        // Update position locally
         const selectedPlayer = this.teamPlayers.find(
           (p) => p.id === this.selectedPlayerId
         );
@@ -357,7 +465,6 @@ export default {
           position.team_player_id = selectedPlayer.id;
         }
 
-        // Close editing mode
         this.editingPosition = null;
         this.selectedPlayerId = null;
 
@@ -371,8 +478,6 @@ export default {
         });
       } catch (err) {
         console.error(err);
-
-        // Revert selection on failure
         this.selectedPlayerId = previousPlayerId;
 
         const message =
@@ -457,7 +562,6 @@ export default {
           { price_payed: value }
         );
 
-        // Update locally without page reload
         position.price_payed = value;
         this.editingPayment = null;
         this.editedPaymentValue = null;

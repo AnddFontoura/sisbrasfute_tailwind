@@ -196,6 +196,11 @@ export default {
     this.financeId = this.$route.params.id || null
     this.isEditing = !!this.financeId
 
+    // Pré-seleciona a partida se vier via query param
+    if (this.$route.query.matchId) {
+      this.form.matchId = Number(this.$route.query.matchId)
+    }
+
     await Promise.all([
       this.loadMatches(),
       this.loadPlayers(),
