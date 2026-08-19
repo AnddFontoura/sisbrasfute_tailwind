@@ -329,7 +329,12 @@ export default {
           timer: 2000,
         })
 
-        this.$router.push({ name: 'team-finance-list', params: { teamId: this.teamId } })
+        // Se veio da administração da partida, volta para lá
+        if (this.$route.query.matchId && this.$route.query.returnTo === 'match-admin') {
+          this.$router.push({ name: 'team-matches-manage', params: { teamId: this.teamId, matchId: this.$route.query.matchId } })
+        } else {
+          this.$router.push({ name: 'team-finance-list', params: { teamId: this.teamId } })
+        }
       } catch (err) {
         console.error(err)
         let mensagens = 'Erro ao salvar movimentação.'
