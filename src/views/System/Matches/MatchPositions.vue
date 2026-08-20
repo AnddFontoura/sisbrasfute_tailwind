@@ -390,7 +390,7 @@ export default {
     async loadTeamPlayers() {
       try {
         const response = await api.get(`/team-player/${this.teamId}/list`);
-        this.teamPlayers = response.data;
+        this.teamPlayers = response.data?.data || response.data || [];
         this.playersLoaded = true;
       } catch (err) {
         console.error(err);
