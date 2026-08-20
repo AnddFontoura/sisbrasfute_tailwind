@@ -272,14 +272,14 @@ export default {
     },
 
     handleReasonCreate(option) {
-      // When user types a new reason that doesn't exist, store it as reasonName
-      this.form.reasonName = option.label || option.value
+      // option arrives as { id: "typed text", name: "typed text" }
+      // matching the valueProp="id", label="name", trackBy="id" config
+      this.form.reasonName = option.name || option.id
 
-      // Return an object with the keys expected by valueProp (id), label (name), and trackBy (id)
-      // Using the string value as the id so we can detect it's a new reason on submit
+      // Return the option object with correct keys so Multiselect can append and select it
       return {
-        id: option.value,
-        name: option.label || option.value,
+        id: option.id,
+        name: option.name || option.id,
       }
     },
 
