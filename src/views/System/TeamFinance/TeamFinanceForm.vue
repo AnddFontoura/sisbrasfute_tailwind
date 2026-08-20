@@ -273,11 +273,14 @@ export default {
 
     handleReasonCreate(option) {
       // When user types a new reason that doesn't exist, store it as reasonName
-      this.form.reasonName = option.value
-      // Add it to the options as a temporary entry
-      const newOption = { id: option.value, name: option.value }
-      this.reasons.push(newOption)
-      return newOption
+      this.form.reasonName = option.label || option.value
+
+      // Return an object with the keys expected by valueProp (id), label (name), and trackBy (id)
+      // Using the string value as the id so we can detect it's a new reason on submit
+      return {
+        id: option.value,
+        name: option.label || option.value,
+      }
     },
 
     async handleSubmit() {
@@ -305,10 +308,8 @@ export default {
       }
 
       // If reasonId is a string (new reason typed), send as reasonName
-      if (this.form.reasonId && typeof this.form.reasonId === 'string') {
+      if (this.form.reasonId && typeof this.form.reasonId === 'string' && isNaN(this.form.reasonId)) {
         payload.reasonName = this.form.reasonId
-      } else if (this.form.reasonName) {
-        payload.reasonName = this.form.reasonName
       } else if (this.form.reasonId) {
         payload.reasonId = this.form.reasonId
       }
