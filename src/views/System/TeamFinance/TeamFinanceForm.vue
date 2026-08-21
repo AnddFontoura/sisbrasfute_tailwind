@@ -72,7 +72,7 @@
                 value-prop="id"
                 :searchable="true"
                 :create-option="true"
-                :on-create="handleReasonCreate"
+                @create="handleReasonCreate"
                 placeholder="Selecione ou digite uma nova razão..."
                 class="mt-1"
               />
@@ -271,11 +271,12 @@ export default {
       }
     },
 
-    handleReasonCreate(option) {
+    handleReasonCreate(query) {
       // When user types a new reason that doesn't exist, store it as reasonName
-      this.form.reasonName = option.value
+      const name = typeof query === 'object' ? query.value : query
+      this.form.reasonName = name
       // Add it to the options as a temporary entry
-      const newOption = { id: option.value, name: option.value }
+      const newOption = { id: name, name: name }
       this.reasons.push(newOption)
       return newOption
     },
