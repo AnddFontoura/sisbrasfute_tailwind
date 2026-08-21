@@ -60,6 +60,99 @@
         </div>
       </div>
 
+      <!-- Filtros -->
+      <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-gray-800 dark:text-white">Filtros</h2>
+          <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">
+            Limpar
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Tipo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo</label>
+            <select
+              v-model="filters.type"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            >
+              <option value="">Todos</option>
+              <option value="1">Crédito (entrada)</option>
+              <option value="0">Débito (saída)</option>
+            </select>
+          </div>
+
+          <!-- Jogador -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Jogador</label>
+            <input
+              v-model="filters.player"
+              type="text"
+              placeholder="Buscar por jogador..."
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+
+          <!-- Razão -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Razão</label>
+            <input
+              v-model="filters.reason"
+              type="text"
+              placeholder="Buscar por razão..."
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+
+          <!-- Data início -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data início</label>
+            <input
+              v-model="filters.dateStart"
+              type="date"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+
+          <!-- Data fim -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data fim</label>
+            <input
+              v-model="filters.dateEnd"
+              type="date"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+
+          <!-- Valor mínimo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor mínimo (R$)</label>
+            <input
+              v-model.number="filters.valueMin"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0,00"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+
+          <!-- Valor máximo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor máximo (R$)</label>
+            <input
+              v-model.number="filters.valueMax"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0,00"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Table Card -->
       <div class="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <!-- Loading -->
@@ -88,7 +181,7 @@
 
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
               <tr
-                v-for="finance in finances"
+                v-for="finance in filteredFinances"
                 :key="finance.id"
                 class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
               >
@@ -158,7 +251,7 @@
               </tr>
 
               <!-- Empty state -->
-              <tr v-if="!finances.length && !loading">
+              <tr v-if="!filteredFinances.length && !loading">
                 <td colspan="7" class="px-4 py-12 text-center">
                   <div class="flex flex-col items-center">
                     <svg class="h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
@@ -201,6 +294,15 @@ export default {
       teamId: null,
       finances: [],
       loading: false,
+      filters: {
+        type: '',
+        player: '',
+        reason: '',
+        dateStart: null,
+        dateEnd: null,
+        valueMin: null,
+        valueMax: null,
+      },
     }
   },
 
@@ -210,13 +312,48 @@ export default {
   },
 
   computed: {
+    filteredFinances() {
+      return this.finances.filter(f => {
+        // Type filter
+        if (this.filters.type !== '' && String(f.type) !== this.filters.type) return false
+
+        // Player filter
+        if (this.filters.player) {
+          const playerName = f.team_player_info?.nickname || f.team_player_info?.name || ''
+          if (!playerName.toLowerCase().includes(this.filters.player.toLowerCase())) return false
+        }
+
+        // Reason filter
+        if (this.filters.reason) {
+          const reasonName = f.reason_info?.name || f.description || ''
+          if (!reasonName.toLowerCase().includes(this.filters.reason.toLowerCase())) return false
+        }
+
+        // Date range filter
+        if (this.filters.dateStart) {
+          const entryDate = new Date(f.created_at).toISOString().split('T')[0]
+          if (entryDate < this.filters.dateStart) return false
+        }
+        if (this.filters.dateEnd) {
+          const entryDate = new Date(f.created_at).toISOString().split('T')[0]
+          if (entryDate > this.filters.dateEnd) return false
+        }
+
+        // Value range filter
+        const value = Number(f.value || 0)
+        if (this.filters.valueMin !== null && this.filters.valueMin !== '' && value < this.filters.valueMin) return false
+        if (this.filters.valueMax !== null && this.filters.valueMax !== '' && value > this.filters.valueMax) return false
+
+        return true
+      })
+    },
     totalCredits() {
-      return this.finances
+      return this.filteredFinances
         .filter(f => Number(f.type) === 1)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
     totalDebits() {
-      return this.finances
+      return this.filteredFinances
         .filter(f => Number(f.type) === 0)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
@@ -256,6 +393,18 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+
+    resetFilters() {
+      this.filters = {
+        type: '',
+        player: '',
+        reason: '',
+        dateStart: null,
+        dateEnd: null,
+        valueMin: null,
+        valueMax: null,
       }
     },
   },
