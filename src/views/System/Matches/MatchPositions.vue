@@ -1,17 +1,22 @@
 <template>
   <system-layout>
     <main>
-      <div class="w-full">
-        <!-- Header -->
-        <div class="mb-6 flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-              Administrar Partida
-            </h2>
-            <p v-if="matchInfo" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ matchInfo.my_team_name }} vs {{ matchInfo.enemy_team_name || 'Adversário' }} — {{ matchInfo.schedule_br }}
-            </p>
-          </div>
+      <!-- Team Banner -->
+      <team-banner v-if="teamId" :teamInfoId="teamId" />
+
+      <!-- Navigation + Match Info -->
+      <div class="mt-4 mb-6">
+        <!-- Navigation buttons -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <router-link
+            v-if="teamId"
+            :to="{ name: 'team-matches-list', params: { teamId: teamId } }"
+            class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Voltar para Partidas
+          </router-link>
+
           <router-link
             v-if="teamId"
             :to="{ name: 'team-finance-form', params: { teamId: teamId }, query: { matchId: matchId, returnTo: 'match-admin' } }"
@@ -21,6 +26,31 @@
             Nova Movimentação Financeira
           </router-link>
         </div>
+
+        <!-- Match Info Card -->
+        <div v-if="matchInfo" class="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+                {{ matchInfo.home_team_name || 'Mandante' }}
+                <span class="mx-2 text-orange-500">vs</span>
+                {{ matchInfo.visitor_team_name || 'Visitante' }}
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                📅 {{ matchInfo.schedule_br || 'Data não definida' }}
+                <span v-if="matchInfo.city_info" class="ml-3">📍 {{ matchInfo.city_info.name }}</span>
+              </p>
+            </div>
+            <div v-if="matchInfo.home_score !== null && matchInfo.visitor_score !== null" class="flex items-center gap-2">
+              <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ matchInfo.home_score }}</span>
+              <span class="text-sm text-gray-400">x</span>
+              <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ matchInfo.visitor_score }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full">
 
         <!-- Layout: Posições + Financeiro lado a lado -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -280,6 +310,7 @@
 <script>
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import TeamBanner from "@/components/team/teamBanner.vue";
 import Multiselect from "@vueform/multiselect";
 import Swal from "@/services/swal.js";
 
@@ -287,6 +318,7 @@ export default {
   name: "MatchPositions",
   components: {
     systemLayout,
+    TeamBanner,
     Multiselect,
   },
   data() {
