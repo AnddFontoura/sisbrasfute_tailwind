@@ -29,7 +29,12 @@
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Entradas</p>
-            <p class="text-sm font-bold text-green-600 dark:text-green-400">{{ formatCurrency(totalCredits) }}</p>
+            <p class="text-sm font-bold text-green-600 dark:text-green-400">
+              {{ formatCurrency(generalCredits) }}
+              <span v-if="hasActiveFilters" class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                (filtrado: {{ formatCurrency(filteredCredits) }})
+              </span>
+            </p>
           </div>
         </div>
 
@@ -41,7 +46,12 @@
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Saídas</p>
-            <p class="text-sm font-bold text-red-600 dark:text-red-400">{{ formatCurrency(totalDebits) }}</p>
+            <p class="text-sm font-bold text-red-600 dark:text-red-400">
+              {{ formatCurrency(generalDebits) }}
+              <span v-if="hasActiveFilters" class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                (filtrado: {{ formatCurrency(filteredDebits) }})
+              </span>
+            </p>
           </div>
         </div>
 
@@ -53,8 +63,11 @@
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Saldo</p>
-            <p class="text-sm font-bold" :class="balance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
-              {{ formatCurrency(balance) }}
+            <p class="text-sm font-bold" :class="generalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+              {{ formatCurrency(generalBalance) }}
+              <span v-if="hasActiveFilters" class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                (filtrado: {{ formatCurrency(filteredBalance) }})
+              </span>
             </p>
           </div>
         </div>
@@ -316,6 +329,7 @@ export default {
     return {
       teamId: null,
       finances: [],
+      allFinances: [],
       pagination: {
         data: [],
         current_page: 1,
@@ -340,22 +354,38 @@ export default {
   created() {
     this.teamId = this.$route.params.teamId
     this.loadFilterOptions()
+    this.loadGeneralTotals()
     this.getFinancesList()
   },
 
   computed: {
-    totalCredits() {
+    // Totais gerais (sem filtro) - carregados uma vez
+    generalCredits() {
+      return this.allFinances
+        .filter(f => Number(f.type) === 1)
+        .reduce((sum, f) => sum + Number(f.value || 0), 0)
+    },
+    generalDebits() {
+      return this.allFinances
+        .filter(f => Number(f.type) === 0)
+        .reduce((sum, f) => sum + Number(f.value || 0), 0)
+    },
+    generalBalance() {
+      return this.generalCredits - this.generalDebits
+    },
+    // Totais filtrados (da página atual)
+    filteredCredits() {
       return this.finances
         .filter(f => Number(f.type) === 1)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
-    totalDebits() {
+    filteredDebits() {
       return this.finances
         .filter(f => Number(f.type) === 0)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
-    balance() {
-      return this.totalCredits - this.totalDebits
+    filteredBalance() {
+      return this.filteredCredits - this.filteredDebits
     },
     hasActiveFilters() {
       return !!(
@@ -382,6 +412,15 @@ export default {
         this.players = Array.isArray(playersData) ? playersData : []
       } catch (err) {
         console.error('Erro ao carregar opções de filtros:', err)
+      }
+    },
+
+    async loadGeneralTotals() {
+      try {
+        const response = await api.get(`/team-finance/${this.teamId}`, { params: { per_page: 9999 } })
+        this.allFinances = response.data?.data || response.data || []
+      } catch (err) {
+        console.error('Erro ao carregar totais gerais:', err)
       }
     },
 
