@@ -221,7 +221,7 @@ export default {
     async loadFinanceSummary() {
       try {
         const response = await api.get(`/team-finance/${this.teamId}`)
-        const finances = response.data || []
+        const finances = response.data?.data || response.data || []
         const credits = finances.filter(f => Number(f.type) === 1).reduce((sum, f) => sum + Number(f.value || 0), 0)
         const debits = finances.filter(f => Number(f.type) === 0).reduce((sum, f) => sum + Number(f.value || 0), 0)
         this.balance = credits - debits

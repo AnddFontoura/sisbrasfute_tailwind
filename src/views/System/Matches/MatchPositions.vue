@@ -433,8 +433,10 @@ export default {
     async loadFinanceSummary() {
       this.financeLoading = true;
       try {
-        const response = await api.get(`/team-finance/${this.teamId}`);
-        const allFinances = response.data || [];
+        const response = await api.get(`/team-finance/${this.teamId}`, {
+          params: { match_id: this.matchId, per_page: 100 }
+        });
+        const allFinances = response.data?.data || response.data || [];
 
         // Filter finances related to this match
         this.financeEntries = allFinances.filter(
