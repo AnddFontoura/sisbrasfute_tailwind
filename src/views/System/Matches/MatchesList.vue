@@ -240,7 +240,7 @@ export default {
         const response = await api.get('/matches', {
           params: {
             page,
-            team_id: this.teamId,
+            teamId: this.teamId,
             team_name: this.filters.team_name,
             state_id: this.filters.state_id,
             city_id: this.filters.city_id,
