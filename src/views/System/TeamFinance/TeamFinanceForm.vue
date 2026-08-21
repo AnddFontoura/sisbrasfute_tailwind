@@ -271,14 +271,16 @@ export default {
       }
     },
 
-    handleReasonCreate(query) {
-      // When user types a new reason that doesn't exist, store it as reasonName
-      const name = typeof query === 'object' ? query.value : query
-      this.form.reasonName = name
-      // Add it to the options as a temporary entry
-      const newOption = { id: name, name: name }
-      this.reasons.push(newOption)
-      return newOption
+    handleReasonCreate(option) {
+      // option arrives as { id: "typed text", name: "typed text" }
+      // matching the valueProp="id", label="name", trackBy="id" config
+      this.form.reasonName = option.name || option.id
+
+      // Return the option object with correct keys so Multiselect can append and select it
+      return {
+        id: option.id,
+        name: option.name || option.id,
+      }
     },
 
     async handleSubmit() {
@@ -306,10 +308,8 @@ export default {
       }
 
       // If reasonId is a string (new reason typed), send as reasonName
-      if (this.form.reasonId && typeof this.form.reasonId === 'string') {
+      if (this.form.reasonId && typeof this.form.reasonId === 'string' && isNaN(this.form.reasonId)) {
         payload.reasonName = this.form.reasonId
-      } else if (this.form.reasonName) {
-        payload.reasonName = this.form.reasonName
       } else if (this.form.reasonId) {
         payload.reasonId = this.form.reasonId
       }
