@@ -60,95 +60,132 @@
         </div>
       </div>
 
-      <!-- Filtros -->
-      <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-800">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-bold text-gray-800 dark:text-white">Filtros</h2>
-          <button @click="resetFilters" class="text-xs font-medium text-gray-500 hover:text-orange-500 transition">
-            Limpar
-          </button>
-        </div>
+      <!-- Filtros (colapsável) -->
+      <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <button
+          type="button"
+          @click="showFilters = !showFilters"
+          class="flex w-full items-center justify-between px-5 py-4"
+        >
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+            </svg>
+            <span class="text-sm font-bold text-gray-800 dark:text-white">Filtros</span>
+            <span v-if="hasActiveFilters" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">!</span>
+          </div>
+          <svg
+            class="h-4 w-4 text-gray-500 transition-transform duration-200"
+            :class="{ 'rotate-180': showFilters }"
+            fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Tipo -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo</label>
-            <select
-              v-model="filters.type"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+        <div v-show="showFilters" class="border-t border-gray-200 dark:border-white/10 px-5 pb-5 pt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Tipo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipo</label>
+              <select
+                v-model="filters.type"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              >
+                <option value="">Todos</option>
+                <option value="1">Crédito (entrada)</option>
+                <option value="0">Débito (saída)</option>
+              </select>
+            </div>
+
+            <!-- Razão -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Razão</label>
+              <select
+                v-model="filters.reason_id"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              >
+                <option value="">Todas as razões</option>
+                <option v-for="reason in reasons" :key="reason.id" :value="reason.id">
+                  {{ reason.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Jogador -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Jogador</label>
+              <select
+                v-model="filters.team_player_id"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              >
+                <option value="">Todos os jogadores</option>
+                <option v-for="player in players" :key="player.id" :value="player.id">
+                  {{ player.nickname || player.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Data início -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data início</label>
+              <input
+                v-model="filters.date_start"
+                type="date"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              />
+            </div>
+
+            <!-- Data fim -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data fim</label>
+              <input
+                v-model="filters.date_end"
+                type="date"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              />
+            </div>
+
+            <!-- Valor mínimo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor mínimo (R$)</label>
+              <input
+                v-model="filters.value_min"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              />
+            </div>
+
+            <!-- Valor máximo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor máximo (R$)</label>
+              <input
+                v-model="filters.value_max"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 mt-4">
+            <button
+              @click="resetFilters"
+              class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:hover:bg-white/5 dark:text-gray-300"
             >
-              <option value="">Todos</option>
-              <option value="1">Crédito (entrada)</option>
-              <option value="0">Débito (saída)</option>
-            </select>
-          </div>
-
-          <!-- Jogador -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Jogador</label>
-            <input
-              v-model="filters.player"
-              type="text"
-              placeholder="Buscar por jogador..."
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-
-          <!-- Razão -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Razão</label>
-            <input
-              v-model="filters.reason"
-              type="text"
-              placeholder="Buscar por razão..."
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-
-          <!-- Data início -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data início</label>
-            <input
-              v-model="filters.dateStart"
-              type="date"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-
-          <!-- Data fim -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data fim</label>
-            <input
-              v-model="filters.dateEnd"
-              type="date"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-
-          <!-- Valor mínimo -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor mínimo (R$)</label>
-            <input
-              v-model.number="filters.valueMin"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0,00"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-
-          <!-- Valor máximo -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor máximo (R$)</label>
-            <input
-              v-model.number="filters.valueMax"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0,00"
-              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
+              Limpar
+            </button>
+            <button
+              @click="applyFilters"
+              class="px-4 py-2 text-sm rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 shadow-sm transition"
+            >
+              Aplicar filtros
+            </button>
           </div>
         </div>
       </div>
@@ -181,11 +218,10 @@
 
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
               <tr
-                v-for="finance in filteredFinances"
+                v-for="finance in finances"
                 :key="finance.id"
                 class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
               >
-                <!-- Tipo -->
                 <td class="px-4 py-3">
                   <span
                     class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
@@ -196,13 +232,9 @@
                     {{ Number(finance.type) === 1 ? 'Crédito' : 'Débito' }}
                   </span>
                 </td>
-
-                <!-- Valor -->
                 <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
                   {{ formatCurrency(finance.value) }}
                 </td>
-
-                <!-- Razão -->
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                   <span v-if="finance.reason_info" class="inline-flex items-center rounded-md bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
                     {{ finance.reason_info.name }}
@@ -212,16 +244,12 @@
                   </span>
                   <span v-else class="text-gray-400">-</span>
                 </td>
-
-                <!-- Jogador -->
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                   <span v-if="finance.team_player_info">
                     {{ finance.team_player_info.nickname || finance.team_player_info.name || '-' }}
                   </span>
                   <span v-else class="text-gray-400">-</span>
                 </td>
-
-                <!-- Partida -->
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                   <button
                     v-if="finance.match_info"
@@ -229,17 +257,13 @@
                     class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 font-medium underline-offset-2 hover:underline"
                     @click="$router.push({ name: 'matches-show', params: { id: finance.match_id } })"
                   >
-                    {{ finance.match_info.my_team_name || 'Time' }} vs {{ finance.match_info.enemy_team_name || 'Adv.' }}
+                    {{ finance.match_info.home_team_name || 'Time' }} vs {{ finance.match_info.visitor_team_name || 'Adv.' }}
                   </button>
                   <span v-else class="text-gray-400">-</span>
                 </td>
-
-                <!-- Data -->
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                   {{ formatDate(finance.created_at) }}
                 </td>
-
-                <!-- Ações -->
                 <td class="px-4 py-3">
                   <router-link
                     :to="{ name: 'team-edit-finance', params: { teamId: teamId, id: finance.id } }"
@@ -251,19 +275,13 @@
               </tr>
 
               <!-- Empty state -->
-              <tr v-if="!filteredFinances.length && !loading">
+              <tr v-if="!finances.length && !loading">
                 <td colspan="7" class="px-4 py-12 text-center">
                   <div class="flex flex-col items-center">
                     <svg class="h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                     </svg>
                     <p class="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nenhuma movimentação financeira encontrada.</p>
-                    <router-link
-                      :to="{ name: 'team-finance-form', params: { teamId: this.teamId } }"
-                      class="mt-3 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400"
-                    >
-                      Registrar a primeira movimentação →
-                    </router-link>
                   </div>
                 </td>
               </tr>
@@ -271,6 +289,9 @@
           </table>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <pagination-component :pagination="pagination" @change="getFinancesList"></pagination-component>
 
     </div>
   </system-layout>
@@ -280,6 +301,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import TeamBanner from "@/components/team/teamBanner.vue";
+import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 import Swal from "@/services/swal.js";
 
 export default {
@@ -287,82 +309,82 @@ export default {
   components: {
     systemLayout,
     TeamBanner,
+    PaginationComponent,
   },
 
   data() {
     return {
       teamId: null,
       finances: [],
+      pagination: {
+        data: [],
+        current_page: 1,
+        last_page: 1,
+      },
       loading: false,
+      showFilters: false,
       filters: {
         type: '',
-        player: '',
-        reason: '',
-        dateStart: null,
-        dateEnd: null,
-        valueMin: null,
-        valueMax: null,
+        reason_id: '',
+        team_player_id: '',
+        date_start: '',
+        date_end: '',
+        value_min: '',
+        value_max: '',
       },
+      reasons: [],
+      players: [],
     }
   },
 
   created() {
     this.teamId = this.$route.params.teamId
+    this.loadFilterOptions()
     this.getFinancesList()
   },
 
   computed: {
-    filteredFinances() {
-      return this.finances.filter(f => {
-        // Type filter
-        if (this.filters.type !== '' && String(f.type) !== this.filters.type) return false
-
-        // Player filter
-        if (this.filters.player) {
-          const playerName = f.team_player_info?.nickname || f.team_player_info?.name || ''
-          if (!playerName.toLowerCase().includes(this.filters.player.toLowerCase())) return false
-        }
-
-        // Reason filter
-        if (this.filters.reason) {
-          const reasonName = f.reason_info?.name || f.description || ''
-          if (!reasonName.toLowerCase().includes(this.filters.reason.toLowerCase())) return false
-        }
-
-        // Date range filter
-        if (this.filters.dateStart) {
-          const entryDate = new Date(f.created_at).toISOString().split('T')[0]
-          if (entryDate < this.filters.dateStart) return false
-        }
-        if (this.filters.dateEnd) {
-          const entryDate = new Date(f.created_at).toISOString().split('T')[0]
-          if (entryDate > this.filters.dateEnd) return false
-        }
-
-        // Value range filter
-        const value = Number(f.value || 0)
-        if (this.filters.valueMin !== null && this.filters.valueMin !== '' && value < this.filters.valueMin) return false
-        if (this.filters.valueMax !== null && this.filters.valueMax !== '' && value > this.filters.valueMax) return false
-
-        return true
-      })
-    },
     totalCredits() {
-      return this.filteredFinances
+      return this.finances
         .filter(f => Number(f.type) === 1)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
     totalDebits() {
-      return this.filteredFinances
+      return this.finances
         .filter(f => Number(f.type) === 0)
         .reduce((sum, f) => sum + Number(f.value || 0), 0)
     },
     balance() {
       return this.totalCredits - this.totalDebits
     },
+    hasActiveFilters() {
+      return !!(
+        this.filters.type ||
+        this.filters.reason_id ||
+        this.filters.team_player_id ||
+        this.filters.date_start ||
+        this.filters.date_end ||
+        this.filters.value_min ||
+        this.filters.value_max
+      )
+    },
   },
 
   methods: {
+    async loadFilterOptions() {
+      try {
+        const [reasonsRes, playersRes] = await Promise.all([
+          api.get(`/team/${this.teamId}/finance-reasons`),
+          api.get(`/team-player/${this.teamId}/list`),
+        ])
+        this.reasons = reasonsRes.data || []
+        const playersData = playersRes.data?.data || playersRes.data || []
+        this.players = Array.isArray(playersData) ? playersData : []
+      } catch (err) {
+        console.error('Erro ao carregar opções de filtros:', err)
+      }
+    },
+
     formatCurrency(value) {
       return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -376,11 +398,39 @@ export default {
       return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
     },
 
-    async getFinancesList() {
+    applyFilters() {
+      this.getFinancesList(1)
+    },
+
+    resetFilters() {
+      this.filters = {
+        type: '',
+        reason_id: '',
+        team_player_id: '',
+        date_start: '',
+        date_end: '',
+        value_min: '',
+        value_max: '',
+      }
+      this.getFinancesList(1)
+    },
+
+    async getFinancesList(page = 1) {
       this.loading = true
       try {
-        const response = await api.get("/team-finance/" + this.teamId)
-        this.finances = response.data || []
+        const params = { page }
+
+        if (this.filters.type !== '') params.type = this.filters.type
+        if (this.filters.reason_id) params.reason_id = this.filters.reason_id
+        if (this.filters.team_player_id) params.team_player_id = this.filters.team_player_id
+        if (this.filters.date_start) params.date_start = this.filters.date_start
+        if (this.filters.date_end) params.date_end = this.filters.date_end
+        if (this.filters.value_min) params.value_min = this.filters.value_min
+        if (this.filters.value_max) params.value_max = this.filters.value_max
+
+        const response = await api.get("/team-finance/" + this.teamId, { params })
+        this.finances = response.data.data || []
+        this.pagination = response.data
       } catch (err) {
         console.error(err)
         await Swal.fire({
@@ -393,18 +443,6 @@ export default {
         })
       } finally {
         this.loading = false
-      }
-    },
-
-    resetFilters() {
-      this.filters = {
-        type: '',
-        player: '',
-        reason: '',
-        dateStart: null,
-        dateEnd: null,
-        valueMin: null,
-        valueMax: null,
       }
     },
   },
