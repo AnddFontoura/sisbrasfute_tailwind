@@ -118,57 +118,57 @@ const steps = [
     <main>
       <!-- HERO -->
       <section class="relative overflow-hidden">
-        <!-- Background effects -->
+        <!-- Background effects - contained to prevent horizontal scroll -->
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.15),_transparent_40%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.08),_transparent_35%)]"></div>
-        <div class="absolute top-20 right-20 h-72 w-72 rounded-full bg-orange-500/10 blur-[100px]"></div>
-        <div class="absolute bottom-20 left-10 h-56 w-56 rounded-full bg-orange-600/8 blur-[80px]"></div>
+        <div class="pointer-events-none absolute right-0 top-20 h-48 w-48 rounded-full bg-orange-500/10 blur-[100px] sm:h-72 sm:w-72 sm:right-20"></div>
+        <div class="pointer-events-none absolute bottom-20 left-0 h-40 w-40 rounded-full bg-orange-600/8 blur-[80px] sm:h-56 sm:w-56 sm:left-10"></div>
 
-        <div class="relative mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-32">
+        <div class="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-32">
           <div>
-            <div class="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-4 py-2 text-sm text-orange-300 backdrop-blur">
-              <span class="h-2 w-2 rounded-full bg-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
+            <div class="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm text-orange-300 backdrop-blur">
+              <span class="h-2 w-2 shrink-0 rounded-full bg-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.9)]"></span>
               Plataforma para futebol amador e competitivo
             </div>
 
-            <h1 class="mt-8 max-w-2xl text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 class="mt-6 text-3xl font-black tracking-tight sm:mt-8 sm:text-5xl lg:text-6xl">
               Gerencie seu
               <span class="text-orange-500">futebol</span>
               com potência e estilo
             </h1>
 
-            <p class="mt-6 max-w-xl text-lg leading-8 text-zinc-400">
+            <p class="mt-4 text-base leading-7 text-zinc-400 sm:mt-6 sm:text-lg sm:leading-8">
               Conecte jogadores, monte equipes, organize partidas e crie campeonatos. Tudo em um sistema moderno feito para quem vive o esporte.
             </p>
 
-            <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+            <div class="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:gap-4">
               <router-link
                 to="/register"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-400 hover:shadow-orange-500/40"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-400 hover:shadow-orange-500/40 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 Começar agora
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
               </router-link>
               <router-link
                 to="/login"
-                class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-7 py-3.5 text-base font-semibold text-white backdrop-blur transition hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-orange-500/10"
+                class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-orange-500/10 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 Já tenho conta
               </router-link>
             </div>
 
             <!-- Stats -->
-            <div class="mt-14 grid gap-4 sm:grid-cols-3">
-              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p class="text-2xl font-black text-orange-400">+ Times</p>
-                <p class="mt-1 text-sm text-zinc-400">Crie e administre equipes</p>
+            <div class="mt-10 grid grid-cols-3 gap-2 sm:mt-14 sm:gap-4">
+              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-4">
+                <p class="text-lg font-black text-orange-400 sm:text-2xl">+ Times</p>
+                <p class="mt-1 text-xs text-zinc-400 sm:text-sm">Crie e administre equipes</p>
               </div>
-              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p class="text-2xl font-black text-orange-400">+ Jogos</p>
-                <p class="mt-1 text-sm text-zinc-400">Encontre e organize partidas</p>
+              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-4">
+                <p class="text-lg font-black text-orange-400 sm:text-2xl">+ Jogos</p>
+                <p class="mt-1 text-xs text-zinc-400 sm:text-sm">Encontre e organize partidas</p>
               </div>
-              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p class="text-2xl font-black text-orange-400">+ Players</p>
-                <p class="mt-1 text-sm text-zinc-400">Descubra atletas para o elenco</p>
+              <div class="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-4">
+                <p class="text-lg font-black text-orange-400 sm:text-2xl">+ Players</p>
+                <p class="mt-1 text-xs text-zinc-400 sm:text-sm">Descubra atletas para o elenco</p>
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@ const steps = [
                 </div>
               </div>
 
-              <div class="grid gap-4 p-6 sm:grid-cols-2">
+              <div class="grid grid-cols-2 gap-4 p-6">
                 <div class="rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 p-5 shadow-lg shadow-orange-500/20">
                   <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-100/70">Painel Rápido</p>
                   <h2 class="mt-3 text-xl font-black text-white">Seu time</h2>
@@ -240,24 +240,24 @@ const steps = [
 
       <!-- FEATURES -->
       <section id="recursos" class="border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
           <div class="text-center">
             <p class="text-sm font-bold uppercase tracking-[0.2em] text-orange-400">Recursos</p>
-            <h2 class="mt-3 text-3xl font-black sm:text-4xl">Tudo para o seu futebol em um só lugar</h2>
-            <p class="mx-auto mt-4 max-w-2xl text-zinc-400">Do recrutamento de jogadores à gestão financeira do time, cada detalhe foi pensado para quem organiza futebol de verdade.</p>
+            <h2 class="mt-3 text-2xl font-black sm:text-3xl md:text-4xl">Tudo para o seu futebol em um só lugar</h2>
+            <p class="mx-auto mt-4 max-w-2xl text-sm text-zinc-400 sm:text-base">Do recrutamento de jogadores à gestão financeira do time, cada detalhe foi pensado para quem organiza futebol de verdade.</p>
           </div>
 
-          <div class="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div class="mt-10 grid grid-cols-2 gap-3 sm:mt-14 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
             <div
               v-for="feature in features"
               :key="feature.title"
-              class="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-orange-500/30 hover:bg-orange-500/5"
+              class="group rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-orange-500/30 hover:bg-orange-500/5 sm:p-6"
             >
-              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-2xl transition group-hover:bg-orange-500/20">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-xl transition group-hover:bg-orange-500/20 sm:h-12 sm:w-12 sm:text-2xl">
                 {{ feature.icon }}
               </div>
-              <h3 class="mt-4 text-lg font-bold">{{ feature.title }}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-zinc-400">{{ feature.description }}</p>
+              <h3 class="mt-3 text-base font-bold sm:mt-4 sm:text-lg">{{ feature.title }}</h3>
+              <p class="mt-1.5 text-xs leading-relaxed text-zinc-400 sm:mt-2 sm:text-sm">{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -265,22 +265,22 @@ const steps = [
 
       <!-- HOW IT WORKS -->
       <section id="como-funciona" class="border-t border-white/10 bg-zinc-950">
-        <div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
           <div class="max-w-2xl">
             <p class="text-sm font-bold uppercase tracking-[0.2em] text-orange-400">Como funciona</p>
-            <h2 class="mt-3 text-3xl font-black sm:text-4xl">Da inscrição ao jogo, em 4 passos</h2>
-            <p class="mt-4 text-zinc-400">Entre, crie seu perfil, participe de times e comece a jogar com organização profissional.</p>
+            <h2 class="mt-3 text-2xl font-black sm:text-3xl md:text-4xl">Da inscrição ao jogo, em 4 passos</h2>
+            <p class="mt-4 text-sm text-zinc-400 sm:text-base">Entre, crie seu perfil, participe de times e comece a jogar com organização profissional.</p>
           </div>
 
-          <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="mt-10 grid grid-cols-2 gap-3 sm:mt-14 sm:gap-6 lg:grid-cols-4">
             <div
               v-for="step in steps"
               :key="step.number"
-              class="relative rounded-2xl border border-white/10 bg-white/[0.02] p-6"
+              class="relative rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-6"
             >
-              <span class="text-4xl font-black text-orange-500/20">{{ step.number }}</span>
-              <h3 class="mt-2 text-lg font-bold">{{ step.title }}</h3>
-              <p class="mt-2 text-sm text-zinc-400">{{ step.description }}</p>
+              <span class="text-3xl font-black text-orange-500/20 sm:text-4xl">{{ step.number }}</span>
+              <h3 class="mt-2 text-base font-bold sm:text-lg">{{ step.title }}</h3>
+              <p class="mt-1.5 text-xs text-zinc-400 sm:mt-2 sm:text-sm">{{ step.description }}</p>
             </div>
           </div>
         </div>
@@ -288,22 +288,22 @@ const steps = [
 
       <!-- CTA -->
       <section class="border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div class="relative overflow-hidden rounded-3xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-black p-10 text-center sm:p-16">
-            <div class="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-orange-500/20 blur-[80px]"></div>
+        <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <div class="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-black p-6 text-center sm:rounded-3xl sm:p-10 md:p-16">
+            <div class="pointer-events-none absolute -top-20 -right-20 h-60 w-60 rounded-full bg-orange-500/20 blur-[80px]"></div>
             <div class="relative">
-              <h2 class="text-3xl font-black sm:text-4xl">Pronto para organizar seu futebol?</h2>
-              <p class="mx-auto mt-4 max-w-xl text-zinc-400">Cadastre-se gratuitamente e descubra como é fácil gerenciar times, partidas e jogadores com o SisBrasFute.</p>
-              <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <h2 class="text-2xl font-black sm:text-3xl md:text-4xl">Pronto para organizar seu futebol?</h2>
+              <p class="mx-auto mt-3 max-w-xl text-sm text-zinc-400 sm:mt-4 sm:text-base">Cadastre-se gratuitamente e descubra como é fácil gerenciar times, partidas e jogadores com o SisBrasFute.</p>
+              <div class="mt-6 flex flex-col justify-center gap-3 sm:mt-8 sm:flex-row sm:gap-4">
                 <router-link
                   to="/register"
-                  class="inline-flex items-center justify-center rounded-xl bg-orange-500 px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-400"
+                  class="inline-flex items-center justify-center rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-400 sm:px-8 sm:py-3.5 sm:text-base"
                 >
                   Criar minha conta grátis
                 </router-link>
                 <router-link
                   to="/login"
-                  class="inline-flex items-center justify-center rounded-xl border border-white/10 px-8 py-3.5 text-base font-semibold text-white transition hover:border-orange-500/30 hover:bg-orange-500/10"
+                  class="inline-flex items-center justify-center rounded-xl border border-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-orange-500/30 hover:bg-orange-500/10 sm:px-8 sm:py-3.5 sm:text-base"
                 >
                   Já tenho conta
                 </router-link>
@@ -316,8 +316,8 @@ const steps = [
 
     <!-- FOOTER -->
     <footer id="comunidade" class="border-t border-white/10 bg-black">
-      <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
-        <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div class="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex items-center gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500 shadow-[0_0_16px_rgba(249,115,22,0.3)]">
               <span class="text-lg">⚽</span>
@@ -328,7 +328,7 @@ const steps = [
             </div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-6 text-sm text-zinc-400">
+          <div class="flex flex-wrap items-center gap-4 text-sm text-zinc-400 sm:gap-6">
             <a href="#recursos" class="transition hover:text-orange-400">Recursos</a>
             <a href="#como-funciona" class="transition hover:text-orange-400">Como funciona</a>
             <router-link to="/login" class="transition hover:text-orange-400">Entrar</router-link>
@@ -336,7 +336,7 @@ const steps = [
           </div>
         </div>
 
-        <div class="mt-8 border-t border-white/10 pt-6 text-center text-xs text-zinc-600">
+        <div class="mt-6 border-t border-white/10 pt-6 text-center text-xs text-zinc-600 sm:mt-8">
           © {{ new Date().getFullYear() }} SisBrasFute. Todos os direitos reservados.
         </div>
       </div>
