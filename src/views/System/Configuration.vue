@@ -28,12 +28,12 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
-                v-model="profileForm.email"
+                :value="profileForm.email"
                 type="email"
-                class="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:bg-white/5 dark:text-white"
-                :class="profileErrors.email ? 'border-red-500' : 'border-gray-300 dark:border-white/10'"
+                disabled
+                class="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-500 cursor-not-allowed outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-400"
               />
-              <p v-if="profileErrors.email" class="mt-1 text-xs text-red-600">{{ profileErrors.email }}</p>
+              <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">O email não pode ser alterado.</p>
             </div>
 
             <!-- CPF -->
@@ -208,12 +208,16 @@ export default {
       this.profileLoading = true
 
       try {
-        const response = await api.post('/configuration/profile', this.profileForm)
+        const payload = {
+          name: this.profileForm.name,
+          cpf: this.profileForm.cpf,
+          rg: this.profileForm.rg,
+        }
+        const response = await api.post('/configuration/profile', payload)
 
         // Atualiza localStorage com novos dados
         const user = JSON.parse(localStorage.getItem('user') || '{}')
         user.name = response.data.user.name
-        user.email = response.data.user.email
         localStorage.setItem('user', JSON.stringify(user))
 
         await Swal.fire({

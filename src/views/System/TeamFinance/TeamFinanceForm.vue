@@ -62,8 +62,8 @@
 
             <!-- Razão (creatable) -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Razão da movimentação</label>
-              <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Selecione uma razão existente ou digite para criar uma nova.</p>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Razão da movimentação (opcional)</label>
+              <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Selecione uma razão existente, digite para criar uma nova, ou deixe em branco.</p>
               <Multiselect
                 v-model="form.reasonId"
                 :options="reasons"
@@ -72,6 +72,8 @@
                 value-prop="id"
                 :searchable="true"
                 :create-option="true"
+                :can-deselect="true"
+                :can-clear="true"
                 @create="handleReasonCreate"
                 placeholder="Selecione ou digite uma nova razão..."
                 class="mt-1"
