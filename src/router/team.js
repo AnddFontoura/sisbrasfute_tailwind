@@ -6,6 +6,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/my-teams',
+    name: 'my-teams',
+    component: () => import('../views/System/Team/MyTeams.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team/:teamId/players/list',
     name: 'team-players-list',
     component: () => import('../views/System/Team/TeamPlayerList.vue'),

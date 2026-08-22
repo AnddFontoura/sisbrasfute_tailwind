@@ -523,6 +523,7 @@ export default {
           current: false,
           children: [
             { name: "Listar Times", href: "/team/list" },
+            { name: "Meus Times", href: "/team/my-teams" },
             { name: "Criar Times", href: "/team/form" },
           ],
         },
@@ -550,7 +551,7 @@ export default {
         { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
       ],
       userNavigation: [
-        { name: "Meus Times", href: "#" },
+        { name: "Meus Times", href: "/team/my-teams" },
         { name: "Meu Perfil", href: "/player-profile/form" },
         { name: "Sair", href: "/logout" },
       ],
@@ -559,6 +560,7 @@ export default {
         { name: "Usuários", href: "/admin/users" },
         { name: "Times", href: "/admin/teams" },
         { name: "Partidas", href: "/admin/matches" },
+        { name: "Posições de Jogo", href: "/admin/game-positions" },
       ],
       currentPageName: false,
     };
