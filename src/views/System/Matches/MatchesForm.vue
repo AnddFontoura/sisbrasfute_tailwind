@@ -391,6 +391,8 @@ export default {
 
     if (this.isEditing) {
       await this.getMatchInfo()
+    } else if (this.$route.query?.repeatFrom) {
+      await this.loadRepeatData(this.$route.query.repeatFrom)
     }
   },
   watch: {
@@ -509,6 +511,63 @@ export default {
           position: 'top-end',
           icon: 'error',
           title: 'Erro ao carregar dados da partida',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.loading = false
+      }
+    },
+    async loadRepeatData(sourceMatchId) {
+      this.loading = true
+      try {
+        const response = await api.get("/matches/show/" + sourceMatchId)
+        const data = response.data
+
+        // Copy structural data (team, type, location, city)
+        this.form.teamId = data.created_by_team_id ?? this.form.teamId
+        this.form.myTeamIs = this.mapMyTeamIsFromBackend(data.my_team_is)
+        this.form.enemyTeamId = data.enemy_team_id ?? null
+        this.form.enemyTeamName = data.enemy_team_name ?? null
+        this.form.matchLocation = data.location ?? null
+        this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
+        this.form.tagId = data.tag_id ?? null
+        this.stateId = data.city_info?.state_id ?? null
+        this.cityId = data.city_id ?? null
+        this.form.teamsCount = data.teams_count ?? 1
+
+        // Do NOT copy: scores, penalties, schedule (user sets new ones)
+        this.form.myTeamScore = null
+        this.form.enemyTeamScore = null
+        this.form.hasPenalties = null
+        this.form.myTeamPenaltyScore = null
+        this.form.enemyTeamPenaltyScore = null
+        this.form.matchSchedule = null
+
+        // Copy positions structure (without players assigned)
+        const positions = typeof data.positions === 'string'
+          ? JSON.parse(data.positions)
+          : data.positions
+
+        if (Array.isArray(positions) && positions.length) {
+          this.form.indicatePositions = true
+          this.form.positions = positions.map((position) => ({
+            game_position_id: position.game_position_id ?? position.id ?? null,
+            price: Number(position.price ?? 0),
+          }))
+          this.form.playersCount = this.form.positions.length
+        }
+
+        // Reload tags for the team
+        await this.loadAvailableTags()
+
+      } catch (err) {
+        console.error(err)
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro ao carregar dados para repetição',
           showConfirmButton: false,
           timer: 3000,
         })
