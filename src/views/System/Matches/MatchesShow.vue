@@ -191,6 +191,43 @@
 
 
         </template>
+
+        <!-- Danger Zone (only for match owner) -->
+        <div v-if="isMatchOwner" class="mt-8 rounded-xl border border-red-200 bg-red-50/50 p-6 dark:border-red-500/20 dark:bg-red-900/10">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2">Zona de Perigo</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            {{ matchInfo.status === 0
+              ? 'Esta partida está inativa e não aparece nas buscas. Você pode reativá-la a qualquer momento.'
+              : 'Desativar a partida irá removê-la das buscas públicas. Você poderá reativá-la depois.'
+            }}
+          </p>
+          <button
+            v-if="matchInfo.status === 0"
+            type="button"
+            :disabled="statusLoading"
+            @click="handleReactivateMatch"
+            class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="statusLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+            Reativar Partida
+          </button>
+          <button
+            v-else
+            type="button"
+            :disabled="statusLoading"
+            @click="handleDeactivateMatch"
+            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="statusLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+            Desativar Partida
+          </button>
+        </div>
       </div>
     </main>
 
@@ -233,6 +270,7 @@ export default {
       currentAssignment: null,
       playerHasRequiredTag: true,
       matchTagName: null,
+      statusLoading: false,
     }
   },
   computed: {
@@ -257,6 +295,15 @@ export default {
     },
     hasPositions() {
       return this.matchInfo.positions && this.matchInfo.positions.length > 0;
+    },
+    isMatchOwner() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (!user || !this.matchInfo.my_team_info) return false
+        return this.matchInfo.my_team_info.user_id === user.id
+      } catch {
+        return false
+      }
     },
   },
   created() {
@@ -501,7 +548,73 @@ export default {
           this.loading = false;
         }
       }
-    }
+    },
+
+    async handleDeactivateMatch() {
+      const result = await Swal.fire({
+        title: 'Desativar partida?',
+        text: 'A partida não aparecerá mais nas buscas públicas. Você poderá reativá-la depois.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Sim, desativar',
+        cancelButtonText: 'Cancelar',
+      })
+
+      if (!result.isConfirmed) return
+
+      this.statusLoading = true
+      try {
+        await api.post(`/matches/${this.matchId}/deactivate`)
+        this.matchInfo.status = 0
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Partida desativada com sucesso.',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || 'Erro ao desativar partida.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.statusLoading = false
+      }
+    },
+
+    async handleReactivateMatch() {
+      this.statusLoading = true
+      try {
+        await api.post(`/matches/${this.matchId}/reactivate`)
+        this.matchInfo.status = 1
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Partida reativada com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || 'Erro ao reativar partida.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.statusLoading = false
+      }
+    },
   },
 };
 </script>

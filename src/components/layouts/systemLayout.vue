@@ -533,6 +533,7 @@ export default {
           current: false,
           children: [
             { name: "Listar Partidas", href: "/matches/list" },
+            { name: "Minhas Partidas", href: "/matches/my-matches" },
             { name: "Criar Partida", href: "/matches/form" },
           ],
         },
