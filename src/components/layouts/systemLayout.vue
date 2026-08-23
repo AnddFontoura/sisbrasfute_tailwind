@@ -538,6 +538,15 @@ export default {
           ],
         },
         {
+          name: "Amistosos",
+          icon: CalendarIcon,
+          current: false,
+          children: [
+            { name: "Partidas Abertas", href: "/friendly/open" },
+            { name: "Meus Desafios", href: "/friendly/my-challenges" },
+          ],
+        },
+        {
           name: "Jogadores",
           icon: UsersIcon,
           current: false,
