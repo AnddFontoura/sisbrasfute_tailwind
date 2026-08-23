@@ -136,6 +136,16 @@
             </svg>
             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Tags</span>
           </router-link>
+
+          <router-link
+            :to="{ name: 'team-position-presets', params: { teamId: teamId } }"
+            class="flex flex-col items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
+          >
+            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+            </svg>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Escalações</span>
+          </router-link>
         </div>
       </div>
 

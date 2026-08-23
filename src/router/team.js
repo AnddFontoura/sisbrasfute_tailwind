@@ -72,6 +72,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/position-presets',
+    name: 'team-position-presets',
+    component: () => import('../views/System/Team/TeamPositionPresets.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/teams/:id/admin',
     name: 'team-admin',
     component: () => import('../views/System/Team/TeamAdmin.vue'),

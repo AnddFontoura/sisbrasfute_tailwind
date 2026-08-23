@@ -202,6 +202,38 @@
             </div>
 
             <div v-if="form.indicatePositions" class="space-y-4">
+              <!-- Preset Load/Save -->
+              <div class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-900/30">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div class="flex-1">
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Carregar configuração salva</label>
+                    <select
+                      v-model="selectedPresetId"
+                      class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      @change="loadPreset"
+                    >
+                      <option :value="null">— Selecione um preset —</option>
+                      <option v-for="preset in presets" :key="preset.id" :value="preset.id">
+                        {{ preset.name }} ({{ preset.positions.length }} posições)
+                      </option>
+                    </select>
+                  </div>
+                  <div class="flex gap-2 sm:mt-5">
+                    <button
+                      type="button"
+                      @click="showSavePresetModal = true"
+                      :disabled="!form.positions.length"
+                      class="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                      </svg>
+                      Salvar preset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Quantidade de jogadores</label>
@@ -306,6 +338,55 @@
 
       </div>
     </form>
+
+    <!-- Save Preset Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showSavePresetModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        @click.self="showSavePresetModal = false"
+      >
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Salvar Configuração de Posições</h3>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Nome do preset</label>
+            <input
+              v-model="presetName"
+              type="text"
+              maxlength="100"
+              placeholder="Ex: Pelada de quinta, Campeonato..."
+              class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              @keyup.enter="savePreset"
+            />
+          </div>
+          <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Será salvo com {{ form.positions.length }} posição(ões) e {{ form.teamsCount }} time(s).
+          </p>
+          <div class="mt-5 flex justify-end gap-3">
+            <button
+              type="button"
+              @click="showSavePresetModal = false"
+              class="rounded-xl border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              @click="savePreset"
+              :disabled="!presetName.trim() || savingPreset"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg v-if="savingPreset" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+              </svg>
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </system-layout>
 </template>
 
@@ -357,6 +438,11 @@ export default {
       },
       gamePositions: [],
       availableTags: [],
+      presets: [],
+      selectedPresetId: null,
+      showSavePresetModal: false,
+      presetName: '',
+      savingPreset: false,
       stateId: null,
       cityId: null,
       matchId: null,
@@ -388,6 +474,7 @@ export default {
 
     await this.loadGamePositions()
     await this.loadAvailableTags()
+    await this.loadPresets()
 
     if (this.isEditing) {
       await this.getMatchInfo()
@@ -439,6 +526,65 @@ export default {
         this.availableTags = response.data ?? []
       } catch (err) {
         console.error("Erro ao carregar tags:", err)
+      }
+    },
+    async loadPresets() {
+      if (!this.form.teamId) return
+      try {
+        const response = await api.get(`/team/${this.form.teamId}/position-presets`)
+        this.presets = response.data ?? []
+      } catch (err) {
+        console.error("Erro ao carregar presets:", err)
+      }
+    },
+    loadPreset() {
+      if (!this.selectedPresetId) return
+      const preset = this.presets.find(p => p.id === this.selectedPresetId)
+      if (!preset) return
+
+      this.form.positions = preset.positions.map(p => ({
+        game_position_id: p.game_position_id,
+        price: Number(p.price ?? 0),
+      }))
+      this.form.playersCount = this.form.positions.length
+      this.form.teamsCount = preset.teams_count ?? 1
+      this.form.indicatePositions = true
+    },
+    async savePreset() {
+      if (!this.presetName.trim() || !this.form.teamId) return
+
+      this.savingPreset = true
+      try {
+        await api.post(`/team/${this.form.teamId}/position-presets`, {
+          name: this.presetName.trim(),
+          positions: this.form.positions,
+          teams_count: this.form.teamsCount,
+        })
+
+        this.showSavePresetModal = false
+        this.presetName = ''
+        await this.loadPresets()
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Preset salvo com sucesso!',
+          showConfirmButton: false,
+          timer: 2000,
+        })
+      } catch (err) {
+        const message = err.response?.data?.message || 'Erro ao salvar preset.'
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: message,
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.savingPreset = false
       }
     },
     mapMatchTypeFromBackend(value) {

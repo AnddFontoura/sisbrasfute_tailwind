@@ -40,13 +40,13 @@
           <div
             v-for="match in filteredMatches"
             :key="match.id"
-            class="group overflow-hidden rounded-2xl border shadow-sm transition hover:shadow-md"
+            class="group rounded-2xl border shadow-sm transition hover:shadow-md"
             :class="match.status === 0
               ? 'border-red-200 bg-red-50/50 dark:border-red-500/20 dark:bg-red-900/10'
               : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800'"
           >
             <!-- Header -->
-            <div class="bg-gray-900 px-4 py-3 text-center dark:bg-black relative">
+            <div class="rounded-t-2xl bg-gray-900 px-4 py-3 text-center dark:bg-black relative">
               <span
                 v-if="match.status === 0"
                 class="absolute top-2 right-2 inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white"
@@ -84,32 +84,58 @@
               </div>
 
               <!-- Actions -->
-              <div class="mt-4 flex flex-col gap-2">
+              <div class="mt-4 flex gap-2">
                 <router-link
                   :to="{ name: 'matches-show', params: { id: match.id } }"
-                  class="inline-flex w-full items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+                  class="inline-flex flex-1 items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
                 >
                   Visualizar
                 </router-link>
-                <div class="grid grid-cols-3 gap-2">
-                  <router-link
-                    :to="{ name: 'matches-edit', params: { id: match.id } }"
-                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+
+                <div class="relative">
+                  <button
+                    type="button"
+                    @click.stop="toggleDropdown(match.id)"
+                    class="dropdown-trigger inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-gray-600 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                   >
-                    Editar
-                  </router-link>
-                  <router-link
-                    :to="{ name: 'team-matches-manage', params: { teamId: match.created_by_team_id, matchId: match.id } }"
-                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
+                    </svg>
+                  </button>
+
+                  <div
+                    v-if="openDropdownId === match.id"
+                    class="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
                   >
-                    Administrar
-                  </router-link>
-                  <router-link
-                    :to="{ name: 'matches-form', query: { repeatFrom: match.id } }"
-                    class="inline-flex items-center justify-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300 dark:hover:bg-orange-500/20"
-                  >
-                    Repetir
-                  </router-link>
+                    <router-link
+                      :to="{ name: 'matches-edit', params: { id: match.id } }"
+                      class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-600"
+                    >
+                      <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                      </svg>
+                      Editar
+                    </router-link>
+                    <router-link
+                      :to="{ name: 'team-matches-manage', params: { teamId: match.created_by_team_id, matchId: match.id } }"
+                      class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-600"
+                    >
+                      <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                      Administrar
+                    </router-link>
+                    <router-link
+                      :to="{ name: 'matches-form', query: { repeatFrom: match.id } }"
+                      class="flex items-center gap-2 px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-500/10"
+                    >
+                      <svg class="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                      </svg>
+                      Repetir
+                    </router-link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -136,7 +162,20 @@ export default {
       matches: [],
       loading: false,
       showInactive: false,
+      openDropdownId: null,
     }
+  },
+
+  mounted() {
+    this._closeDropdowns = (e) => {
+      if (this.openDropdownId && !e.target.closest('.dropdown-trigger')) {
+        this.openDropdownId = null
+      }
+    }
+    document.addEventListener('click', this._closeDropdowns)
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this._closeDropdowns)
   },
 
   computed: {
@@ -153,6 +192,9 @@ export default {
   },
 
   methods: {
+    toggleDropdown(matchId) {
+      this.openDropdownId = this.openDropdownId === matchId ? null : matchId
+    },
     async loadMatches() {
       this.loading = true
       try {
