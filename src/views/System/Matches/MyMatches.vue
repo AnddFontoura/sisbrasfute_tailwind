@@ -7,7 +7,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 class="text-2xl font-black text-gray-900 dark:text-white">Minhas Partidas</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Partidas criadas pelos times que você administra.</p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Partidas dos seus times e partidas em que você participa como jogador.</p>
           </div>
           <label class="inline-flex items-center gap-2 cursor-pointer">
             <input
@@ -41,17 +41,24 @@
             v-for="match in filteredMatches"
             :key="match.id"
             class="group rounded-2xl border shadow-sm transition hover:shadow-md"
-            :class="match.status === 0
-              ? 'border-red-200 bg-red-50/50 dark:border-red-500/20 dark:bg-red-900/10'
-              : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800'"
+            :class="cardClasses(match)"
           >
             <!-- Header -->
-            <div class="rounded-t-2xl bg-gray-900 px-4 py-3 text-center dark:bg-black relative">
+            <div
+              class="rounded-t-2xl px-4 py-3 text-center relative"
+              :class="isPastMatch(match) ? 'bg-gray-600 dark:bg-gray-700' : 'bg-gray-900 dark:bg-black'"
+            >
               <span
                 v-if="match.status === 0"
                 class="absolute top-2 right-2 inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white"
               >
                 Inativa
+              </span>
+              <span
+                v-else-if="isPastMatch(match)"
+                class="absolute top-2 right-2 inline-flex items-center rounded-full bg-gray-500 px-2 py-0.5 text-[10px] font-bold text-white"
+              >
+                Encerrada
               </span>
               <p class="text-sm font-bold text-white">
                 <template v-if="match.my_team_score !== null && match.enemy_team_score !== null">
@@ -142,6 +149,8 @@
           </div>
         </div>
 
+        <!-- Pagination -->
+        <pagination-component :pagination="pagination" @change="loadMatches"></pagination-component>
       </div>
     </main>
   </system-layout>
@@ -149,17 +158,20 @@
 
 <script>
 import systemLayout from "@/components/layouts/systemLayout.vue";
+import PaginationComponent from "@/components/pagination/PaginationComponent.vue";
 import api from "@/services/api.js";
 
 export default {
   name: "MyMatches",
   components: {
     systemLayout,
+    PaginationComponent,
   },
 
   data() {
     return {
       matches: [],
+      pagination: { data: [], current_page: 1, last_page: 1 },
       loading: false,
       showInactive: false,
       openDropdownId: null,
@@ -195,11 +207,28 @@ export default {
     toggleDropdown(matchId) {
       this.openDropdownId = this.openDropdownId === matchId ? null : matchId
     },
-    async loadMatches() {
+
+    isPastMatch(match) {
+      if (!match.schedule) return false
+      return new Date(match.schedule) < new Date()
+    },
+
+    cardClasses(match) {
+      if (match.status === 0) {
+        return 'border-red-200 bg-red-50/50 dark:border-red-500/20 dark:bg-red-900/10 opacity-75'
+      }
+      if (this.isPastMatch(match)) {
+        return 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60 opacity-70'
+      }
+      return 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800'
+    },
+
+    async loadMatches(page = 1) {
       this.loading = true
       try {
-        const response = await api.get('/matches/my-matches')
-        this.matches = response.data || []
+        const response = await api.get('/matches/my-matches', { params: { page } })
+        this.matches = response.data.data || []
+        this.pagination = response.data
       } catch (err) {
         console.error('Erro ao carregar minhas partidas:', err)
       } finally {

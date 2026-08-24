@@ -111,10 +111,16 @@
         <div
           v-for="match in matches.data"
           :key="match.id"
-          class="group rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-orange-500/40 hover:shadow-md dark:border-white/10 dark:bg-gray-800"
+          class="group rounded-2xl border shadow-sm transition hover:shadow-md"
+          :class="isPastMatch(match)
+            ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60 opacity-70'
+            : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800'"
         >
           <!-- Header escuro -->
-          <div class="rounded-t-2xl bg-gray-900 px-4 py-3 text-center dark:bg-black">
+          <div
+            class="rounded-t-2xl px-4 py-3 text-center"
+            :class="isPastMatch(match) ? 'bg-gray-600 dark:bg-gray-700' : 'bg-gray-900 dark:bg-black'"
+          >
             <p class="text-sm font-bold text-white">
               <template v-if="match.my_team_score !== null && match.enemy_team_score !== null">
                 {{ match.my_team_name || 'Meu Time' }}
@@ -282,6 +288,10 @@ export default {
     },
     closeDropdowns() {
       this.openDropdownId = null
+    },
+    isPastMatch(match) {
+      if (!match.schedule) return false
+      return new Date(match.schedule) < new Date()
     },
     async getMatchesList(page = 1) {
       this.loading = true
