@@ -41,4 +41,10 @@ export default [
     component: () => import('../views/System/Matches/ChoosePosition.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/matches/:id/statistics',
+    name: 'matches-statistics',
+    component: () => import('../views/System/Matches/MatchStatistics.vue'),
+    meta: { requiresAuth: true }
+  },
 ]

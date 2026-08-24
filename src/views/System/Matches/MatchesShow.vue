@@ -190,6 +190,40 @@
         </div>
 
 
+        <!-- SEÇÃO GERENCIAR ESTATÍSTICAS (only for match owner) -->
+        <div v-if="isMatchOwner" class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h2 class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+            <span>📊</span> Estatísticas dos Jogadores
+          </h2>
+
+          <div class="flex flex-col items-start gap-2">
+            <router-link
+              v-if="hasPlayersAssigned"
+              :to="{ name: 'matches-statistics', params: { id: matchId } }"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Gerenciar Estatísticas
+            </router-link>
+
+            <span
+              v-else
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm opacity-50 cursor-not-allowed"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Gerenciar Estatísticas
+            </span>
+
+            <p v-if="!hasPlayersAssigned" class="text-xs text-amber-600 dark:text-amber-400">
+              É necessário escalar jogadores antes de registrar estatísticas
+            </p>
+          </div>
+        </div>
+
         </template>
 
         <!-- Danger Zone (only for match owner) -->
@@ -295,6 +329,9 @@ export default {
     },
     hasPositions() {
       return this.matchInfo.positions && this.matchInfo.positions.length > 0;
+    },
+    hasPlayersAssigned() {
+      return this.positionsData.some(p => p.team_player_id != null)
     },
     isMatchOwner() {
       try {
