@@ -29,4 +29,16 @@ export default [
     component: () => import('../views/System/Admin/AdminGamePositionList.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: '/admin/fee-config',
+    name: 'admin-fee-config',
+    component: () => import('../views/System/Admin/AdminFeeConfig.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/revenue',
+    name: 'admin-revenue',
+    component: () => import('../views/System/Admin/AdminRevenue.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 ]

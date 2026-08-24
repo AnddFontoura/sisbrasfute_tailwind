@@ -127,6 +127,81 @@
                 </ul>
               </div>
 
+              <!-- Seção de Estatísticas Acumuladas -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-3">📊 Estatísticas Acumuladas</h3>
+
+                <!-- Loading -->
+                <div v-if="statsLoading" class="flex items-center gap-2">
+                  <svg class="animate-spin h-5 w-5 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                  <span class="text-sm text-gray-500 dark:text-gray-400">Carregando estatísticas...</span>
+                </div>
+
+                <!-- Error -->
+                <div v-else-if="statsError" class="text-center py-4">
+                  <p class="text-sm text-red-600 dark:text-red-400 mb-3">Falha ao carregar as estatísticas acumuladas</p>
+                  <button
+                    @click="loadAccumulatedStats"
+                    class="inline-flex items-center rounded-md bg-orange-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors duration-150"
+                  >
+                    Tentar novamente
+                  </button>
+                </div>
+
+                <!-- Stats Content -->
+                <div v-else>
+                  <div v-if="accumulatedStats.length === 0" class="text-sm text-gray-500 dark:text-gray-400 italic">
+                    Este jogador não possui estatísticas registradas
+                  </div>
+
+                  <div v-for="stat in accumulatedStats" :key="stat.teamId" class="mb-4 last:mb-0">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ stat.teamName }}</p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Partidas</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.matches_count }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">⚽ Gols</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.goals_scored }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">🅰️ Assistências</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.assists }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">🟡 C. Amarelos</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.yellow_cards }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">🔴 C. Vermelhos</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.red_cards }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">🧤 Defesas</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.saves }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">😤 Faltas Com.</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.fouls_committed }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">😣 Faltas Sof.</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.fouls_suffered }}</p>
+                      </div>
+                      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">🥅 Gols Sofridos</p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.totals.goals_conceded }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Seção de Partidas -->
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Últimas Partidas</h3>
@@ -180,6 +255,7 @@
 
 <script>
 import api from "@/services/api";
+import { playerStatisticsService } from "@/services/playerStatisticsService";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import Swal from "@/services/swal.js";
 
@@ -200,6 +276,9 @@ export default {
       matches: [],
       matchesLoading: true,
       matchesError: false,
+      accumulatedStats: [],
+      statsLoading: false,
+      statsError: false,
     }
   },
   created() {
@@ -231,11 +310,51 @@ export default {
       try {
         const response = await api.get('/player-profile/' + this.playerProfileId + '/teams');
         this.teams = response.data.sort((a, b) => a.name.localeCompare(b.name));
+        this.loadAccumulatedStats();
       } catch (err) {
         console.error(err);
         this.teamsError = true;
       } finally {
         this.teamsLoading = false;
+      }
+    },
+    async loadAccumulatedStats() {
+      if (this.teams.length === 0) {
+        this.accumulatedStats = [];
+        return;
+      }
+
+      this.statsLoading = true;
+      this.statsError = false;
+
+      try {
+        const statsPromises = this.teams
+          .filter(team => team.team_player_id)
+          .map(async (team) => {
+            const response = await playerStatisticsService.getPlayerAccumulatedStats(team.id, team.team_player_id);
+            return {
+              teamId: team.id,
+              teamName: team.name,
+              matches_count: response.data.matches_count ?? 0,
+              totals: {
+                goals_scored: response.data.totals?.goals_scored ?? 0,
+                goals_conceded: response.data.totals?.goals_conceded ?? 0,
+                assists: response.data.totals?.assists ?? 0,
+                yellow_cards: response.data.totals?.yellow_cards ?? 0,
+                red_cards: response.data.totals?.red_cards ?? 0,
+                saves: response.data.totals?.saves ?? 0,
+                fouls_committed: response.data.totals?.fouls_committed ?? 0,
+                fouls_suffered: response.data.totals?.fouls_suffered ?? 0,
+              },
+            };
+          });
+
+        this.accumulatedStats = await Promise.all(statsPromises);
+      } catch (err) {
+        console.error(err);
+        this.statsError = true;
+      } finally {
+        this.statsLoading = false;
       }
     },
     async getPlayerMatches() {

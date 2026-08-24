@@ -42,6 +42,12 @@
           </div>
         </div>
 
+        <!-- Wallet balance display -->
+        <div v-if="walletBalance !== null" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
+          <span class="text-sm text-gray-600 dark:text-gray-300">Saldo disponível: </span>
+          <span class="text-sm font-bold text-orange-600 dark:text-orange-400">{{ formatCurrencyCents(walletBalance) }}</span>
+        </div>
+
         <!-- Loading indicator -->
         <div v-if="loading" class="flex items-center justify-center py-12">
           <svg
@@ -89,78 +95,167 @@
           Nenhuma posição configurada para esta partida.
         </div>
 
-        <!-- Positions list -->
-        <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
-          <div
-            v-for="position in positions"
-            :key="position.id"
-            class="py-3 flex items-center justify-between gap-4"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-0.5">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                  {{ position.game_position_name }}
-                </span>
-                <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
-                  {{ formatCurrency(position.value) }}
-                </span>
+        <!-- Positions split view: two columns -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Home team column -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 px-1">
+              {{ homeTeamName }}
+            </h3>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div
+                v-for="position in homePositions"
+                :key="position.id"
+                class="py-3 px-3 flex items-center justify-between gap-4"
+              >
+                <div class="flex-1 min-w-0">
+                  <div class="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-0.5">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {{ position.game_position_name }}
+                    </span>
+                    <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
+                      {{ formatCurrency(position.value) }}
+                    </span>
+                  </div>
+                  <div class="mt-1">
+                    <!-- Available position -->
+                    <span
+                      v-if="getPositionState(position) === 'available'"
+                      class="text-sm italic text-green-600 dark:text-green-400"
+                    >
+                      Disponível
+                    </span>
+
+                    <!-- My position -->
+                    <span
+                      v-else-if="getPositionState(position) === 'mine'"
+                      class="text-sm font-semibold text-orange-700 dark:text-orange-300"
+                    >
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
+                        ({{ position.player_nickname }})
+                      </span>
+                    </span>
+
+                    <!-- Occupied by another player -->
+                    <span
+                      v-else
+                      class="text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
+                        ({{ position.player_nickname }})
+                      </span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex-shrink-0">
+                  <button
+                    v-if="getPositionState(position) === 'available'"
+                    type="button"
+                    @click="handleChoose(position)"
+                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
+                  >
+                    Escolher
+                  </button>
+
+                  <button
+                    v-else-if="getPositionState(position) === 'mine'"
+                    type="button"
+                    @click="handleRelease(position)"
+                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
+                  >
+                    Liberar posição
+                  </button>
+                </div>
               </div>
-              <div class="mt-1">
-                <!-- Available position -->
-                <span
-                  v-if="getPositionState(position) === 'available'"
-                  class="text-sm italic text-green-600 dark:text-green-400"
-                >
-                  Disponível
-                </span>
-
-                <!-- My position -->
-                <span
-                  v-else-if="getPositionState(position) === 'mine'"
-                  class="text-sm font-semibold text-orange-700 dark:text-orange-300"
-                >
-                  {{ position.player_name }}
-                  <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
-                    ({{ position.player_nickname }})
-                  </span>
-                </span>
-
-                <!-- Occupied by another player -->
-                <span
-                  v-else
-                  class="text-sm text-gray-700 dark:text-gray-300"
-                >
-                  {{ position.player_name }}
-                  <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
-                    ({{ position.player_nickname }})
-                  </span>
-                </span>
+              <!-- Empty state for column -->
+              <div v-if="homePositions.length === 0" class="py-4 px-3 text-center text-sm text-gray-400 dark:text-gray-500">
+                Nenhuma posição disponível
               </div>
             </div>
+          </div>
 
-            <!-- Action buttons -->
-            <div class="flex-shrink-0">
-              <!-- Available: "Escolher" button -->
-              <button
-                v-if="getPositionState(position) === 'available'"
-                type="button"
-                @click="handleChoose(position)"
-                class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
+          <!-- Visitor team column -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 px-1">
+              {{ visitorTeamName }}
+            </h3>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div
+                v-for="position in visitorPositions"
+                :key="position.id"
+                class="py-3 px-3 flex items-center justify-between gap-4"
               >
-                Escolher
-              </button>
+                <div class="flex-1 min-w-0">
+                  <div class="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-0.5">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {{ position.game_position_name }}
+                    </span>
+                    <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
+                      {{ formatCurrency(position.value) }}
+                    </span>
+                  </div>
+                  <div class="mt-1">
+                    <!-- Available position -->
+                    <span
+                      v-if="getPositionState(position) === 'available'"
+                      class="text-sm italic text-green-600 dark:text-green-400"
+                    >
+                      Disponível
+                    </span>
 
-              <!-- Mine: "Liberar posição" button -->
-              <button
-                v-else-if="getPositionState(position) === 'mine'"
-                type="button"
-                @click="handleRelease(position)"
-                class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
-              >
-                Liberar posição
-              </button>
+                    <!-- My position -->
+                    <span
+                      v-else-if="getPositionState(position) === 'mine'"
+                      class="text-sm font-semibold text-orange-700 dark:text-orange-300"
+                    >
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
+                        ({{ position.player_nickname }})
+                      </span>
+                    </span>
 
-              <!-- Occupied: no button -->
+                    <!-- Occupied by another player -->
+                    <span
+                      v-else
+                      class="text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
+                        ({{ position.player_nickname }})
+                      </span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex-shrink-0">
+                  <button
+                    v-if="getPositionState(position) === 'available'"
+                    type="button"
+                    @click="handleChoose(position)"
+                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
+                  >
+                    Escolher
+                  </button>
+
+                  <button
+                    v-else-if="getPositionState(position) === 'mine'"
+                    type="button"
+                    @click="handleRelease(position)"
+                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
+                  >
+                    Liberar posição
+                  </button>
+                </div>
+              </div>
+              <!-- Empty state for column -->
+              <div v-if="visitorPositions.length === 0" class="py-4 px-3 text-center text-sm text-gray-400 dark:text-gray-500">
+                Nenhuma posição disponível
+              </div>
             </div>
           </div>
         </div>
@@ -202,6 +297,8 @@ export default {
       isLightboxOpen: false,
       lightboxImageUrl: null,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
+      walletBalance: null,
+      systemFee: 0,
     };
   },
   computed: {
@@ -212,10 +309,36 @@ export default {
       return this.matchInfo.enemy_team_info?.logo_url || this.fallbackImage;
     },
     homeTeamName() {
-      return this.matchInfo.my_team_info?.name || this.matchInfo.my_team_name || 'Meu Time';
+      return this.matchInfo.my_team_info?.name || this.matchInfo.my_team_name || 'Time Mandante';
     },
     visitorTeamName() {
-      return this.matchInfo.enemy_team_info?.name || this.matchInfo.enemy_team_name || 'Adversário';
+      return this.matchInfo.enemy_team_info?.name || this.matchInfo.enemy_team_name || 'Time Visitante';
+    },
+    homePositions() {
+      if (!this.positions || this.positions.length === 0) return [];
+
+      // If positions have team_reference, group by it
+      const hasTeamRef = this.positions.some(p => p.team_reference);
+      if (hasTeamRef) {
+        return this.positions.filter(p => p.team_reference === 'home');
+      }
+
+      // Fallback: split evenly — first half = home
+      const midpoint = Math.ceil(this.positions.length / 2);
+      return this.positions.slice(0, midpoint);
+    },
+    visitorPositions() {
+      if (!this.positions || this.positions.length === 0) return [];
+
+      // If positions have team_reference, group by it
+      const hasTeamRef = this.positions.some(p => p.team_reference);
+      if (hasTeamRef) {
+        return this.positions.filter(p => p.team_reference === 'visitor');
+      }
+
+      // Fallback: split evenly — second half = visitor
+      const midpoint = Math.ceil(this.positions.length / 2);
+      return this.positions.slice(midpoint);
     },
   },
   created() {
@@ -223,6 +346,7 @@ export default {
     this.loadPositions();
     this.loadMatchInfo();
     this.identifyCurrentPlayer();
+    this.loadWalletBalance();
   },
   mounted() {
     this._escHandler = (e) => { if (e.key === 'Escape' && this.isLightboxOpen) this.closeLightbox(); };
@@ -232,6 +356,25 @@ export default {
     document.removeEventListener('keydown', this._escHandler);
   },
   methods: {
+    async loadWalletBalance() {
+      try {
+        const response = await api.get('/wallet/balance');
+        this.walletBalance = response.data.balance_cents ?? response.data.balance ?? null;
+      } catch (err) {
+        console.error('Erro ao carregar saldo da carteira:', err);
+        // Silently fail — wallet balance is informational
+      }
+    },
+
+    formatCurrencyCents(cents) {
+      const numericValue = Number(cents) || 0;
+      const reais = numericValue / 100;
+      return reais.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    },
+
     async loadMatchInfo() {
       try {
         const response = await api.get('/matches/show/' + this.matchId);
@@ -339,13 +482,43 @@ export default {
         return;
       }
 
-      // Show confirmation dialog
+      const positionValue = Number(position.value || 0);
+      const feeCents = this.systemFee || 0;
+      const positionValueCents = positionValue * 100;
+      const totalCostCents = positionValueCents + feeCents;
+
+      // Check if wallet balance is insufficient
+      if (this.walletBalance !== null && this.walletBalance < totalCostCents) {
+        const insufficientResult = await Swal.fire({
+          title: 'Saldo insuficiente',
+          text: `Seu saldo (${this.formatCurrencyCents(this.walletBalance)}) é insuficiente para esta posição. Deposite fundos na sua carteira.`,
+          icon: 'warning',
+          confirmButtonText: 'Ir para Carteira',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#f97316',
+        });
+        if (insufficientResult.isConfirmed) {
+          this.$router.push('/financeiro');
+        }
+        return;
+      }
+
+      // Show detailed confirmation dialog with cost breakdown
       const result = await Swal.fire({
         title: 'Confirmar escolha',
-        text: `Deseja escolher a posição "${position.game_position_name}"?`,
+        html: `
+          <div class="text-left text-sm">
+            <p><strong>Posição:</strong> ${position.game_position_name}</p>
+            <p><strong>Valor:</strong> ${this.formatCurrency(positionValue)}</p>
+            ${feeCents > 0 ? `<p><strong>Taxa do sistema:</strong> ${this.formatCurrencyCents(feeCents)}</p>` : ''}
+            ${feeCents > 0 ? `<p class="font-bold mt-2"><strong>Total:</strong> ${this.formatCurrencyCents(totalCostCents)}</p>` : ''}
+            ${this.walletBalance !== null ? `<p class="mt-2 text-gray-500">Seu saldo: ${this.formatCurrencyCents(this.walletBalance)}</p>` : ''}
+          </div>
+        `,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Confirmar',
+        confirmButtonText: 'Confirmar pagamento',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#f97316',
       });
@@ -369,6 +542,9 @@ export default {
         }
 
         this.currentAssignment = position;
+
+        // Reload wallet balance after payment
+        this.loadWalletBalance();
 
         await Swal.fire({
           toast: true,
@@ -442,6 +618,9 @@ export default {
         position.player_nickname = null;
         position.team_player_id = null;
         this.currentAssignment = null;
+
+        // Reload wallet balance after refund
+        this.loadWalletBalance();
 
         await Swal.fire({
           toast: true,

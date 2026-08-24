@@ -1,5 +1,11 @@
 export default [
   {
+    path: '/team/:teamId/receivables',
+    name: 'team-receivables',
+    component: () => import('../views/System/TeamFinance/TeamReceivables.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team-finance/:teamId/list',
     name: 'team-finance-list',
     component: () => import('../views/System/TeamFinance/TeamFinanceList.vue'),
