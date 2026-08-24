@@ -203,7 +203,20 @@
               </div>
               <div>
                 <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400">Email verificado em</dt>
-                <dd class="text-sm text-gray-900 dark:text-white">{{ selectedUser.email_verified_at || 'Não verificado' }}</dd>
+                <dd class="text-sm text-gray-900 dark:text-white">
+                  <span v-if="selectedUser.email_verified_at">{{ selectedUser.email_verified_at }}</span>
+                  <span v-else class="flex items-center gap-2">
+                    <span class="text-red-500">Não verificado</span>
+                    <button
+                      type="button"
+                      @click="verifyUserEmail(selectedUser.id)"
+                      :disabled="verifyingEmail"
+                      class="inline-flex items-center rounded-md bg-green-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-700 transition disabled:opacity-50"
+                    >
+                      {{ verifyingEmail ? 'Verificando...' : 'Verificar agora' }}
+                    </button>
+                  </span>
+                </dd>
               </div>
               <div>
                 <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400">CPF</dt>
@@ -317,6 +330,7 @@ export default {
       showModal: false,
       modalLoading: false,
       selectedUser: null,
+      verifyingEmail: false,
       debounceTimer: null,
     }
   },
@@ -396,6 +410,35 @@ export default {
     closeDetailModal() {
       this.showModal = false
       this.selectedUser = null
+    },
+
+    async verifyUserEmail(userId) {
+      this.verifyingEmail = true
+      try {
+        await api.post(`/admin/users/${userId}/verify-email`)
+        if (this.selectedUser) {
+          this.selectedUser.email_verified_at = new Date().toISOString()
+        }
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Email verificado com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || 'Erro ao verificar email.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.verifyingEmail = false
+      }
     },
   },
 }

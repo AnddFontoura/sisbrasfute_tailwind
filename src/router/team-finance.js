@@ -6,6 +6,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team-finance/:teamId/settings',
+    name: 'team-finance-settings',
+    component: () => import('../views/System/TeamFinance/TeamFinanceSettings.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/team-finance/:teamId/show/:id',
     name: 'team-finance-show',
     component: () => import('../views/System/TeamFinance/TeamFinanceShow.vue'),

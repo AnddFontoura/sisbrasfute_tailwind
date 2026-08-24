@@ -23,4 +23,10 @@ export default [
     component: () => import('../views/System/Admin/AdminMatchList.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: '/admin/game-positions',
+    name: 'admin-game-positions',
+    component: () => import('../views/System/Admin/AdminGamePositionList.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 ]

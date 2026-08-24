@@ -136,7 +136,54 @@
             </svg>
             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Tags</span>
           </router-link>
+
+          <router-link
+            :to="{ name: 'team-position-presets', params: { teamId: teamId } }"
+            class="flex flex-col items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
+          >
+            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+            </svg>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Escalações</span>
+          </router-link>
         </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="rounded-xl border border-red-200 bg-red-50/50 p-6 shadow-sm dark:border-red-500/20 dark:bg-red-900/10">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2">Zona de Perigo</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {{ team.status === 0
+            ? 'Este time está inativo e não aparece nas buscas. Você pode reativá-lo a qualquer momento.'
+            : 'Desativar o time irá removê-lo das buscas públicas. Você poderá reativá-lo depois.'
+          }}
+        </p>
+        <button
+          v-if="team.status === 0"
+          type="button"
+          :disabled="statusLoading"
+          @click="handleReactivate"
+          class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg v-if="statusLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+          </svg>
+          Reativar Time
+        </button>
+        <button
+          v-else
+          type="button"
+          :disabled="statusLoading"
+          @click="handleDeactivate"
+          class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg v-if="statusLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+          </svg>
+          Desativar Time
+        </button>
       </div>
 
     </div>
@@ -160,6 +207,7 @@ export default {
       teamId: null,
       team: {},
       loading: false,
+      statusLoading: false,
       loadingApplications: true,
       loadingFinance: true,
       loadingMatches: true,
@@ -258,6 +306,72 @@ export default {
         style: 'currency',
         currency: 'BRL',
       }).format(Number(value || 0))
+    },
+
+    async handleDeactivate() {
+      const result = await Swal.fire({
+        title: 'Desativar time?',
+        text: 'O time não aparecerá mais nas buscas públicas. Você poderá reativá-lo depois.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Sim, desativar',
+        cancelButtonText: 'Cancelar',
+      })
+
+      if (!result.isConfirmed) return
+
+      this.statusLoading = true
+      try {
+        await api.post(`/team/deactivate/${this.teamId}`)
+        this.team.status = 0
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Time desativado com sucesso.',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || 'Erro ao desativar time.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.statusLoading = false
+      }
+    },
+
+    async handleReactivate() {
+      this.statusLoading = true
+      try {
+        await api.post(`/team/reactivate/${this.teamId}`)
+        this.team.status = 1
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Time reativado com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || 'Erro ao reativar time.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.statusLoading = false
+      }
     },
   },
 }

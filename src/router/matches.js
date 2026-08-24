@@ -6,6 +6,12 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/matches/my-matches',
+    name: 'my-matches',
+    component: () => import('../views/System/Matches/MyMatches.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/matches/show/:id',
     name: 'matches-show',
     component: () => import('../views/System/Matches/MatchesShow.vue'),
