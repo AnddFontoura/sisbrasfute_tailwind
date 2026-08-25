@@ -1,7 +1,7 @@
 <template>
   <system-layout>
     <main class="py-8">
-      <div class="max-w-6xl mx-auto">
+      <div>
         <!-- Header -->
         <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>

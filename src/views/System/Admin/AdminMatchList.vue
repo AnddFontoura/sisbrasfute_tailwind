@@ -1,6 +1,6 @@
 <template>
   <system-layout>
-    <main class="mx-auto max-w-7xl">
+    <main class="mx-auto">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Administração - Partidas</h1>
 
       <!-- FILTROS (colapsável) -->

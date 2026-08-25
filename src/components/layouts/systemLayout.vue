@@ -554,6 +554,12 @@ export default {
             { name: "Listar Jogadores", href: "/player-profile/list" },
           ],
         },
+        {
+          name: "Financeiro",
+          icon: ChartPieIcon,
+          current: false,
+          href: "/financeiro",
+        },
       ],
       teams: [
         { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
@@ -571,6 +577,8 @@ export default {
         { name: "Times", href: "/admin/teams" },
         { name: "Partidas", href: "/admin/matches" },
         { name: "Posições de Jogo", href: "/admin/game-positions" },
+        { name: "Config. Taxas", href: "/admin/fee-config" },
+        { name: "Receita", href: "/admin/revenue" },
       ],
       currentPageName: false,
     };

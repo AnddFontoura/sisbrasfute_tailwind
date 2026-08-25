@@ -3,7 +3,7 @@
     <!-- Team Banner -->
     <team-banner :team-info-id="teamId"></team-banner>
 
-    <div class="mx-auto max-w-3xl space-y-6 mt-6">
+    <div class="space-y-6 mt-6">
 
       <!-- Page Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

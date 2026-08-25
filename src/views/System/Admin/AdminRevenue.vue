@@ -1,7 +1,7 @@
 <template>
   <system-layout>
     <main class="py-8">
-      <div class="max-w-4xl mx-auto">
+      <div>
         <!-- Header -->
         <div class="mb-6">
           <h1 class="text-2xl font-black text-gray-900 dark:text-white">Receita do Sistema</h1>

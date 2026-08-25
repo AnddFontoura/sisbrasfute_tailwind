@@ -6,7 +6,7 @@
         :teamInfoId="teamId"
       />
 
-      <div class="mt-6 mx-auto max-w-2xl">
+      <div class="mt-6">
         <div class="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
           <!-- Loading state -->
           <div v-if="loading" class="flex items-center justify-center py-12">
