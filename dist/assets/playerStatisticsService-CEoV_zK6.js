@@ -1,0 +1,1 @@
+import{a}from"./index-By5wH8Ob.js";const i={getMatchStatistics(t){return a.get(`/matches/${t}/statistics`)},saveMatchStatistics(t,s){return a.post(`/matches/${t}/statistics`,{statistics:s})},getPlayerAccumulatedStats(t,s){return a.get(`/team-player/${t}/statistics/${s}`)}};export{i as p};

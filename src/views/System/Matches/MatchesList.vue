@@ -112,9 +112,12 @@
           v-for="match in matches.data"
           :key="match.id"
           class="group rounded-2xl border shadow-sm transition hover:shadow-md"
-          :class="isPastMatch(match)
-            ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60 opacity-70'
-            : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800'"
+          :class="[
+            isPastMatch(match)
+              ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60 opacity-70'
+              : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800',
+            { 'z-30 relative': openDropdownId === match.id }
+          ]"
         >
           <!-- Header escuro -->
           <div

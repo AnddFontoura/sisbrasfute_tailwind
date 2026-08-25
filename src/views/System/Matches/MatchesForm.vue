@@ -64,12 +64,12 @@
           </div>
         </div>
 
-        <!-- Section 2: Placar (apenas para partidas que não são entre o time) -->
-        <div v-if="!isTeamMatch()" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <!-- Section 2: Placar -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Placar</h2>
 
           <div class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-if="!isTeamMatch()" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Seu time é</label>
                 <Multiselect
@@ -96,7 +96,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Placar do seu time</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ isTeamMatch() ? 'Placar Time A' : 'Placar do seu time' }}</label>
                 <input
                   v-model="form.myTeamScore"
                   type="number"
@@ -105,7 +105,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Placar Adversário</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ isTeamMatch() ? 'Placar Time B' : 'Placar Adversário' }}</label>
                 <input
                   v-model="form.enemyTeamScore"
                   type="number"
@@ -168,20 +168,20 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Configuração de Posições</h2>
 
           <div class="space-y-4">
-            <!-- Tag da partida -->
+            <!-- Tags da partida -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tag da partida (opcional)</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Se uma tag for selecionada, apenas jogadores com essa tag poderão se inscrever.</p>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tags da partida (opcional)</label>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Se tags forem selecionadas, apenas jogadores com essas tags poderão se inscrever.</p>
               <Multiselect
-                v-model="form.tagId"
+                v-model="form.tagIds"
                 :options="availableTags"
-                mode="single"
+                mode="tags"
                 track-by="name"
                 label="name"
                 value-prop="id"
                 :searchable="true"
                 placeholder="Sem restrição de tag"
-                :allow-empty="true"
+                :close-on-deselect="false"
                 class="mt-2"
               />
             </div>
@@ -433,7 +433,7 @@ export default {
         playersCount: 1,
         teamsCount: 1,
         matchType: null,
-        tagId: null,
+        tagIds: [],
         positions: [],
       },
       gamePositions: [],
@@ -492,6 +492,13 @@ export default {
             price: 0,
           })
         );
+      }
+    },
+    'form.teamId'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.loadAvailableTags()
+        this.loadPresets()
+        this.loadGamePositions()
       }
     },
     'form.matchType'(newValue) {
@@ -631,7 +638,7 @@ export default {
         this.form.playersCount = data.players_count ?? 1
         this.form.teamsCount = data.teams_count ?? 1
         this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
-        this.form.tagId = data.tag_id ?? null
+        this.form.tagIds = data.tag_id ? [data.tag_id] : (data.tag_ids ?? [])
         this.stateId = data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
 
@@ -677,7 +684,7 @@ export default {
         this.form.enemyTeamName = data.enemy_team_name ?? null
         this.form.matchLocation = data.location ?? null
         this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
-        this.form.tagId = data.tag_id ?? null
+        this.form.tagIds = data.tag_id ? [data.tag_id] : (data.tag_ids ?? [])
         this.stateId = data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
         this.form.teamsCount = data.teams_count ?? 1
@@ -729,6 +736,11 @@ export default {
       Object.entries(this.form).forEach(([key, value]) => {
         if (key === 'positions') {
           formData.append('positions', JSON.stringify(value ?? []))
+          return
+        }
+
+        if (key === 'tagIds') {
+          formData.append('tagIds', JSON.stringify(value ?? []))
           return
         }
 
