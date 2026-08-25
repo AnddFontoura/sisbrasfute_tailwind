@@ -113,10 +113,12 @@
           :key="match.id"
           class="group rounded-2xl border shadow-sm transition hover:shadow-md"
           :class="[
-            isPastMatch(match)
+            isPastMatch(match) && openDropdownId !== match.id
               ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60 opacity-70'
-              : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800',
-            { 'z-30 relative': openDropdownId === match.id }
+              : isPastMatch(match) && openDropdownId === match.id
+                ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60'
+                : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800',
+            openDropdownId === match.id ? 'z-50 relative overflow-visible' : ''
           ]"
         >
           <!-- Header escuro -->
@@ -178,7 +180,7 @@
 
                 <div
                   v-if="openDropdownId === match.id"
-                  class="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
+                  class="absolute right-0 top-full z-[100] mt-1 w-44 rounded-xl border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
                 >
                   <router-link
                     :to="{ name: 'matches-edit', params: { id: match.id } }"
