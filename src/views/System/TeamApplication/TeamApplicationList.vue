@@ -24,103 +24,57 @@
         <div
           v-for="(player, key) in players"
           :key="player.id ?? key"
-          class="
-            w-full
-            rounded-xl
-            border
-            bg-white
-            shadow-sm
-            p-4
-            flex
-            items-center
-            gap-4
-          "
+          class="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700"
         >
-          <!-- Foto -->
-          <div
-            class="
-              flex-shrink-0
-              w-20
-              h-20
-              rounded-xl
-              overflow-hidden
-              bg-gray-100
-              border
-            "
-          >
-            <img
-              :src="player?.photo_url || fallbackImage"
-              :alt="player.name"
-              class="w-full h-full object-cover"
-            >
+          <div class="flex items-center gap-4">
+            <!-- Foto circular 56x56 -->
+            <div class="flex-shrink-0">
+              <img
+                :src="player?.photo_url || fallbackImage"
+                :alt="player.player_info?.name || player.name"
+                class="w-14 h-14 rounded-full object-cover bg-gray-100 dark:bg-gray-700"
+              >
+            </div>
+
+            <!-- Informações do jogador -->
+            <div class="flex-1 min-w-0">
+              <h2 class="text-base font-bold text-gray-900 truncate dark:text-white">
+                {{ player.player_info?.name || player.name }}
+                <span v-if="player.nickname || player.player_info?.nickname" class="font-normal text-gray-500 dark:text-gray-400">
+                  ({{ player.nickname || player.player_info?.nickname }})
+                </span>
+              </h2>
+
+              <p class="mt-0.5 text-sm text-gray-600 dark:text-gray-300">
+                {{ formatPositions(player) }} • {{ player.age ?? 'N/A' }} anos
+              </p>
+
+              <p v-if="player.created_at" class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                Inscrição: {{ formatDate(player.created_at) }}
+              </p>
+            </div>
+
+            <!-- Botões - visíveis apenas em sm+ -->
+            <div class="hidden sm:flex flex-shrink-0 items-center gap-2">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+                @click="openApplicationModal(player)"
+              >
+                Avaliar
+              </button>
+            </div>
           </div>
 
-          <!-- Infos -->
-          <div class="flex-1 min-w-0">
-            <div class="flex items-start justify-between gap-4">
-              <div class="min-w-0">
-                <h2 class="text-lg md:text-xl font-bold text-gray-900 truncate">
-                  {{ player.player_info.name }}
-                </h2>
-
-                <p class="text-sm text-gray-500 truncate">
-                  {{ player.nickname || 'Sem apelido' }}
-                </p>
-
-                <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700">
-                  <span>
-                    <b>Idade:</b> {{ player.age ?? 'N/A' }}
-                  </span>
-
-                  <span>
-                    <b>Posições:</b> {{ formatPositions(player) }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="flex flex-shrink-0 flex-col gap-2 sm:flex-row">
-                <router-link
-                  :to="{ name: 'player-profile-show', params: { id: player.id } }"
-                  class="
-                    inline-flex
-                    justify-center
-                    rounded-md
-                    bg-orange-500
-                    hover:bg-orange-600
-                    px-4
-                    py-2
-                    text-sm
-                    font-semibold
-                    text-black
-                    shadow-sm
-                    transition-colors
-                  "
-                >
-                  Visualizar
-                </router-link>
-
-                <button
-                  type="button"
-                  class="
-                    inline-flex
-                    justify-center
-                    rounded-md
-                    bg-black
-                    hover:bg-gray-800
-                    px-4
-                    py-2
-                    text-sm
-                    font-semibold
-                    text-white
-                    shadow-sm
-                    transition-colors
-                  "
-                  @click="openApplicationModal(player)"
-                >
-                  Avaliar
-                </button>
-              </div>
-            </div>
+          <!-- Botões - visíveis apenas em mobile (<640px), full width -->
+          <div class="mt-3 flex sm:hidden">
+            <button
+              type="button"
+              class="w-full inline-flex items-center justify-center rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+              @click="openApplicationModal(player)"
+            >
+              Avaliar
+            </button>
           </div>
         </div>
       </div>
@@ -362,6 +316,11 @@ export default {
 
       return player.position_name || player.position || 'N/A'
     },
+    formatDate(dateString) {
+      if (!dateString) return ''
+      const date = new Date(dateString)
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    },
     openApplicationModal(player) {
       this.selectedApplication = player;
       this.applicationDecision = "";
@@ -403,14 +362,16 @@ export default {
           justification: this.applicationDecision === "rejected" ? this.applicationRejectionReason : null,
         });
 
+        const successMessage = this.applicationDecision === "accepted"
+          ? "Jogador aceito com sucesso."
+          : "Jogador rejeitado com sucesso.";
+
         this.closeApplicationModal();
 
         await Swal.fire({
           icon: "success",
           title: "Decisão salva!",
-          text: this.applicationDecision === "accepted"
-            ? "Jogador aceito com sucesso."
-            : "Jogador rejeitado com sucesso.",
+          text: successMessage,
           confirmButtonText: "Ok",
         });
 

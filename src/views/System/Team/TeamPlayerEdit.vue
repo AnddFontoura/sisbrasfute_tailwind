@@ -478,6 +478,49 @@
                 </div>
               </div>
 
+              <!-- Section: Ativar/Inativar Jogador (apenas dono do time) -->
+              <div v-if="isTeamOwner" class="mb-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Status do Jogador
+                </h2>
+
+                <div class="flex items-center justify-between rounded-lg border p-4"
+                     :class="player.active
+                       ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                       : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'"
+                >
+                  <div>
+                    <p class="text-sm font-medium"
+                       :class="player.active ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'"
+                    >
+                      {{ player.active ? 'Jogador Ativo' : 'Jogador Inativo' }}
+                    </p>
+                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                      {{ player.active
+                        ? 'O jogador recebe notificações e aparece na seleção de partidas.'
+                        : 'Jogador inativado não recebe notificações e não aparece na seleção de partidas.'
+                      }}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
+                    :class="player.active
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-green-600 text-white hover:bg-green-700'"
+                    :disabled="togglingActive"
+                    @click="toggleActive"
+                  >
+                    <svg v-if="togglingActive" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                    </svg>
+                    <span>{{ player.active ? 'Inativar' : 'Ativar' }}</span>
+                  </button>
+                </div>
+              </div>
+
               <!-- Actions -->
               <div class="flex justify-end gap-3">
                 <router-link
@@ -567,6 +610,7 @@ import TeamBanner from "@/components/team/teamBanner.vue";
 import Multiselect from "@vueform/multiselect";
 import api from "@/services/api.js";
 import Swal from "@/services/swal.js";
+import { useAuthStore } from "@/stores/auth.js";
 
 export default {
   name: "TeamPlayerEdit",
@@ -581,8 +625,10 @@ export default {
       playerId: null,
       loading: false,
       saving: false,
+      togglingActive: false,
       error: null,
       player: {},
+      team: {},
       form: {
         name: null,
         nickname: null,
@@ -610,21 +656,31 @@ export default {
     this.playerId = this.$route.params.playerId;
     this.loadData();
   },
+  computed: {
+    isTeamOwner() {
+      const authStore = useAuthStore();
+      const userId = authStore.user?.id;
+      if (!userId) return false;
+      return this.team.user_id === userId;
+    },
+  },
   methods: {
     async loadData() {
       this.loading = true;
       this.error = null;
 
       try {
-        const [playerResponse, tagsResponse, positionsResponse] = await Promise.all([
+        const [playerResponse, tagsResponse, positionsResponse, teamResponse] = await Promise.all([
           api.get(`/team-player/${this.teamId}/show/${this.playerId}`),
           api.get(`/team/${this.teamId}/tags`),
           api.get('/game-positions/list'),
+          api.get(`/team/show/${this.teamId}`),
         ]);
 
         this.player = playerResponse.data;
         this.availableTags = tagsResponse.data;
         this.gamePositions = positionsResponse.data?.gamePositions ?? positionsResponse.data ?? [];
+        this.team = teamResponse.data;
 
         // Pre-populate form fields from player data
         this.form.name = this.player.name ?? null;
@@ -750,6 +806,68 @@ export default {
           showConfirmButton: false,
           timer: 3000,
         });
+      }
+    },
+
+    async toggleActive() {
+      const currentlyActive = this.player.active;
+      const newActive = !currentlyActive;
+
+      // If deactivating, show confirmation
+      if (!newActive) {
+        const result = await Swal.fire({
+          icon: 'warning',
+          title: 'Inativar jogador?',
+          text: 'Jogador inativado não receberá notificações e não aparecerá na seleção de partidas.',
+          showCancelButton: true,
+          confirmButtonText: 'Sim, inativar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#dc2626',
+        });
+
+        if (!result.isConfirmed) return;
+      }
+
+      this.togglingActive = true;
+
+      try {
+        await api.patch(`/team-player/${this.teamId}/toggle-active/${this.playerId}`, {
+          active: newActive,
+        });
+
+        this.player.active = newActive;
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: newActive ? 'Jogador ativado com sucesso!' : 'Jogador inativado com sucesso!',
+          showConfirmButton: false,
+          timer: 2500,
+        });
+      } catch (err) {
+        console.error(err);
+
+        let mensagem = 'Não foi possível completar a operação.';
+
+        if (err.response?.data?.message) {
+          mensagem = err.response.data.message;
+        }
+
+        if (err.response?.data?.errors) {
+          mensagem = Object.values(err.response.data.errors).flat().join('<br><br>');
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Erro',
+          html: mensagem,
+          showConfirmButton: true,
+        });
+      } finally {
+        this.togglingActive = false;
       }
     },
 

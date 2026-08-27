@@ -47,7 +47,7 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Nome -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
@@ -87,6 +87,20 @@
               <option v-for="tag in availableTags" :key="tag.id" :value="tag.id">
                 {{ tag.name }}
               </option>
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
+            <select
+              v-model="filters.active"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              @change="applyFilters"
+            >
+              <option value="true">Ativos</option>
+              <option value="false">Inativos</option>
+              <option value="all">Todos</option>
             </select>
           </div>
         </div>
@@ -131,6 +145,12 @@
           <div class="px-4 pb-4 pt-10">
             <h3 class="text-base font-bold text-gray-900 truncate dark:text-white">
               {{ getPlayerName(player) }}
+              <span
+                v-if="player.active === false || player.active === 0"
+                class="ml-1 inline-flex items-center bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-xs px-2 py-0.5 rounded-full"
+              >
+                Inativo
+              </span>
             </h3>
             <p class="text-sm text-gray-500 truncate dark:text-gray-400">
               {{ getPlayerNickname(player) }}
@@ -290,6 +310,7 @@ export default {
         name: '',
         game_position_id: null,
         tag_id: null,
+        active: 'true',
       },
       gamePositions: [],
       availableTags: [],
@@ -345,7 +366,7 @@ export default {
     },
 
     resetFilters() {
-      this.filters = { name: '', game_position_id: null, tag_id: null }
+      this.filters = { name: '', game_position_id: null, tag_id: null, active: 'true' }
       this.getTeamPlayerList(1)
     },
 
@@ -386,6 +407,7 @@ export default {
             name: this.filters.name || undefined,
             game_position_id: this.filters.game_position_id || undefined,
             tag_id: this.filters.tag_id || undefined,
+            active: this.filters.active || undefined,
           }
         })
         this.players = response.data.data

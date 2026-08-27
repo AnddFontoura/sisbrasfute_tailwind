@@ -108,6 +108,54 @@
         </button>
       </div>
 
+      <!-- Player Management Section (Unlink + Notification Toggle) -->
+      <div
+        v-if="teamPlayer"
+        class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700"
+      >
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Meu vínculo com o time</h2>
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <!-- Notification Toggle -->
+          <div class="flex items-center gap-3">
+            <label for="notify-match-toggle" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Notificações de partidas
+            </label>
+            <button
+              id="notify-match-toggle"
+              type="button"
+              role="switch"
+              :aria-checked="notifyMatch"
+              :class="notifyMatch ? 'bg-orange-500' : 'bg-gray-300 dark:bg-gray-600'"
+              class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+              :disabled="updatingNotification"
+              @click="toggleNotification"
+            >
+              <span
+                :class="notifyMatch ? 'translate-x-5' : 'translate-x-0'"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              />
+            </button>
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              {{ notifyMatch ? 'Ativado' : 'Desativado' }}
+            </span>
+          </div>
+
+          <!-- Unlink Button -->
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-700 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-gray-600"
+            :disabled="unlinking"
+            @click="confirmUnlink"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            {{ unlinking ? 'Desvinculando...' : 'Desvincular' }}
+          </button>
+        </div>
+      </div>
+
       <!-- Description Section -->
       <div v-if="team.description" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Sobre o time</h2>
@@ -246,6 +294,7 @@ import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import { MapIcon, MapPinIcon, CalendarIcon } from '@heroicons/vue/20/solid'
 import Swal from "@/services/swal.js"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
   name: "teamList",
@@ -265,6 +314,10 @@ export default {
       loading: false,
       isLightboxOpen: false,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
+      teamPlayer: null,
+      notifyMatch: true,
+      updatingNotification: false,
+      unlinking: false,
     }
   },
   created() {
@@ -297,6 +350,7 @@ export default {
           this.team = response.data
 
           this.loadPerformance()
+          this.loadTeamPlayer()
         } catch (err) {
           console.error(err);
           await Swal.fire({
@@ -318,6 +372,115 @@ export default {
         this.performance = response.data || []
       } catch (err) {
         console.error('Erro ao carregar desempenho:', err)
+      }
+    },
+    async loadTeamPlayer() {
+      const authStore = useAuthStore()
+      const userId = authStore.user?.id
+
+      if (!userId) return
+
+      try {
+        const response = await api.get(`/team-player/${this.teamId}/list`, {
+          params: { active: 'all' }
+        })
+        const players = response.data?.data || response.data || []
+        const myPlayer = players.find(p => p.user_id === userId)
+
+        if (myPlayer) {
+          this.teamPlayer = myPlayer
+          this.notifyMatch = myPlayer.notify_match ?? true
+        }
+      } catch (err) {
+        console.error('Erro ao buscar vínculo do jogador:', err)
+      }
+    },
+    async confirmUnlink() {
+      const result = await Swal.fire({
+        icon: 'warning',
+        title: 'Desvincular do time?',
+        text: 'Ao confirmar, sua conta de usuário será desvinculada deste time. Seus dados históricos serão mantidos, mas você perderá o acesso como jogador vinculado.',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, desvincular',
+        cancelButtonText: 'Cancelar',
+      })
+
+      if (result.isConfirmed) {
+        await this.unlinkFromTeam()
+      }
+    },
+    async unlinkFromTeam() {
+      this.unlinking = true
+
+      try {
+        await api.post(`/team-player/${this.teamId}/unlink`)
+
+        this.teamPlayer = null
+        this.notifyMatch = true
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Desvinculado!',
+          text: 'Você foi desvinculado do time com sucesso.',
+          confirmButtonText: 'Ok',
+        })
+      } catch (err) {
+        let mensagem = 'Não foi possível completar a operação.'
+
+        if (err.response?.data?.message) {
+          mensagem = err.response.data.message
+        }
+
+        if (err.response?.data?.errors) {
+          mensagem = Object.values(err.response.data.errors).flat().join('<br><br>')
+        }
+
+        await Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          html: mensagem,
+          confirmButtonText: 'Ok',
+        })
+      } finally {
+        this.unlinking = false
+      }
+    },
+    async toggleNotification() {
+      const newValue = !this.notifyMatch
+      this.updatingNotification = true
+
+      try {
+        await api.patch(`/team-player/${this.teamId}/notification-preference`, {
+          notify_match: newValue,
+        })
+
+        this.notifyMatch = newValue
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: newValue ? 'Notificações ativadas' : 'Notificações desativadas',
+          showConfirmButton: false,
+          timer: 2000,
+        })
+      } catch (err) {
+        let mensagem = 'Não foi possível completar a operação.'
+
+        if (err.response?.data?.message) {
+          mensagem = err.response.data.message
+        }
+
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: mensagem,
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.updatingNotification = false
       }
     },
     handleInterestClick() {
