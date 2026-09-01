@@ -426,14 +426,89 @@
         </div>
 
         <div class="ml-auto flex items-center gap-3">
-          <button
-            type="button"
-            class="relative rounded-xl p-2 text-zinc-500 hover:bg-white/10 hover:text-orange-400"
-          >
-            <span class="sr-only">Notificações</span>
-            <BellIcon class="size-5" aria-hidden="true" />
-            <span class="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-orange-500"></span>
-          </button>
+          <Menu as="div" class="relative">
+            <MenuButton
+              type="button"
+              class="relative rounded-xl p-2 text-zinc-500 hover:bg-white/10 hover:text-orange-400"
+              @click="onBellClick"
+            >
+              <span class="sr-only">Notificações</span>
+              <BellIcon class="size-5" aria-hidden="true" />
+              <span
+                v-if="notificationsStore.unreadCount > 0"
+                class="absolute -right-0.5 -top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-black leading-none text-white"
+              >
+                {{ notificationsStore.unreadCount > 9 ? '9+' : notificationsStore.unreadCount }}
+              </span>
+            </MenuButton>
+
+            <transition
+              enter-active-class="transition ease-out duration-100"
+              enter-from-class="transform opacity-0 scale-95"
+              enter-to-class="transform scale-100"
+              leave-active-class="transition ease-in duration-75"
+              leave-from-class="transform scale-100"
+              leave-to-class="transform opacity-0 scale-95"
+            >
+              <MenuItems class="absolute right-0 z-50 mt-2 w-80 origin-top-right overflow-hidden rounded-xl border border-white/10 bg-[#111111] shadow-2xl focus:outline-none">
+                <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                  <p class="text-sm font-black text-white">Notificações</p>
+                  <button
+                    v-if="notificationsStore.unreadCount > 0"
+                    type="button"
+                    class="text-xs font-bold text-orange-400 hover:text-orange-300"
+                    @click.stop="markAllRead"
+                  >
+                    Marcar todas
+                  </button>
+                </div>
+
+                <div class="max-h-96 overflow-y-auto">
+                  <div v-if="notificationsStore.latest.length === 0" class="px-4 py-8 text-center text-sm text-zinc-500">
+                    Nenhuma notificação.
+                  </div>
+
+                  <MenuItem
+                    v-for="item in notificationsStore.latest"
+                    :key="item.id"
+                    v-slot="{ active }"
+                  >
+                    <button
+                      type="button"
+                      @click="openNotification(item)"
+                      :class="[
+                        active ? 'bg-white/[0.06]' : '',
+                        'flex w-full items-start gap-3 border-b border-white/5 px-4 py-3 text-left transition-colors'
+                      ]"
+                    >
+                      <span
+                        :class="[
+                          item.read_at ? 'bg-transparent' : 'bg-orange-500',
+                          'mt-1.5 size-2 shrink-0 rounded-full'
+                        ]"
+                      ></span>
+                      <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-bold text-white">
+                          {{ item.notification_info?.title || item.notificationInfo?.title }}
+                        </span>
+                        <span class="mt-0.5 block line-clamp-2 text-xs text-zinc-400">
+                          {{ item.notification_info?.description || item.notificationInfo?.description }}
+                        </span>
+                      </span>
+                    </button>
+                  </MenuItem>
+                </div>
+
+                <button
+                  type="button"
+                  class="block w-full border-t border-white/10 px-4 py-3 text-center text-xs font-black uppercase tracking-wider text-orange-400 hover:bg-white/[0.05]"
+                  @click="$router.push('/notifications')"
+                >
+                  Ver todas
+                </button>
+              </MenuItems>
+            </transition>
+          </Menu>
         </div>
       </header>
 
@@ -450,6 +525,7 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth.js";
+import { useNotificationsStore } from "@/stores/notifications.js";
 import {
   Dialog,
   DialogPanel,
@@ -509,6 +585,10 @@ export default {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
+  },
+  setup() {
+    const notificationsStore = useNotificationsStore();
+    return { notificationsStore };
   },
   data() {
     return {
@@ -576,6 +656,7 @@ export default {
         { name: "Usuários", href: "/admin/users" },
         { name: "Times", href: "/admin/teams" },
         { name: "Partidas", href: "/admin/matches" },
+        { name: "Notificações", href: "/admin/notifications" },
         { name: "Posições de Jogo", href: "/admin/game-positions" },
         { name: "Config. Taxas", href: "/admin/fee-config" },
         { name: "Receita", href: "/admin/revenue" },
@@ -586,6 +667,10 @@ export default {
   mounted() {
     const auth = useAuthStore();
     this.user = auth.user;
+    if (this.user?.name) {
+      this.userInitials = this.user.name.trim().charAt(0).toUpperCase() || 'A';
+    }
+    this.notificationsStore.fetchLatest();
   },
   methods: {
     go(route) {
@@ -598,6 +683,26 @@ export default {
       }
 
       return this.$route.path === href || this.$route.path.startsWith(`${href}/`);
+    },
+    onBellClick() {
+      this.notificationsStore.fetchLatest();
+    },
+    async markAllRead() {
+      try {
+        await this.notificationsStore.markAllAsRead();
+      } catch {
+        // ignore
+      }
+    },
+    async openNotification(item) {
+      if (!item.read_at) {
+        try {
+          await this.notificationsStore.markAsRead(item.id);
+        } catch {
+          // ignore
+        }
+      }
+      this.$router.push('/notifications');
     },
   },
 };

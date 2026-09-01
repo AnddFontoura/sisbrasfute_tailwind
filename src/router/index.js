@@ -10,6 +10,7 @@ import playerInvitation from './player-invitation.js'
 import admin from './admin.js'
 import friendly from './friendly.js'
 import wallet from './wallet.js'
+import notifications from './notifications.js'
 
 
 const router = createRouter({
@@ -42,6 +43,7 @@ const router = createRouter({
     ...admin,
     ...friendly,
     ...wallet,
+    ...notifications,
   ],
 })
 

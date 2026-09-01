@@ -30,6 +30,12 @@ export default [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/admin/notifications',
+    name: 'admin-notifications',
+    component: () => import('../views/System/Admin/AdminNotifications.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/admin/fee-config',
     name: 'admin-fee-config',
     component: () => import('../views/System/Admin/AdminFeeConfig.vue'),
