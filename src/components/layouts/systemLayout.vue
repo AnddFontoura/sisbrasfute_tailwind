@@ -694,6 +694,16 @@ export default {
         // ignore
       }
     },
+    notificationTarget(item) {
+      const n = item.notification_info || item.notificationInfo || {};
+      if (n.match_id) {
+        return `/matches/show/${n.match_id}`;
+      }
+      if (n.team_id) {
+        return `/team/show/${n.team_id}`;
+      }
+      return '/notifications';
+    },
     async openNotification(item) {
       if (!item.read_at) {
         try {
@@ -702,7 +712,7 @@ export default {
           // ignore
         }
       }
-      this.$router.push('/notifications');
+      this.$router.push(this.notificationTarget(item));
     },
   },
 };
