@@ -172,7 +172,7 @@
                 <!-- Action buttons -->
                 <div class="flex-shrink-0">
                   <button
-                    v-if="getPositionState(position) === 'available' && isMember"
+                    v-if="getPositionState(position) === 'available' && canChooseOn(position)"
                     type="button"
                     @click="handleChoose(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
@@ -259,7 +259,7 @@
                 <!-- Action buttons -->
                 <div class="flex-shrink-0">
                   <button
-                    v-if="getPositionState(position) === 'available' && isMember"
+                    v-if="getPositionState(position) === 'available' && canChooseOn(position)"
                     type="button"
                     @click="handleChoose(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
@@ -401,6 +401,7 @@ export default {
       walletBalance: null,
       systemFee: 0,
       isMember: true,
+      currentTeamId: null,
       paymentModal: {
         open: false,
         method: 'pix',
@@ -431,31 +432,28 @@ export default {
     visitorTeamName() {
       return this.matchInfo.enemy_team_info?.name || this.matchInfo.enemy_team_name || 'Time Visitante';
     },
+    homeTeamId() {
+      return this.matchInfo.created_by_team_id ?? this.matchInfo.my_team_id ?? null;
+    },
+    enemyTeamId() {
+      return this.matchInfo.enemy_team_id ?? null;
+    },
+    hasEnemyTeam() {
+      return !!this.enemyTeamId;
+    },
     homePositions() {
       if (!this.positions || this.positions.length === 0) return [];
-
-      // If positions have team_reference, group by it
-      const hasTeamRef = this.positions.some(p => p.team_reference);
-      if (hasTeamRef) {
-        return this.positions.filter(p => p.team_reference === 'home');
+      if (this.homeTeamId != null && this.positions.some(p => p.team_id != null)) {
+        return this.positions.filter(p => p.team_id === this.homeTeamId);
       }
-
-      // Fallback: split evenly — first half = home
-      const midpoint = Math.ceil(this.positions.length / 2);
-      return this.positions.slice(0, midpoint);
+      return this.positions;
     },
     visitorPositions() {
       if (!this.positions || this.positions.length === 0) return [];
-
-      // If positions have team_reference, group by it
-      const hasTeamRef = this.positions.some(p => p.team_reference);
-      if (hasTeamRef) {
-        return this.positions.filter(p => p.team_reference === 'visitor');
+      if (this.enemyTeamId != null) {
+        return this.positions.filter(p => p.team_id === this.enemyTeamId);
       }
-
-      // Fallback: split evenly — second half = visitor
-      const midpoint = Math.ceil(this.positions.length / 2);
-      return this.positions.slice(midpoint);
+      return [];
     },
   },
   created() {
@@ -497,6 +495,7 @@ export default {
         const response = await api.get('/matches/show/' + this.matchId);
         this.matchInfo = response.data;
         this.isMember = response.data.is_member ?? false;
+        this.currentTeamId = response.data.current_team_id ?? null;
 
         // Backend is the reliable source for the current team_player_id.
         if (response.data.current_team_player_id) {
@@ -592,14 +591,19 @@ export default {
       return 'occupied';
     },
 
+    canChooseOn(position) {
+      // The user can only pick a position on the side of their own team.
+      return this.isMember && this.currentTeamId != null && position.team_id === this.currentTeamId;
+    },
+
     async handleChoose(position) {
-      // Guard: only team members can choose a position.
-      if (!this.isMember) {
+      // Guard: user can only pick a position on their own team's side.
+      if (!this.canChooseOn(position)) {
         await Swal.fire({
           toast: true,
           position: "top-end",
           icon: "warning",
-          title: "Você não faz parte deste time",
+          title: "Você só pode escolher posições do seu time",
           showConfirmButton: false,
           timer: 3000,
         });
@@ -649,7 +653,7 @@ export default {
       }
 
       const payload = {
-        game_position_id: position.game_position_id,
+        match_position_id: position.id,
         payment_method: method,
       };
 

@@ -134,59 +134,118 @@
             </button>
           </div>
 
-          <!-- Positions grid -->
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <div
-              v-for="position in positionsData"
-              :key="position.game_position_id"
-              class="rounded-xl border p-4 transition"
-              :class="getPositionClasses(position)"
-            >
-              <!-- Position name + price -->
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-bold text-gray-900 dark:text-white">
-                  {{ position.game_position_name }}
-                </span>
-                <span class="text-xs font-semibold text-orange-600 dark:text-orange-400">
-                  {{ formatCurrency(position.value) }}
-                </span>
-              </div>
-
-              <!-- State: Available -->
-              <div v-if="getPositionState(position) === 'available'">
-                <p class="text-xs text-green-700 dark:text-green-400 font-medium mb-2">Disponível</p>
-                <button
-                  v-if="isMember && !currentAssignment && playerHasRequiredTag"
-                  @click="handleChoose(position)"
-                  class="w-full rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+          <!-- Positions split view: two columns, one team each -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Home team column -->
+            <div>
+              <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                <img :src="homeLogoUrl" @error="$event.target.src = fallbackImage"
+                     class="h-6 w-6 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700" />
+                <span class="truncate">{{ homeTeamDisplayName }}</span>
+              </h3>
+              <div class="space-y-3">
+                <div
+                  v-for="position in homePositions"
+                  :key="position.game_position_id"
+                  class="flex flex-col min-h-[112px] rounded-xl border p-4 transition"
+                  :class="getPositionClasses(position)"
                 >
-                  Escolher
-                </button>
-                <p v-else-if="!isMember" class="text-xs text-red-600 dark:text-red-400 italic">
-                  Apenas jogadores do time
-                </p>
-                <p v-else-if="!playerHasRequiredTag" class="text-xs text-amber-600 dark:text-amber-400 italic">
-                  Tag necessária ausente
-                </p>
-              </div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">{{ position.game_position_name }}</span>
+                    <span class="text-xs font-semibold text-orange-600 dark:text-orange-400">{{ formatCurrency(position.value) }}</span>
+                  </div>
 
-              <!-- State: Mine -->
-              <div v-else-if="getPositionState(position) === 'mine'">
-                <p class="text-xs text-orange-700 dark:text-orange-300 font-semibold mb-2">✓ Sua posição</p>
-                <button
-                  @click="handleRelease(position)"
-                  class="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                  <div v-if="getPositionState(position) === 'available'" class="flex flex-1 flex-col justify-between">
+                    <p class="text-xs text-green-700 dark:text-green-400 font-medium mb-2">Disponível</p>
+                    <button
+                      v-if="canChooseOn(position) && !currentAssignment && playerHasRequiredTag"
+                      @click="handleChoose(position)"
+                      class="mt-auto w-full rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+                    >
+                      Escolher
+                    </button>
+                    <p v-else-if="canChooseOn(position) && !playerHasRequiredTag" class="mt-auto text-xs text-amber-600 dark:text-amber-400 italic">Tag necessária ausente</p>
+                  </div>
+
+                  <div v-else-if="getPositionState(position) === 'mine'" class="flex flex-1 flex-col justify-between">
+                    <p class="text-xs text-orange-700 dark:text-orange-300 font-semibold mb-2">✓ Sua posição</p>
+                    <button
+                      @click="handleRelease(position)"
+                      class="mt-auto w-full rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                    >
+                      Liberar posição
+                    </button>
+                  </div>
+
+                  <div v-else class="flex flex-1 items-end">
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
+                    </p>
+                  </div>
+                </div>
+                <div v-if="homePositions.length === 0" class="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 py-4 text-center text-xs text-gray-400 dark:text-gray-500">
+                  Nenhuma posição
+                </div>
+              </div>
+            </div>
+
+            <!-- Visitor team column -->
+            <div>
+              <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                <img :src="visitorLogoUrl" @error="$event.target.src = fallbackImage"
+                     class="h-6 w-6 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700" />
+                <span class="truncate">{{ visitorTeamDisplayName }}</span>
+              </h3>
+              <div class="space-y-3">
+                <div
+                  v-for="position in visitorPositions"
+                  :key="position.game_position_id"
+                  class="flex flex-col min-h-[112px] rounded-xl border p-4 transition"
+                  :class="getPositionClasses(position)"
                 >
-                  Liberar posição
-                </button>
-              </div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">{{ position.game_position_name }}</span>
+                    <span class="text-xs font-semibold text-orange-600 dark:text-orange-400">{{ formatCurrency(position.value) }}</span>
+                  </div>
 
-              <!-- State: Occupied -->
-              <div v-else>
-                <p class="text-xs text-gray-600 dark:text-gray-400">
-                  {{ position.player_name }}
-                  <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
-                </p>
+                  <div v-if="getPositionState(position) === 'available'" class="flex flex-1 flex-col justify-between">
+                    <p class="text-xs text-green-700 dark:text-green-400 font-medium mb-2">Disponível</p>
+                    <button
+                      v-if="canChooseOn(position) && !currentAssignment && playerHasRequiredTag"
+                      @click="handleChoose(position)"
+                      class="mt-auto w-full rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
+                    >
+                      Escolher
+                    </button>
+                    <p v-else-if="canChooseOn(position) && !playerHasRequiredTag" class="mt-auto text-xs text-amber-600 dark:text-amber-400 italic">Tag necessária ausente</p>
+                  </div>
+
+                  <div v-else-if="getPositionState(position) === 'mine'" class="flex flex-1 flex-col justify-between">
+                    <p class="text-xs text-orange-700 dark:text-orange-300 font-semibold mb-2">✓ Sua posição</p>
+                    <button
+                      @click="handleRelease(position)"
+                      class="mt-auto w-full rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                    >
+                      Liberar posição
+                    </button>
+                  </div>
+
+                  <div v-else class="flex flex-1 items-end">
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                      {{ position.player_name }}
+                      <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
+                    </p>
+                  </div>
+                </div>
+                <div v-if="visitorPositions.length === 0" class="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 py-6 px-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                  <template v-if="!hasEnemyTeam">
+                    Adversário externo — sem jogadores cadastrados no sistema.
+                  </template>
+                  <template v-else>
+                    Nenhuma posição
+                  </template>
+                </div>
               </div>
             </div>
           </div>
@@ -309,6 +368,7 @@ export default {
       matchTagName: null,
       statusLoading: false,
       isMember: true,
+      currentTeamId: null,
     }
   },
   computed: {
@@ -336,6 +396,31 @@ export default {
     },
     hasPlayersAssigned() {
       return this.positionsData.some(p => p.team_player_id != null)
+    },
+    homeTeamId() {
+      return this.matchInfo.created_by_team_id ?? this.matchInfo.my_team_id ?? null
+    },
+    enemyTeamId() {
+      return this.matchInfo.enemy_team_id ?? null
+    },
+    hasEnemyTeam() {
+      return !!this.enemyTeamId
+    },
+    homePositions() {
+      if (!this.positionsData || this.positionsData.length === 0) return []
+      // Split by the real team_id when available; otherwise everything is the
+      // creator team's side.
+      if (this.homeTeamId != null && this.positionsData.some(p => p.team_id != null)) {
+        return this.positionsData.filter(p => p.team_id === this.homeTeamId)
+      }
+      return this.positionsData
+    },
+    visitorPositions() {
+      if (!this.positionsData || this.positionsData.length === 0) return []
+      if (this.enemyTeamId != null) {
+        return this.positionsData.filter(p => p.team_id === this.enemyTeamId)
+      }
+      return []
     },
     isMatchOwner() {
       try {
@@ -413,6 +498,11 @@ export default {
       ) || null
     },
 
+    canChooseOn(position) {
+      // The user can only pick a position on the side of their own team.
+      return this.isMember && this.currentTeamId != null && position.team_id === this.currentTeamId
+    },
+
     getPositionState(position) {
       if (!position.team_player_id) return 'available'
       if (position.team_player_id === this.currentTeamPlayerId) return 'mine'
@@ -450,16 +540,22 @@ export default {
     },
 
     async handleChoose(position) {
-      // Guard: only team members can choose a position.
-      if (!this.isMember) {
+      // Guard: user can only pick a position on their own team's side.
+      if (!this.canChooseOn(position)) {
         await Swal.fire({
           toast: true,
           position: 'top-end',
           icon: 'warning',
-          title: 'Você não faz parte deste time',
+          title: 'Você só pode escolher posições do seu time',
           showConfirmButton: false,
           timer: 3000,
         })
+        return
+      }
+
+      // Paid positions go through the dedicated flow (wallet/Pix/boleto).
+      if (Number(position.value || 0) > 0) {
+        this.$router.push(`/matches/${this.matchId}/choose-position`)
         return
       }
 
@@ -476,7 +572,7 @@ export default {
 
       try {
         await api.post(`/matches/${this.matchId}/players/self-assign`, {
-          game_position_id: position.game_position_id,
+          match_position_id: position.id,
         })
 
         // Atualiza estado local
@@ -569,6 +665,7 @@ export default {
           let response = await api.get("/matches/show/" + this.matchId);
           this.matchInfo = response.data
           this.isMember = response.data.is_member ?? false
+          this.currentTeamId = response.data.current_team_id ?? null
 
           // Backend is the reliable source for the current team_player_id.
           if (response.data.current_team_player_id) {
