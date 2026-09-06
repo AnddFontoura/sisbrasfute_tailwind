@@ -42,8 +42,21 @@
           </div>
         </div>
 
+        <!-- Not a member banner -->
+        <div v-if="!isMember" class="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-700 dark:bg-red-900/20">
+          <span class="text-red-600 dark:text-red-400">🔒</span>
+          <div>
+            <p class="text-sm font-medium text-red-800 dark:text-red-300">
+              Você não faz parte deste time
+            </p>
+            <p class="text-xs text-red-600 dark:text-red-400 mt-0.5">
+              Apenas jogadores do time que criou a partida podem escolher uma posição.
+            </p>
+          </div>
+        </div>
+
         <!-- Wallet balance display -->
-        <div v-if="walletBalance !== null" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
+        <div v-if="isMember && walletBalance !== null" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
           <span class="text-sm text-gray-600 dark:text-gray-300">Saldo disponível: </span>
           <span class="text-sm font-bold text-orange-600 dark:text-orange-400">{{ formatCurrencyCents(walletBalance) }}</span>
         </div>
@@ -135,6 +148,12 @@
                       <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
                         ({{ position.player_nickname }})
                       </span>
+                      <span
+                        v-if="position.payment_status === 'pending'"
+                        class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
+                      >
+                        Aguardando pagamento
+                      </span>
                     </span>
 
                     <!-- Occupied by another player -->
@@ -153,7 +172,7 @@
                 <!-- Action buttons -->
                 <div class="flex-shrink-0">
                   <button
-                    v-if="getPositionState(position) === 'available'"
+                    v-if="getPositionState(position) === 'available' && isMember"
                     type="button"
                     @click="handleChoose(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
@@ -167,7 +186,7 @@
                     @click="handleRelease(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
                   >
-                    Liberar posição
+                    {{ position.payment_status === 'pending' ? 'Cancelar' : 'Liberar posição' }}
                   </button>
                 </div>
               </div>
@@ -216,6 +235,12 @@
                       <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
                         ({{ position.player_nickname }})
                       </span>
+                      <span
+                        v-if="position.payment_status === 'pending'"
+                        class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
+                      >
+                        Aguardando pagamento
+                      </span>
                     </span>
 
                     <!-- Occupied by another player -->
@@ -234,7 +259,7 @@
                 <!-- Action buttons -->
                 <div class="flex-shrink-0">
                   <button
-                    v-if="getPositionState(position) === 'available'"
+                    v-if="getPositionState(position) === 'available' && isMember"
                     type="button"
                     @click="handleChoose(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
@@ -248,7 +273,7 @@
                     @click="handleRelease(position)"
                     class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
                   >
-                    Liberar posição
+                    {{ position.payment_status === 'pending' ? 'Cancelar' : 'Liberar posição' }}
                   </button>
                 </div>
               </div>
@@ -261,6 +286,82 @@
         </div>
       </div>
     </main>
+
+    <!-- Payment charge modal (Pix / Boleto) -->
+    <div
+      v-if="paymentModal.open"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="closePaymentModal"
+    >
+      <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ paymentModal.method === 'boleto' ? 'Pague com Boleto' : 'Pague com Pix' }}
+          </h3>
+          <button
+            @click="closePaymentModal"
+            class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/10"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+          Sua posição está reservada como <strong>aguardando pagamento</strong> e será confirmada
+          automaticamente após a compensação.
+        </p>
+
+        <!-- Pix -->
+        <template v-if="paymentModal.method !== 'boleto'">
+          <div v-if="paymentModal.qrCodeBase64" class="mb-4 flex justify-center">
+            <img
+              :src="paymentQrCodeSrc"
+              alt="QR Code Pix"
+              class="h-52 w-52 rounded-lg border border-gray-200 dark:border-white/10"
+            />
+          </div>
+          <div v-if="paymentModal.copiaECola" class="space-y-2">
+            <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Pix copia e cola</label>
+            <textarea
+              readonly
+              :value="paymentModal.copiaECola"
+              rows="3"
+              class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-200"
+            ></textarea>
+            <button
+              @click="copyPaymentCode(paymentModal.copiaECola)"
+              class="w-full rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+            >
+              {{ paymentModal.copied ? 'Copiado!' : 'Copiar código Pix' }}
+            </button>
+          </div>
+        </template>
+
+        <!-- Boleto -->
+        <template v-else>
+          <p v-if="paymentModal.boletoDueDate" class="mb-2 text-xs text-gray-500 dark:text-gray-400">
+            Vencimento: {{ paymentModal.boletoDueDate }}
+          </p>
+          <div v-if="paymentModal.boletoLinhaDigitavel" class="space-y-2">
+            <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Linha digitável</label>
+            <textarea
+              readonly
+              :value="paymentModal.boletoLinhaDigitavel"
+              rows="2"
+              class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-200"
+            ></textarea>
+            <button
+              @click="copyPaymentCode(paymentModal.boletoLinhaDigitavel)"
+              class="w-full rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+            >
+              {{ paymentModal.copied ? 'Copiado!' : 'Copiar linha digitável' }}
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
 
     <!-- Lightbox -->
     <Transition name="fade">
@@ -299,9 +400,25 @@ export default {
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
       walletBalance: null,
       systemFee: 0,
+      isMember: true,
+      paymentModal: {
+        open: false,
+        method: 'pix',
+        copiaECola: '',
+        qrCodeBase64: '',
+        boletoLinhaDigitavel: '',
+        boletoDueDate: '',
+        copied: false,
+      },
     };
   },
   computed: {
+    paymentQrCodeSrc() {
+      if (!this.paymentModal.qrCodeBase64) return '';
+      return this.paymentModal.qrCodeBase64.startsWith('data:')
+        ? this.paymentModal.qrCodeBase64
+        : `data:image/png;base64,${this.paymentModal.qrCodeBase64}`;
+    },
     homeLogoUrl() {
       return this.matchInfo.my_team_info?.logo_url || this.fallbackImage;
     },
@@ -379,6 +496,13 @@ export default {
       try {
         const response = await api.get('/matches/show/' + this.matchId);
         this.matchInfo = response.data;
+        this.isMember = response.data.is_member ?? false;
+
+        // Backend is the reliable source for the current team_player_id.
+        if (response.data.current_team_player_id) {
+          this.currentTeamPlayerId = response.data.current_team_player_id;
+          this.findCurrentAssignment();
+        }
       } catch (err) {
         console.error(err);
       }
@@ -469,6 +593,19 @@ export default {
     },
 
     async handleChoose(position) {
+      // Guard: only team members can choose a position.
+      if (!this.isMember) {
+        await Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "warning",
+          title: "Você não faz parte deste time",
+          showConfirmButton: false,
+          timer: 3000,
+        });
+        return;
+      }
+
       // Check if player already has a position in this match
       if (this.currentAssignment) {
         await Swal.fire({
@@ -487,11 +624,18 @@ export default {
       const positionValueCents = positionValue * 100;
       const totalCostCents = positionValueCents + feeCents;
 
-      // Check if wallet balance is insufficient
-      if (this.walletBalance !== null && this.walletBalance < totalCostCents) {
+      // Free position: assign directly without choosing a method.
+      let method = 'wallet';
+      if (totalCostCents > 0) {
+        method = await this.choosePaymentMethod(position, positionValue, feeCents, totalCostCents);
+        if (!method) return;
+      }
+
+      // Wallet: verify balance before proceeding.
+      if (method === 'wallet' && this.walletBalance !== null && this.walletBalance < totalCostCents) {
         const insufficientResult = await Swal.fire({
           title: 'Saldo insuficiente',
-          text: `Seu saldo (${this.formatCurrencyCents(this.walletBalance)}) é insuficiente para esta posição. Deposite fundos na sua carteira.`,
+          text: `Seu saldo (${this.formatCurrencyCents(this.walletBalance)}) é insuficiente. Escolha Pix/Boleto ou deposite fundos.`,
           icon: 'warning',
           confirmButtonText: 'Ir para Carteira',
           showCancelButton: true,
@@ -504,33 +648,20 @@ export default {
         return;
       }
 
-      // Show detailed confirmation dialog with cost breakdown
-      const result = await Swal.fire({
-        title: 'Confirmar escolha',
-        html: `
-          <div class="text-left text-sm">
-            <p><strong>Posição:</strong> ${position.game_position_name}</p>
-            <p><strong>Valor:</strong> ${this.formatCurrency(positionValue)}</p>
-            ${feeCents > 0 ? `<p><strong>Taxa do sistema:</strong> ${this.formatCurrencyCents(feeCents)}</p>` : ''}
-            ${feeCents > 0 ? `<p class="font-bold mt-2"><strong>Total:</strong> ${this.formatCurrencyCents(totalCostCents)}</p>` : ''}
-            ${this.walletBalance !== null ? `<p class="mt-2 text-gray-500">Seu saldo: ${this.formatCurrencyCents(this.walletBalance)}</p>` : ''}
-          </div>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Confirmar pagamento',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#f97316',
-      });
+      const payload = {
+        game_position_id: position.game_position_id,
+        payment_method: method,
+      };
 
-      if (!result.isConfirmed) {
-        return;
+      // Boleto requires payer identification.
+      if (method === 'boleto') {
+        const payer = await this.promptPayerData();
+        if (!payer) return;
+        Object.assign(payload, payer);
       }
 
       try {
-        await api.post(`/matches/${this.matchId}/players/self-assign`, {
-          game_position_id: position.game_position_id,
-        });
+        const { data } = await api.post(`/matches/${this.matchId}/players/self-assign`, payload);
 
         // Update position locally with current user data
         const userJson = localStorage.getItem("user");
@@ -540,20 +671,34 @@ export default {
           position.player_nickname = user.nickname || null;
           position.team_player_id = user.team_player_id;
         }
+        position.payment_status = data.payment_status || 'paid';
+        position.payment_method = method;
 
         this.currentAssignment = position;
-
-        // Reload wallet balance after payment
         this.loadWalletBalance();
 
-        await Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-          title: "Posição escolhida com sucesso!",
-          showConfirmButton: false,
-          timer: 2000,
-        });
+        // Gateway charge (Pix/boleto): show payment instructions.
+        const charge = data.charge;
+        if (charge && (charge.pix_copia_e_cola || charge.pix_qrcode_base64 || charge.boleto_linha_digitavel)) {
+          this.paymentModal = {
+            open: true,
+            method: charge.method || method,
+            copiaECola: charge.pix_copia_e_cola || '',
+            qrCodeBase64: charge.pix_qrcode_base64 || '',
+            boletoLinhaDigitavel: charge.boleto_linha_digitavel || '',
+            boletoDueDate: charge.boleto_due_date || '',
+            copied: false,
+          };
+        } else {
+          await Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: "Posição escolhida com sucesso!",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
       } catch (err) {
         if (err.response?.status === 409) {
           await Swal.fire({
@@ -596,6 +741,86 @@ export default {
           });
         }
       }
+    },
+
+    async choosePaymentMethod(position, positionValue, feeCents, totalCostCents) {
+      const balanceLine = this.walletBalance !== null
+        ? `<p class="mt-2 text-gray-500 text-sm">Seu saldo: ${this.formatCurrencyCents(this.walletBalance)}</p>`
+        : '';
+
+      const result = await Swal.fire({
+        title: 'Forma de pagamento',
+        html: `
+          <div class="text-left text-sm mb-3">
+            <p><strong>Posição:</strong> ${position.game_position_name}</p>
+            <p><strong>Valor:</strong> ${this.formatCurrency(positionValue)}</p>
+            ${feeCents > 0 ? `<p><strong>Taxa do sistema:</strong> ${this.formatCurrencyCents(feeCents)}</p>` : ''}
+            ${feeCents > 0 ? `<p class="font-bold mt-1"><strong>Total:</strong> ${this.formatCurrencyCents(totalCostCents)}</p>` : ''}
+            ${balanceLine}
+          </div>
+        `,
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Carteira',
+        denyButtonText: 'Pix',
+        cancelButtonText: 'Boleto',
+        confirmButtonColor: '#f97316',
+        denyButtonColor: '#16a34a',
+        cancelButtonColor: '#3b82f6',
+      });
+
+      if (result.isConfirmed) return 'wallet';
+      if (result.isDenied) return 'pix';
+      if (result.dismiss === Swal.DismissReason.cancel) return 'boleto';
+      return null;
+    },
+
+    async promptPayerData() {
+      const { value: formValues } = await Swal.fire({
+        title: 'Dados para o boleto',
+        html: `
+          <input id="swal-payer-name" class="swal2-input" placeholder="Nome completo">
+          <input id="swal-payer-document" class="swal2-input" placeholder="CPF ou CNPJ">
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Gerar boleto',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f97316',
+        preConfirm: () => {
+          const name = document.getElementById('swal-payer-name').value.trim();
+          const doc = document.getElementById('swal-payer-document').value.replace(/\D/g, '');
+          if (!name || !doc) {
+            Swal.showValidationMessage('Informe nome e CPF/CNPJ');
+            return false;
+          }
+          return { payer_name: name, payer_document: doc };
+        },
+      });
+
+      return formValues || null;
+    },
+
+    async copyPaymentCode(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.paymentModal.copied = true;
+        setTimeout(() => { this.paymentModal.copied = false; }, 2000);
+      } catch {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Não foi possível copiar',
+          showConfirmButton: false,
+          timer: 3000,
+        });
+      }
+    },
+
+    closePaymentModal() {
+      this.paymentModal.open = false;
+      this.loadPositions();
     },
 
     async handleRelease(position) {

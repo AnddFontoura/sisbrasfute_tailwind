@@ -164,37 +164,47 @@
 
       <!-- Performance Stats -->
       <div v-if="performance.length" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Desempenho</h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Desempenho</h2>
 
-        <div class="space-y-6">
-          <div v-for="stats in performance" :key="stats.year">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white mb-3">{{ stats.year }}</h3>
+          <select
+            v-model="selectedYear"
+            class="w-full sm:w-40 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+          >
+            <option value="all">Todos os anos</option>
+            <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+          </select>
+        </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-3 text-center">
-                <p class="text-2xl font-black text-gray-900 dark:text-white">{{ stats.matches }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Partidas</p>
-              </div>
-              <div class="rounded-lg bg-green-50 dark:bg-green-900/20 p-3 text-center">
-                <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ stats.wins }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Vitórias</p>
-              </div>
-              <div class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-3 text-center">
-                <p class="text-2xl font-black text-yellow-600 dark:text-yellow-400">{{ stats.draws }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Empates</p>
-              </div>
-              <div class="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-center">
-                <p class="text-2xl font-black text-red-600 dark:text-red-400">{{ stats.losses }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Derrotas</p>
-              </div>
-              <div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-center">
-                <p class="text-2xl font-black text-blue-600 dark:text-blue-400">{{ stats.goals_scored }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Gols feitos</p>
-              </div>
-              <div class="rounded-lg bg-orange-50 dark:bg-orange-900/20 p-3 text-center">
-                <p class="text-2xl font-black text-orange-600 dark:text-orange-400">{{ stats.goals_conceded }}</p>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Gols sofridos</p>
-              </div>
+        <div>
+          <h3 class="text-lg font-black text-gray-900 dark:text-white mb-3">
+            {{ selectedYear === 'all' ? 'Todos os anos' : selectedYear }}
+          </h3>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-3 text-center">
+              <p class="text-2xl font-black text-gray-900 dark:text-white">{{ displayedStats.matches }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Partidas</p>
+            </div>
+            <div class="rounded-lg bg-green-50 dark:bg-green-900/20 p-3 text-center">
+              <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ displayedStats.wins }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Vitórias</p>
+            </div>
+            <div class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-3 text-center">
+              <p class="text-2xl font-black text-yellow-600 dark:text-yellow-400">{{ displayedStats.draws }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Empates</p>
+            </div>
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-center">
+              <p class="text-2xl font-black text-red-600 dark:text-red-400">{{ displayedStats.losses }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Derrotas</p>
+            </div>
+            <div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-center">
+              <p class="text-2xl font-black text-blue-600 dark:text-blue-400">{{ displayedStats.goals_scored }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Gols feitos</p>
+            </div>
+            <div class="rounded-lg bg-orange-50 dark:bg-orange-900/20 p-3 text-center">
+              <p class="text-2xl font-black text-orange-600 dark:text-orange-400">{{ displayedStats.goals_conceded }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Gols sofridos</p>
             </div>
           </div>
         </div>
@@ -309,6 +319,7 @@ export default {
       teamId: 0,
       team: {},
       performance: [],
+      selectedYear: 'all',
       recruitGamePositionId: 0,
       showInterestModal: false,
       loading: false,
@@ -331,7 +342,38 @@ export default {
   beforeUnmount() {
     document.removeEventListener('keydown', this._escHandler);
   },
+  computed: {
+    availableYears() {
+      return this.performance.map(stats => stats.year)
+    },
+    displayedStats() {
+      if (this.selectedYear !== 'all') {
+        return this.performance.find(stats => stats.year === this.selectedYear) || this.emptyStats()
+      }
+
+      // "Todos": sum every year into a single total.
+      return this.performance.reduce((total, stats) => {
+        total.matches += stats.matches
+        total.wins += stats.wins
+        total.draws += stats.draws
+        total.losses += stats.losses
+        total.goals_scored += stats.goals_scored
+        total.goals_conceded += stats.goals_conceded
+        return total
+      }, this.emptyStats())
+    },
+  },
   methods: {
+    emptyStats() {
+      return {
+        matches: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        goals_scored: 0,
+        goals_conceded: 0,
+      }
+    },
     openLightbox() {
       if (!this.team?.logo_url) return;
       this.isLightboxOpen = true;

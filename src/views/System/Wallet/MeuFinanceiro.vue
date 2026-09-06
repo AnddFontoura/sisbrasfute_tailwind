@@ -19,7 +19,7 @@
             </div>
 
             <!-- Deposit Section -->
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
               <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">R$</span>
                 <input
@@ -30,6 +30,13 @@
                   class="w-32 rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
                 />
               </div>
+              <select
+                v-model="depositMethod"
+                class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+              >
+                <option value="pix">Pix</option>
+                <option value="boleto">Boleto</option>
+              </select>
               <button
                 @click="handleDeposit"
                 :disabled="depositing || !depositAmount"
@@ -138,6 +145,106 @@
           </div>
         </div>
       </div>
+
+      <!-- Pix Payment Modal -->
+      <div
+        v-if="pixModal.open"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        @click.self="closePixModal"
+      >
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+              {{ pixModal.method === 'boleto' ? 'Pague com Boleto' : 'Pague com Pix' }}
+            </h3>
+            <button
+              @click="closePixModal"
+              class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/10"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Pix -->
+          <template v-if="pixModal.method !== 'boleto'">
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+              Escaneie o QR Code no app do seu banco ou copie o código Pix abaixo. O saldo é
+              creditado automaticamente após a confirmação do pagamento.
+            </p>
+
+            <div
+              v-if="pixModal.qrCodeBase64"
+              class="mb-4 flex justify-center"
+            >
+              <img
+                :src="pixQrCodeSrc"
+                alt="QR Code Pix"
+                class="h-52 w-52 rounded-lg border border-gray-200 dark:border-white/10"
+              />
+            </div>
+
+            <div v-if="pixModal.copiaECola" class="space-y-2">
+              <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Pix copia e cola
+              </label>
+              <textarea
+                readonly
+                :value="pixModal.copiaECola"
+                rows="3"
+                class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-200"
+              ></textarea>
+              <button
+                @click="copyPixCode"
+                class="w-full rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
+              >
+                {{ pixModal.copied ? 'Copiado!' : 'Copiar código Pix' }}
+              </button>
+            </div>
+          </template>
+
+          <!-- Boleto -->
+          <template v-else>
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+              Copie a linha digitável abaixo e pague no app do seu banco. O saldo é creditado
+              automaticamente após a compensação do boleto.
+            </p>
+
+            <p v-if="pixModal.boletoDueDate" class="mb-2 text-xs text-gray-500 dark:text-gray-400">
+              Vencimento: {{ formatDate(pixModal.boletoDueDate) }}
+            </p>
+
+            <div v-if="pixModal.boletoLinhaDigitavel" class="space-y-2">
+              <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Linha digitável
+              </label>
+              <textarea
+                readonly
+                :value="pixModal.boletoLinhaDigitavel"
+                rows="2"
+                class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-200"
+              ></textarea>
+              <button
+                @click="copyBoletoCode"
+                class="w-full rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
+              >
+                {{ pixModal.copied ? 'Copiado!' : 'Copiar linha digitável' }}
+              </button>
+            </div>
+
+            <a
+              v-if="pixModal.boletoPdfUrl"
+              :href="pixModal.boletoPdfUrl"
+              target="_blank"
+              rel="noopener"
+              class="mt-2 block w-full rounded-lg border border-orange-500 px-4 py-2 text-center text-sm font-semibold text-orange-600 transition hover:bg-orange-50 dark:hover:bg-orange-500/10"
+            >
+              Baixar boleto (PDF)
+            </a>
+          </template>
+        </div>
+      </div>
     </main>
   </system-layout>
 </template>
@@ -158,6 +265,7 @@ export default {
     return {
       balanceCents: 0,
       depositAmount: '',
+      depositMethod: 'pix',
       depositing: false,
       loadingTransactions: false,
       typeFilter: '',
@@ -166,7 +274,26 @@ export default {
         current_page: 1,
         last_page: 1,
       },
+      pixModal: {
+        open: false,
+        method: 'pix',
+        copiaECola: '',
+        qrCodeBase64: '',
+        boletoLinhaDigitavel: '',
+        boletoPdfUrl: '',
+        boletoDueDate: '',
+        copied: false,
+      },
     }
+  },
+  computed: {
+    pixQrCodeSrc() {
+      if (!this.pixModal.qrCodeBase64) return ''
+      // Backend may return the raw base64 or a full data URI.
+      return this.pixModal.qrCodeBase64.startsWith('data:')
+        ? this.pixModal.qrCodeBase64
+        : `data:image/png;base64,${this.pixModal.qrCodeBase64}`
+    },
   },
   async mounted() {
     this.handleGatewayReturn()
@@ -229,13 +356,37 @@ export default {
         return
       }
 
+      const payload = { amount_cents: amountCents, payment_method: this.depositMethod }
+
+      // Boleto requires payer identification.
+      if (this.depositMethod === 'boleto') {
+        const payer = await this.promptPayerData()
+        if (!payer) return
+        Object.assign(payload, payer)
+      }
+
       this.depositing = true
       try {
-        const { data } = await api.post('/wallet/deposit', {
-          amount_cents: amountCents,
-        })
+        const { data } = await api.post('/wallet/deposit', payload)
 
-        if (data.payment_url) {
+        if (
+          data.pix_copia_e_cola ||
+          data.pix_qrcode_base64 ||
+          data.boleto_linha_digitavel
+        ) {
+          // Inter gateway: show Pix QR / copia e cola or boleto digitable line.
+          this.pixModal = {
+            open: true,
+            method: data.payment_method || this.depositMethod,
+            copiaECola: data.pix_copia_e_cola || '',
+            qrCodeBase64: data.pix_qrcode_base64 || '',
+            boletoLinhaDigitavel: data.boleto_linha_digitavel || '',
+            boletoPdfUrl: data.boleto_pdf_url || '',
+            boletoDueDate: data.boleto_due_date || '',
+            copied: false,
+          }
+          this.depositAmount = ''
+        } else if (data.payment_url) {
           window.location.href = data.payment_url
         } else {
           await Swal.fire({
@@ -263,6 +414,66 @@ export default {
       } finally {
         this.depositing = false
       }
+    },
+
+    async promptPayerData() {
+      const { value: formValues } = await Swal.fire({
+        title: 'Dados para o boleto',
+        html: `
+          <input id="swal-payer-name" class="swal2-input" placeholder="Nome completo">
+          <input id="swal-payer-document" class="swal2-input" placeholder="CPF ou CNPJ">
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Gerar boleto',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f97316',
+        preConfirm: () => {
+          const name = document.getElementById('swal-payer-name').value.trim()
+          const doc = document.getElementById('swal-payer-document').value.replace(/\D/g, '')
+          if (!name || !doc) {
+            Swal.showValidationMessage('Informe nome e CPF/CNPJ')
+            return false
+          }
+          return { payer_name: name, payer_document: doc }
+        },
+      })
+
+      return formValues || null
+    },
+
+    async copyPixCode() {
+      await this.copyToClipboard(this.pixModal.copiaECola)
+    },
+
+    async copyBoletoCode() {
+      await this.copyToClipboard(this.pixModal.boletoLinhaDigitavel)
+    },
+
+    async copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text)
+        this.pixModal.copied = true
+        setTimeout(() => {
+          this.pixModal.copied = false
+        }, 2000)
+      } catch {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Não foi possível copiar o código',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      }
+    },
+
+    closePixModal() {
+      this.pixModal.open = false
+      // Refresh so a completed payment (via webhook) reflects in the balance.
+      this.fetchBalance()
+      this.fetchTransactions()
     },
 
     handleGatewayReturn() {

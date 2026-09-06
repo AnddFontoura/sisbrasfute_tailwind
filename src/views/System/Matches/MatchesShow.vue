@@ -156,12 +156,15 @@
               <div v-if="getPositionState(position) === 'available'">
                 <p class="text-xs text-green-700 dark:text-green-400 font-medium mb-2">Disponível</p>
                 <button
-                  v-if="!currentAssignment && playerHasRequiredTag"
+                  v-if="isMember && !currentAssignment && playerHasRequiredTag"
                   @click="handleChoose(position)"
                   class="w-full rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
                 >
                   Escolher
                 </button>
+                <p v-else-if="!isMember" class="text-xs text-red-600 dark:text-red-400 italic">
+                  Apenas jogadores do time
+                </p>
                 <p v-else-if="!playerHasRequiredTag" class="text-xs text-amber-600 dark:text-amber-400 italic">
                   Tag necessária ausente
                 </p>
@@ -305,6 +308,7 @@ export default {
       playerHasRequiredTag: true,
       matchTagName: null,
       statusLoading: false,
+      isMember: true,
     }
   },
   computed: {
@@ -446,6 +450,19 @@ export default {
     },
 
     async handleChoose(position) {
+      // Guard: only team members can choose a position.
+      if (!this.isMember) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'warning',
+          title: 'Você não faz parte deste time',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return
+      }
+
       const result = await Swal.fire({
         title: 'Confirmar escolha',
         text: `Deseja se atribuir à posição "${position.game_position_name}"?`,
@@ -551,6 +568,12 @@ export default {
         try {
           let response = await api.get("/matches/show/" + this.matchId);
           this.matchInfo = response.data
+          this.isMember = response.data.is_member ?? false
+
+          // Backend is the reliable source for the current team_player_id.
+          if (response.data.current_team_player_id) {
+            this.currentTeamPlayerId = response.data.current_team_player_id
+          }
 
           // Carrega posições detalhadas se a partida tem posições configuradas
           if (this.matchInfo.positions && this.matchInfo.positions.length > 0) {
