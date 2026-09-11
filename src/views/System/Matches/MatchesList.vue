@@ -118,7 +118,7 @@
               : isPastMatch(match) && openDropdownId === match.id
                 ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/60'
                 : 'border-gray-200 bg-white hover:border-orange-500/40 dark:border-white/10 dark:bg-gray-800',
-            openDropdownId === match.id ? 'z-50 relative overflow-visible' : ''
+            openDropdownId === match.id ? 'relative z-[90] overflow-visible' : 'relative z-0'
           ]"
         >
           <!-- Header escuro -->
