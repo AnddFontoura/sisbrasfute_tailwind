@@ -1,5 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useSeo } from '@/composables/useSeo'
+
+onMounted(() => {
+  useSeo({
+    title: 'Organize seu futebol: times, partidas e jogadores',
+    description:
+      'Plataforma para futebol amador e competitivo: monte times, encontre partidas na sua cidade, recrute jogadores e organize campeonatos. Cadastre-se grátis.',
+    path: '/',
+  })
+})
 
 const mobileMenuOpen = ref(false)
 

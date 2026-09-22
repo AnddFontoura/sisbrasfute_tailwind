@@ -604,6 +604,7 @@ export default {
           children: [
             { name: "Listar Times", href: "/team/list" },
             { name: "Meus Times", href: "/team/my-teams" },
+            { name: "Minhas Camisas", href: "/my-uniform-numbers" },
             { name: "Criar Times", href: "/team/form" },
           ],
         },

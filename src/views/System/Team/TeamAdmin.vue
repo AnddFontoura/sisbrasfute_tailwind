@@ -146,6 +146,16 @@
             </svg>
             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Escalações</span>
           </router-link>
+
+          <router-link
+            :to="{ name: 'team-uniforms', params: { teamId: teamId } }"
+            class="flex flex-col items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
+          >
+            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 4.5 4 6.5V10l2.5-1v9.5h11V9L20 10V6.5L16.5 4.5 14 6a2 2 0 0 1-4 0L7.5 4.5Z" />
+            </svg>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Camisas</span>
+          </router-link>
         </div>
       </div>
 

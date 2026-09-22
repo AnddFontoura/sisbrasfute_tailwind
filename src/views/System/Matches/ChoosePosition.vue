@@ -55,6 +55,21 @@
           </div>
         </div>
 
+        <!-- Uniforme da partida -->
+        <div v-if="matchInfo.uniform" class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-gray-50 dark:bg-gray-700/50">
+          <img
+            v-if="uniformPhoto"
+            :src="uniformPhoto"
+            alt=""
+            class="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-white/10 cursor-pointer transition hover:ring-2 hover:ring-orange-400"
+            @click="openLightbox(uniformPhoto)"
+          />
+          <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Uniforme da partida</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ matchInfo.uniform.name }}</p>
+          </div>
+        </div>
+
         <!-- Wallet balance display -->
         <div v-if="isMember && walletBalance !== null" class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
           <span class="text-sm text-gray-600 dark:text-gray-300">Saldo disponível: </span>
@@ -144,6 +159,7 @@
                       v-else-if="getPositionState(position) === 'mine'"
                       class="text-sm font-semibold text-orange-700 dark:text-orange-300"
                     >
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-orange-200 dark:bg-orange-500/30 px-1.5 text-xs font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
                         ({{ position.player_nickname }})
@@ -161,6 +177,7 @@
                       v-else
                       class="text-sm text-gray-700 dark:text-gray-300"
                     >
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 text-xs font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
                         ({{ position.player_nickname }})
@@ -231,6 +248,7 @@
                       v-else-if="getPositionState(position) === 'mine'"
                       class="text-sm font-semibold text-orange-700 dark:text-orange-300"
                     >
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-orange-200 dark:bg-orange-500/30 px-1.5 text-xs font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
                         ({{ position.player_nickname }})
@@ -248,6 +266,7 @@
                       v-else
                       class="text-sm text-gray-700 dark:text-gray-300"
                     >
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 text-xs font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
                         ({{ position.player_nickname }})
@@ -380,6 +399,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import Swal from "@/services/swal.js";
+import { resolveStorageUrl } from "@/services/storage.js";
 
 export default {
   name: "ChoosePosition",
@@ -402,6 +422,7 @@ export default {
       systemFee: 0,
       isMember: true,
       currentTeamId: null,
+      myUniformNumbers: [],
       paymentModal: {
         open: false,
         method: 'pix',
@@ -419,6 +440,11 @@ export default {
       return this.paymentModal.qrCodeBase64.startsWith('data:')
         ? this.paymentModal.qrCodeBase64
         : `data:image/png;base64,${this.paymentModal.qrCodeBase64}`;
+    },
+    uniformPhoto() {
+      const u = this.matchInfo.uniform;
+      if (!u) return null;
+      return resolveStorageUrl(u.photo) || u.photo_url || null;
     },
     homeLogoUrl() {
       return this.matchInfo.my_team_info?.logo_url || this.fallbackImage;
@@ -502,9 +528,58 @@ export default {
           this.currentTeamPlayerId = response.data.current_team_player_id;
           this.findCurrentAssignment();
         }
+
+        // Load the player's numbers for the match uniform (if any).
+        await this.loadMyUniformNumbers();
       } catch (err) {
         console.error(err);
       }
+    },
+
+    async loadMyUniformNumbers() {
+      this.myUniformNumbers = [];
+      const uniformId = this.matchInfo.uniform_id;
+      if (!uniformId || !this.currentTeamId) return;
+
+      try {
+        const response = await api.get(`/team/${this.currentTeamId}/my-uniform-numbers`);
+        const uniform = (response.data || []).find(u => u.id === uniformId);
+        this.myUniformNumbers = uniform?.my_numbers ?? [];
+      } catch (err) {
+        console.error('Erro ao carregar números do uniforme:', err);
+      }
+    },
+
+    async promptUniformNumber() {
+      // No uniform on the match → no number.
+      if (!this.matchInfo.uniform_id) return { ok: true, number: null };
+
+      const numbers = this.myUniformNumbers;
+
+      if (numbers.length === 0) {
+        // Player has no number for this uniform; proceed without one.
+        return { ok: true, number: null };
+      }
+
+      if (numbers.length === 1) {
+        return { ok: true, number: numbers[0] };
+      }
+
+      const options = numbers.reduce((acc, n) => { acc[n] = n; return acc; }, {});
+      const result = await Swal.fire({
+        title: 'Escolha seu número',
+        input: 'select',
+        inputOptions: options,
+        inputPlaceholder: 'Selecione o número',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f97316',
+        inputValidator: (value) => (value ? undefined : 'Selecione um número'),
+      });
+
+      if (!result.isConfirmed) return { ok: false, number: null };
+      return { ok: true, number: Number(result.value) };
     },
 
     openLightbox(imageUrl) {
@@ -652,10 +727,17 @@ export default {
         return;
       }
 
+      // Choose the shirt number (when the match has a uniform).
+      const numberChoice = await this.promptUniformNumber();
+      if (!numberChoice.ok) return;
+
       const payload = {
         match_position_id: position.id,
         payment_method: method,
       };
+      if (numberChoice.number != null) {
+        payload.number = numberChoice.number;
+      }
 
       // Boleto requires payer identification.
       if (method === 'boleto') {
@@ -677,6 +759,7 @@ export default {
         }
         position.payment_status = data.payment_status || 'paid';
         position.payment_method = method;
+        position.number = numberChoice.number ?? null;
 
         this.currentAssignment = position;
         this.loadWalletBalance();

@@ -163,7 +163,7 @@
       </div>
 
       <!-- Performance Stats -->
-      <div v-if="performance.length" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div v-if="showPerformanceSection" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Desempenho</h2>
 
@@ -176,7 +176,28 @@
           </select>
         </div>
 
-        <div>
+        <!-- Match type filter (multi-select) -->
+        <div class="mb-4 flex flex-wrap gap-2">
+          <button
+            v-for="opt in matchTypeOptions"
+            :key="opt.id"
+            type="button"
+            @click="toggleMatchType(opt.id)"
+            class="rounded-full border px-3 py-1 text-xs font-medium transition"
+            :class="selectedMatchTypes.includes(opt.id)
+              ? 'border-orange-500 bg-orange-500 text-white'
+              : 'border-gray-300 bg-white text-gray-600 hover:border-orange-400 dark:border-white/10 dark:bg-white/5 dark:text-gray-300'"
+          >
+            {{ opt.name }}
+          </button>
+        </div>
+
+        <!-- Empty state when the filter yields no results -->
+        <div v-if="performance.length === 0" class="rounded-lg border border-dashed border-gray-200 dark:border-gray-700 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+          Nenhuma partida encontrada para o filtro selecionado.
+        </div>
+
+        <div v-else>
           <h3 class="text-lg font-black text-gray-900 dark:text-white mb-3">
             {{ selectedYear === 'all' ? 'Todos os anos' : selectedYear }}
           </h3>
@@ -320,6 +341,12 @@ export default {
       team: {},
       performance: [],
       selectedYear: 'all',
+      selectedMatchTypes: [],
+      matchTypeOptions: [
+        { id: 0, name: 'Partida entre o time' },
+        { id: 1, name: 'Amistoso' },
+        { id: 2, name: 'Campeonato' },
+      ],
       recruitGamePositionId: 0,
       showInterestModal: false,
       loading: false,
@@ -345,6 +372,11 @@ export default {
   computed: {
     availableYears() {
       return this.performance.map(stats => stats.year)
+    },
+    showPerformanceSection() {
+      // Keep the section (and its filter) visible when a filter is active,
+      // even if the current filter returns no matches.
+      return this.performance.length > 0 || this.selectedMatchTypes.length > 0
     },
     displayedStats() {
       if (this.selectedYear !== 'all') {
@@ -410,11 +442,29 @@ export default {
     },
     async loadPerformance() {
       try {
-        const response = await api.get(`/team/${this.teamId}/performance`)
+        const params = {}
+        if (this.selectedMatchTypes.length > 0) {
+          params.match_types = this.selectedMatchTypes
+        }
+        const response = await api.get(`/team/${this.teamId}/performance`, { params })
         this.performance = response.data || []
+        // Keep the year selector valid if the selected year disappeared.
+        if (this.selectedYear !== 'all' && !this.performance.some(s => s.year === this.selectedYear)) {
+          this.selectedYear = 'all'
+        }
       } catch (err) {
         console.error('Erro ao carregar desempenho:', err)
       }
+    },
+
+    toggleMatchType(typeId) {
+      const idx = this.selectedMatchTypes.indexOf(typeId)
+      if (idx === -1) {
+        this.selectedMatchTypes.push(typeId)
+      } else {
+        this.selectedMatchTypes.splice(idx, 1)
+      }
+      this.loadPerformance()
     },
     async loadTeamPlayer() {
       const authStore = useAuthStore()

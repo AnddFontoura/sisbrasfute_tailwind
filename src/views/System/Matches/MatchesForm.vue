@@ -186,6 +186,23 @@
               />
             </div>
 
+            <!-- Uniforme da partida -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Uniforme da partida (opcional)</label>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ao escolher uma camisa, os jogadores que possuem números dela poderão selecioná-los ao ocupar uma posição.</p>
+              <Multiselect
+                v-model="form.uniformId"
+                :options="availableUniforms"
+                track-by="name"
+                label="name"
+                value-prop="id"
+                :searchable="true"
+                :can-clear="true"
+                placeholder="Sem uniforme definido"
+                class="mt-2"
+              />
+            </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Indicar posições de jogadores?</label>
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ative essa opção para configurar quais posições estarão disponíveis na partida.</p>
@@ -434,10 +451,12 @@ export default {
         teamsCount: 1,
         matchType: null,
         tagIds: [],
+        uniformId: null,
         positions: [],
       },
       gamePositions: [],
       availableTags: [],
+      availableUniforms: [],
       presets: [],
       selectedPresetId: null,
       showSavePresetModal: false,
@@ -474,6 +493,7 @@ export default {
 
     await this.loadGamePositions()
     await this.loadAvailableTags()
+    await this.loadAvailableUniforms()
     await this.loadPresets()
 
     if (this.isEditing) {
@@ -497,6 +517,7 @@ export default {
     'form.teamId'(newVal, oldVal) {
       if (newVal && newVal !== oldVal) {
         this.loadAvailableTags()
+        this.loadAvailableUniforms()
         this.loadPresets()
         this.loadGamePositions()
       }
@@ -533,6 +554,15 @@ export default {
         this.availableTags = response.data ?? []
       } catch (err) {
         console.error("Erro ao carregar tags:", err)
+      }
+    },
+    async loadAvailableUniforms() {
+      if (!this.form.teamId) return
+      try {
+        const response = await api.get(`/team/${this.form.teamId}/uniforms`)
+        this.availableUniforms = response.data ?? []
+      } catch (err) {
+        console.error("Erro ao carregar camisas:", err)
       }
     },
     async loadPresets() {
@@ -639,6 +669,7 @@ export default {
         this.form.teamsCount = data.teams_count ?? 1
         this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
         this.form.tagIds = data.tag_id ? [data.tag_id] : (data.tag_ids ?? [])
+        this.form.uniformId = data.uniform_id ?? null
         this.stateId = data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
 
@@ -685,6 +716,7 @@ export default {
         this.form.matchLocation = data.location ?? null
         this.form.matchType = this.mapMatchTypeFromBackend(data.match_type)
         this.form.tagIds = data.tag_id ? [data.tag_id] : (data.tag_ids ?? [])
+        this.form.uniformId = data.uniform_id ?? null
         this.stateId = data.city_info?.state_id ?? null
         this.cityId = data.city_id ?? null
         this.form.teamsCount = data.teams_count ?? 1

@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /$
+Allow: /login
+Allow: /register
+
+# Internal app areas require login and should not be indexed.
+Disallow: /dashboard
+Disallow: /configuration
+Disallow: /team/
+Disallow: /teams/
+Disallow: /matches/
+Disallow: /player-profile/
+Disallow: /wallet
+Disallow: /financeiro
+Disallow: /notifications
+Disallow: /admin/
+Disallow: /friendly/
+Disallow: /my-uniform-numbers
+
+Sitemap: https://www.sbfa.com.br/sitemap.xml

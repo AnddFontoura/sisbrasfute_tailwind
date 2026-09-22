@@ -78,6 +78,18 @@ export default [
     meta: { requiresAuth: true }
   },
   {
+    path: '/team/:teamId/uniforms',
+    name: 'team-uniforms',
+    component: () => import('../views/System/Team/TeamUniforms.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/my-uniform-numbers',
+    name: 'my-uniform-numbers',
+    component: () => import('../views/System/Team/MyUniformNumbers.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/teams/:id/admin',
     name: 'team-admin',
     component: () => import('../views/System/Team/TeamAdmin.vue'),

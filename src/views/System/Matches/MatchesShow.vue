@@ -103,6 +103,21 @@
             <span>⚽</span> Vagas Disponíveis
           </h2>
 
+          <!-- Uniforme da partida -->
+          <div v-if="matchInfo.uniform" class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-gray-50 dark:bg-gray-700/50">
+            <img
+              v-if="uniformPhoto"
+              :src="uniformPhoto"
+              alt=""
+              class="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-white/10 cursor-pointer transition hover:ring-2 hover:ring-orange-400"
+              @click="openLightbox(uniformPhoto)"
+            />
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Uniforme da partida</p>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ matchInfo.uniform.name }}</p>
+            </div>
+          </div>
+
           <!-- Tag info banner -->
           <div v-if="matchTagName" class="mb-4 rounded-lg px-4 py-3 text-sm"
             :class="playerHasRequiredTag
@@ -179,6 +194,7 @@
 
                   <div v-else class="flex flex-1 items-end">
                     <p class="text-xs text-gray-600 dark:text-gray-400">
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
                     </p>
@@ -233,6 +249,7 @@
 
                   <div v-else class="flex flex-1 items-end">
                     <p class="text-xs text-gray-600 dark:text-gray-400">
+                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 font-bold">#{{ position.number }}</span>
                       {{ position.player_name }}
                       <span v-if="position.player_nickname" class="text-gray-400">({{ position.player_nickname }})</span>
                     </p>
@@ -344,6 +361,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import Swal from "@/services/swal.js";
+import { resolveStorageUrl } from "@/services/storage.js";
 
 export default {
   name: "MatchesShow",
@@ -369,6 +387,7 @@ export default {
       statusLoading: false,
       isMember: true,
       currentTeamId: null,
+      myUniformNumbers: [],
     }
   },
   computed: {
@@ -405,6 +424,11 @@ export default {
     },
     hasEnemyTeam() {
       return !!this.enemyTeamId
+    },
+    uniformPhoto() {
+      const u = this.matchInfo.uniform
+      if (!u) return null
+      return resolveStorageUrl(u.photo) || u.photo_url || null
     },
     homePositions() {
       if (!this.positionsData || this.positionsData.length === 0) return []
@@ -539,6 +563,41 @@ export default {
       }
     },
 
+    async loadMyUniformNumbers() {
+      this.myUniformNumbers = []
+      const uniformId = this.matchInfo.uniform_id
+      if (!uniformId || !this.currentTeamId) return
+      try {
+        const response = await api.get(`/team/${this.currentTeamId}/my-uniform-numbers`)
+        const uniform = (response.data || []).find(u => u.id === uniformId)
+        this.myUniformNumbers = uniform?.my_numbers ?? []
+      } catch (err) {
+        console.error('Erro ao carregar números do uniforme:', err)
+      }
+    },
+
+    async promptUniformNumber() {
+      if (!this.matchInfo.uniform_id) return { ok: true, number: null }
+      const numbers = this.myUniformNumbers
+      if (numbers.length === 0) return { ok: true, number: null }
+      if (numbers.length === 1) return { ok: true, number: numbers[0] }
+
+      const options = numbers.reduce((acc, n) => { acc[n] = n; return acc }, {})
+      const result = await Swal.fire({
+        title: 'Escolha seu número',
+        input: 'select',
+        inputOptions: options,
+        inputPlaceholder: 'Selecione o número',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f97316',
+        inputValidator: (value) => (value ? undefined : 'Selecione um número'),
+      })
+      if (!result.isConfirmed) return { ok: false, number: null }
+      return { ok: true, number: Number(result.value) }
+    },
+
     async handleChoose(position) {
       // Guard: user can only pick a position on their own team's side.
       if (!this.canChooseOn(position)) {
@@ -570,16 +629,22 @@ export default {
 
       if (!result.isConfirmed) return
 
+      // Choose the shirt number (when the match has a uniform).
+      const numberChoice = await this.promptUniformNumber()
+      if (!numberChoice.ok) return
+
       try {
-        await api.post(`/matches/${this.matchId}/players/self-assign`, {
-          match_position_id: position.id,
-        })
+        const payload = { match_position_id: position.id }
+        if (numberChoice.number != null) payload.number = numberChoice.number
+
+        await api.post(`/matches/${this.matchId}/players/self-assign`, payload)
 
         // Atualiza estado local
         const user = JSON.parse(localStorage.getItem('user'))
         position.team_player_id = this.currentTeamPlayerId
         position.player_name = user?.name || 'Você'
         position.player_nickname = user?.nickname || null
+        position.number = numberChoice.number ?? null
         this.currentAssignment = position
 
         await Swal.fire({
@@ -671,6 +736,9 @@ export default {
           if (response.data.current_team_player_id) {
             this.currentTeamPlayerId = response.data.current_team_player_id
           }
+
+          // Load the player's numbers for the match uniform (if any).
+          await this.loadMyUniformNumbers()
 
           // Carrega posições detalhadas se a partida tem posições configuradas
           if (this.matchInfo.positions && this.matchInfo.positions.length > 0) {

@@ -109,6 +109,18 @@
                           :disabled="!playersLoaded"
                           class="mt-1"
                         />
+                        <!-- Número da camisa (quando a partida tem uniforme) -->
+                        <div v-if="matchInfo && matchInfo.uniform_id" class="mt-2">
+                          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">Número da camisa (opcional)</label>
+                          <input
+                            v-model="selectedNumber"
+                            type="number"
+                            min="1"
+                            max="999"
+                            placeholder="Nº"
+                            class="mt-1 w-24 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-900 dark:text-white focus:border-orange-500 focus:ring-orange-500"
+                          />
+                        </div>
                         <div class="mt-2 flex gap-2">
                           <button
                             type="button"
@@ -132,6 +144,7 @@
                       <div v-else-if="position.player_name" class="flex flex-col gap-2">
                         <div class="flex items-center gap-2">
                           <span class="text-sm text-gray-700 dark:text-gray-300">
+                            <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 text-xs font-bold">#{{ position.number }}</span>
                             {{ position.player_name }}
                             <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
                               ({{ position.player_nickname }})
@@ -332,6 +345,7 @@ export default {
       playersLoaded: false,
       editingPosition: null,
       selectedPlayerId: null,
+      selectedNumber: null,
       editingPayment: null,
       editedPaymentValue: null,
       paymentValidationMessage: "",
@@ -466,11 +480,13 @@ export default {
     startEditing(position) {
       this.editingPosition = position.id;
       this.selectedPlayerId = position.team_player_id || null;
+      this.selectedNumber = position.number || null;
     },
 
     cancelEditing() {
       this.editingPosition = null;
       this.selectedPlayerId = null;
+      this.selectedNumber = null;
     },
 
     onDirectSelect(position) {
@@ -485,10 +501,15 @@ export default {
       const previousPlayerId = position.team_player_id;
 
       try {
-        await api.post(`/matches/${this.matchId}/players/save`, {
+        const payload = {
           game_position_id: position.game_position_id,
           team_player_id: this.selectedPlayerId,
-        });
+        };
+        if (this.matchInfo?.uniform_id && this.selectedNumber) {
+          payload.number = Number(this.selectedNumber);
+        }
+
+        await api.post(`/matches/${this.matchId}/players/save`, payload);
 
         const selectedPlayer = this.teamPlayers.find(
           (p) => p.id === this.selectedPlayerId
@@ -498,9 +519,13 @@ export default {
           position.player_nickname = selectedPlayer.nickname || null;
           position.team_player_id = selectedPlayer.id;
         }
+        position.number = (this.matchInfo?.uniform_id && this.selectedNumber)
+          ? Number(this.selectedNumber)
+          : null;
 
         this.editingPosition = null;
         this.selectedPlayerId = null;
+        this.selectedNumber = null;
 
         await Swal.fire({
           toast: true,
