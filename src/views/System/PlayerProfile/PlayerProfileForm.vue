@@ -228,7 +228,7 @@ export default {
         playerKwaii: null,
         playerFacebook: null,
         playerGDA: null,
-        playerStatus: null,
+        playerStatus: 1,
       },
       isGoalkeeper: null,
       stateId: null,
@@ -269,7 +269,9 @@ export default {
         this.form.playerFootSize = data.foot_size ?? null
         this.form.playerGloveSize = data.glove_size ?? null
         this.form.playerUniformSize = data.uniform_size ?? null
-        this.form.playerStatus = data.status ?? null
+        // Respeita a escolha salva pelo jogador (inclusive "Não" = 0).
+        // Quando ainda não há valor definido, mantém o padrão "Sim" (1).
+        this.form.playerStatus = data.status ?? 1
         this.cityId = data.city_id ?? null
         this.stateId = data.city_info?.state_id ?? data.city_info?.state_info?.id ?? null
         this.form.playerYoutube = socialProfiles.youtube ?? null
