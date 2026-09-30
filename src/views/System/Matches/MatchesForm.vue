@@ -574,18 +574,42 @@ export default {
         console.error("Erro ao carregar presets:", err)
       }
     },
+    mapPositionsFromBackend(positions) {
+      if (!Array.isArray(positions) || positions.length === 0) return []
+
+      // When a match already has an opponent, the backend stores the position
+      // slots twice (team_reference 1 = creator, 2 = opponent). Keep only the
+      // creator side so the form doesn't show duplicated rows.
+      const hasReference = positions.some(p => p.team_reference != null)
+      const source = hasReference
+        ? positions.filter(p => Number(p.team_reference) === 1)
+        : positions
+
+      return source.map((position) => {
+        const rawId = position.game_position_id ?? position.id ?? null
+        // Price is stored in the "value" column on the backend; presets use "price".
+        const rawPrice = position.value ?? position.price ?? 0
+        return {
+          game_position_id: rawId != null ? Number(rawId) : null,
+          price: Number(rawPrice) || 0,
+        }
+      })
+    },
     loadPreset() {
       if (!this.selectedPresetId) return
       const preset = this.presets.find(p => p.id === this.selectedPresetId)
       if (!preset) return
 
+      this.form.indicatePositions = true
+      // Set playersCount FIRST so the 'form.playersCount' watcher (which
+      // rebuilds blank position slots on the create screen) runs before we
+      // assign the real positions. Otherwise it would wipe the preset out.
+      this.form.playersCount = preset.positions.length
+      this.form.teamsCount = preset.teams_count ?? 1
       this.form.positions = preset.positions.map(p => ({
-        game_position_id: p.game_position_id,
+        game_position_id: p.game_position_id != null ? Number(p.game_position_id) : null,
         price: Number(p.price ?? 0),
       }))
-      this.form.playersCount = this.form.positions.length
-      this.form.teamsCount = preset.teams_count ?? 1
-      this.form.indicatePositions = true
     },
     async savePreset() {
       if (!this.presetName.trim() || !this.form.teamId) return
@@ -677,13 +701,12 @@ export default {
           ? JSON.parse(data.positions)
           : data.positions
 
-        if (Array.isArray(positions) && positions.length) {
+        const mappedPositions = this.mapPositionsFromBackend(positions)
+
+        if (mappedPositions.length) {
           this.form.indicatePositions = true
-          this.form.positions = positions.map((position) => ({
-            game_position_id: position.game_position_id ?? position.id ?? null,
-            price: Number(position.price ?? 0),
-          }))
-          this.form.playersCount = this.form.positions.length
+          this.form.playersCount = mappedPositions.length
+          this.form.positions = mappedPositions
         } else {
           this.form.indicatePositions = !!this.form.matchType && this.form.matchType !== 'team_match'
         }
@@ -734,13 +757,12 @@ export default {
           ? JSON.parse(data.positions)
           : data.positions
 
-        if (Array.isArray(positions) && positions.length) {
+        const mappedPositions = this.mapPositionsFromBackend(positions)
+
+        if (mappedPositions.length) {
           this.form.indicatePositions = true
-          this.form.positions = positions.map((position) => ({
-            game_position_id: position.game_position_id ?? position.id ?? null,
-            price: Number(position.price ?? 0),
-          }))
-          this.form.playersCount = this.form.positions.length
+          this.form.playersCount = mappedPositions.length
+          this.form.positions = mappedPositions
         }
 
         // Reload tags for the team
