@@ -24,26 +24,18 @@
           </div>
 
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Foto de Perfil</h2>
-          <div class="flex flex-col items-center">
-            <div class="h-28 w-28 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-4 ring-gray-200 dark:ring-gray-600">
-              <img v-if="photoPreviewUrl" :src="photoPreviewUrl" alt="Foto" class="h-full w-full object-cover" @error="photoPreviewUrl = null; existingPhotoUrl = null" />
-              <svg v-else class="h-full w-full text-gray-300 dark:text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-              </svg>
-            </div>
-            <p v-if="photoFileName" class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ photoFileName }}</p>
-            <div class="mt-3 flex gap-3">
-              <label for="photo-upload" class="cursor-pointer rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 transition-colors" :class="{ 'pointer-events-none opacity-50': loading }">
-                <span>Escolher foto</span>
-                <input id="photo-upload" type="file" class="sr-only" accept="image/png,image/jpeg,image/gif" :disabled="loading" @change="onPhotoChange" />
-              </label>
-              <button v-if="photoPreviewUrl || existingPhotoUrl" type="button" class="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors" :disabled="loading" @click="onRemovePhoto">
-                Remover
-              </button>
-            </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF até 10MB</p>
-            <p v-if="photoError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ photoError }}</p>
-          </div>
+          <image-crop-upload
+            v-model="photoPreviewUrl"
+            button-label="Escolher foto"
+            :aspect-ratio="1"
+            stencil="circle"
+            preview-class="h-28 w-28"
+            accept="image/png,image/jpeg,image/gif"
+            :disabled="loading"
+            @cropped="onPhotoCropped"
+            @removed="onRemovePhoto"
+          />
+          <p v-if="photoError" class="mt-2 text-center text-sm text-red-600 dark:text-red-400">{{ photoError }}</p>
         </div>
 
         <!-- Section 2: Personal Info -->
@@ -196,6 +188,7 @@ import StateSelectComponent from "@/components/form/StateSelectComponent.vue";
 import api from "@/services/api.js";
 import Multiselect from '@vueform/multiselect'
 import Swal from "@/services/swal.js";
+import ImageCropUpload from "@/components/form/ImageCropUpload.vue";
 
 export default {
   name: "PlayerProfileForm",
@@ -206,6 +199,7 @@ export default {
     CitySelectComponent,
     StateSelectComponent,
     Multiselect,
+    ImageCropUpload,
   },
   data() {
     return {
@@ -278,7 +272,7 @@ export default {
         this.form.playerTiktok = socialProfiles.tiktok ?? null
         this.form.playerInstagram = socialProfiles.instagram ?? null
         this.form.playerX = socialProfiles.x  ?? null
-        this.form.playerKwaii = socialProfiles.kwaii ?? null
+        this.form.playerKwaii = socialProfiles.kwai ?? socialProfiles.kwaii ?? null
         this.form.playerFacebook = socialProfiles.facebook ?? null
         this.form.playerGDA = socialProfiles.gda ?? null
 
@@ -291,47 +285,58 @@ export default {
         this.loading = false;
       }
     },
-    onPhotoChange(event) {
-      const file = event.target.files[0]
-      if (!file) return
-
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/gif']
-      const maxSize = 10 * 1024 * 1024 // 10MB
-
-      if (file.size > maxSize) {
-        this.photoError = 'O arquivo excede o tamanho máximo de 10MB.'
-        event.target.value = ''
-        return
-      }
-
-      if (!allowedTypes.includes(file.type)) {
-        this.photoError = 'Formato não permitido. Use PNG, JPG ou GIF.'
-        event.target.value = ''
-        return
-      }
-
-      this.revokePreviewUrl()
+    // Recebe o arquivo já recortado pelo componente de upload.
+    onPhotoCropped(file) {
       this.form.photoFile = file
-      this.photoPreviewUrl = URL.createObjectURL(file)
-      this.photoFileName = file.name
+      this.photoFileName = file?.name ?? null
       this.photoError = null
       this.removePhoto = false
+      this.existingPhotoUrl = null
     },
     onRemovePhoto() {
-      this.revokePreviewUrl()
-      this.photoPreviewUrl = null
       this.form.photoFile = null
       this.photoFileName = null
       this.photoError = null
       this.removePhoto = true
+      this.existingPhotoUrl = null
     },
-    revokePreviewUrl() {
-      if (this.photoPreviewUrl && this.photoPreviewUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(this.photoPreviewUrl)
+    // Extrai apenas o "handle" de uma rede social. Se o usuário colar a URL
+    // completa (ex.: https://instagram.com/fulano), recorta e guarda só "fulano".
+    // Aceita variações com http(s)://, www., @, barras e parâmetros de query.
+    normalizeSocialHandle(value, domains = []) {
+      if (!value) return value
+
+      let handle = String(value).trim()
+      if (!handle) return handle
+
+      // Remove protocolo e www.
+      handle = handle.replace(/^https?:\/\//i, '').replace(/^www\./i, '')
+
+      // Remove o domínio da rede, caso tenha sido colado (ex.: "instagram.com/").
+      for (const domain of domains) {
+        const escaped = domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        handle = handle.replace(new RegExp(`^${escaped}/?`, 'i'), '')
       }
+
+      // Remove @ inicial, barras extras e qualquer query string/âncora.
+      handle = handle.replace(/^@+/, '').replace(/^\/+|\/+$/g, '').split(/[?#]/)[0]
+
+      return handle
+    },
+    normalizeSocialProfiles() {
+      this.form.playerInstagram = this.normalizeSocialHandle(this.form.playerInstagram, ['instagram.com'])
+      this.form.playerYoutube = this.normalizeSocialHandle(this.form.playerYoutube, ['youtube.com', 'youtu.be'])
+      this.form.playerTiktok = this.normalizeSocialHandle(this.form.playerTiktok, ['tiktok.com'])
+      this.form.playerFacebook = this.normalizeSocialHandle(this.form.playerFacebook, ['facebook.com', 'fb.com'])
+      this.form.playerX = this.normalizeSocialHandle(this.form.playerX, ['x.com', 'twitter.com'])
+      this.form.playerKwaii = this.normalizeSocialHandle(this.form.playerKwaii, ['kwai.com'])
+      this.form.playerGDA = this.normalizeSocialHandle(this.form.playerGDA, ['goleiro.app', 'goleirodealuguel.com.br'])
     },
     async handleSubmit() {
       this.loading = true
+
+      // Garante que apenas o handle seja salvo, mesmo que colem a URL completa.
+      this.normalizeSocialProfiles()
 
       const formData = new FormData()
 
