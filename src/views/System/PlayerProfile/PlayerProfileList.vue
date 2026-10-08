@@ -113,11 +113,11 @@
             <div class="grid grid-cols-2 gap-2 text-center">
               <div class="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-gray-700/50">
                 <p class="text-[10px] font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</p>
-                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_name || player.city_info?.name || '—' }}</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.name || '—' }}</p>
               </div>
               <div class="rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-gray-700/50">
                 <p class="text-[10px] font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</p>
-                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.state_name || player.city_info?.state_info?.name || '—' }}</p>
+                <p class="mt-0.5 text-xs font-medium text-gray-900 truncate dark:text-white">{{ player.city_info?.state_info?.name || '—' }}</p>
               </div>
             </div>
           </div>
