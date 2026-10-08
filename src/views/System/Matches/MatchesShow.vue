@@ -691,11 +691,15 @@ export default {
       try {
         await api.delete(`/matches/${this.matchId}/players/self-assign`)
 
-        // Limpa estado local
+        // Limpa estado local (feedback imediato)
         position.team_player_id = null
         position.player_name = null
         position.player_nickname = null
+        position.number = null
         this.currentAssignment = null
+
+        // Recarrega do backend para refletir o estado real (vaga liberada para todos)
+        await this.loadPositions()
 
         await Swal.fire({
           toast: true,
