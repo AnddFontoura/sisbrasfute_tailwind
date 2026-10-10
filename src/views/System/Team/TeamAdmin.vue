@@ -159,6 +159,12 @@
         </div>
       </div>
 
+      <!-- Calendário de partidas -->
+      <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Calendário de partidas</h2>
+        <match-calendar :teamId="teamId" />
+      </div>
+
       <!-- Danger Zone -->
       <div class="rounded-xl border border-red-200 bg-red-50/50 p-6 shadow-sm dark:border-red-500/20 dark:bg-red-900/10">
         <h2 class="text-sm font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2">Zona de Perigo</h2>
@@ -204,6 +210,7 @@
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import TeamBanner from "@/components/team/teamBanner.vue";
+import MatchCalendar from "@/components/calendar/MatchCalendar.vue";
 import Swal from "@/services/swal.js";
 
 export default {
@@ -211,6 +218,7 @@ export default {
   components: {
     TeamBanner,
     systemLayout,
+    MatchCalendar,
   },
   data() {
     return {

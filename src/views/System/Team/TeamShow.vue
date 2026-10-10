@@ -303,91 +303,10 @@
           <pagination-component :pagination="playersPagination" @change="getTeamPlayers" />
         </div>
 
-        <!-- Upcoming matches carousel -->
+        <!-- Calendário de partidas -->
         <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-          <div class="flex items-center justify-between gap-3 mb-4">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Próximas partidas</h2>
-
-            <div v-if="upcomingMatches.length > 0" class="flex gap-2">
-              <button
-                type="button"
-                @click="scrollUpcoming(-1)"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
-                aria-label="Anterior"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                @click="scrollUpcoming(1)"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
-                aria-label="Próximo"
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          <!-- Loading -->
-          <div v-if="upcomingLoading" class="flex items-center justify-center py-10">
-            <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
-          </div>
-
-          <!-- Empty state -->
-          <div
-            v-else-if="upcomingMatches.length === 0"
-            class="rounded-lg border border-dashed border-gray-200 dark:border-gray-700 py-8 text-center text-sm text-gray-400 dark:text-gray-500"
-          >
-            Nenhuma partida agendada.
-          </div>
-
-          <!-- Carousel -->
-          <div
-            v-else
-            ref="upcomingTrack"
-            class="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 upcoming-track"
-          >
-            <div
-              v-for="match in upcomingMatches"
-              :key="match.id"
-              class="w-64 shrink-0 snap-start rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-orange-500/40 hover:shadow-md dark:border-white/10 dark:bg-gray-800"
-            >
-              <!-- Header escuro -->
-              <div class="rounded-t-2xl bg-gray-900 dark:bg-black px-4 py-3 text-center">
-                <p class="text-sm font-bold text-white">
-                  {{ match.my_team_name || 'Meu Time' }}
-                  <span class="mx-2 text-orange-400">VS</span>
-                  {{ match.enemy_team_name || 'Adversário' }}
-                </p>
-                <p class="mt-1 text-xs text-zinc-400">{{ match.schedule_br || 'Data não definida' }}</p>
-              </div>
-
-              <!-- Body -->
-              <div class="px-4 py-4">
-                <div class="grid grid-cols-2 gap-3 text-center">
-                  <div>
-                    <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Cidade</p>
-                    <p class="mt-0.5 text-sm font-medium text-gray-900 dark:text-white">{{ match.city_info?.name ?? '—' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Estado</p>
-                    <p class="mt-0.5 text-sm font-medium text-gray-900 dark:text-white">{{ match.city_info?.state_info?.name ?? '—' }}</p>
-                  </div>
-                </div>
-
-                <router-link
-                  :to="{ name: 'matches-show', params: { id: match.id } }"
-                  class="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600"
-                >
-                  Visualizar
-                </router-link>
-              </div>
-            </div>
-          </div>
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Calendário de partidas</h2>
+          <match-calendar :teamId="teamId" />
         </div>
       </div>
 
@@ -487,6 +406,7 @@ import { MapIcon, MapPinIcon, CalendarIcon } from '@heroicons/vue/20/solid'
 import Swal from "@/services/swal.js"
 import { useAuthStore } from "@/stores/auth"
 import PaginationComponent from "@/components/pagination/PaginationComponent.vue"
+import MatchCalendar from "@/components/calendar/MatchCalendar.vue"
 
 export default {
   name: "teamList",
@@ -496,6 +416,7 @@ export default {
     MapPinIcon,
     CalendarIcon,
     PaginationComponent,
+    MatchCalendar,
   },
   data() {
     return {
@@ -525,16 +446,12 @@ export default {
       playersLoading: false,
       playersSearchTimeout: null,
       playerFallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
-      // Upcoming matches carousel
-      upcomingMatches: [],
-      upcomingLoading: false,
     }
   },
   created() {
     this.teamId = this.$route.params.id
     this.getTeamInformation()
     this.getTeamPlayers()
-    this.getUpcomingMatches()
   },
   mounted() {
     this._escHandler = (e) => { if (e.key === 'Escape' && this.isLightboxOpen) this.closeLightbox(); };
@@ -605,26 +522,6 @@ export default {
       this.playersSearchTimeout = setTimeout(() => {
         this.getTeamPlayers(1)
       }, 400)
-    },
-    async getUpcomingMatches() {
-      if (!this.teamId) return
-
-      this.upcomingLoading = true
-
-      try {
-        const response = await api.get(`/matches/team/${this.teamId}/upcoming`)
-        this.upcomingMatches = response.data || []
-      } catch (err) {
-        console.error('Erro ao carregar próximas partidas:', err)
-      } finally {
-        this.upcomingLoading = false
-      }
-    },
-    scrollUpcoming(direction) {
-      const track = this.$refs.upcomingTrack
-      if (!track) return
-      // Scroll by roughly one card width (card 256px + gap 16px).
-      track.scrollBy({ left: direction * 272, behavior: 'smooth' })
     },
     openLightbox() {
       if (!this.team?.logo_url) return;
@@ -861,14 +758,5 @@ export default {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
-}
-
-/* Hide scrollbar on the upcoming matches carousel while keeping scroll. */
-.upcoming-track {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.upcoming-track::-webkit-scrollbar {
-  display: none;
 }
 </style>
