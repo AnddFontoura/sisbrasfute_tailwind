@@ -170,9 +170,9 @@ export default {
           label: 'Amistosos',
           description: 'Partidas amistosas',
           icon: this.icons.friendly,
-          to: '/friendly-matches/list',
-          disabled: true,
-          disabledReason: 'coming_soon',
+          to: '/friendly/open',
+          disabled: !this.isEmailVerified,
+          disabledReason: !this.isEmailVerified ? 'verification' : null,
         },
         {
           key: 'trophy',

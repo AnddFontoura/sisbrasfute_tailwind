@@ -308,6 +308,139 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Calendário de partidas</h2>
           <match-calendar :teamId="teamId" />
         </div>
+
+        <!-- Uniforms carousel (only shown when the team has uniforms) -->
+        <div v-if="uniformsLoading || uniforms.length > 0" class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Uniformes</h2>
+
+            <div v-if="uniforms.length > 1" class="flex items-center gap-2">
+              <span class="text-xs font-medium text-gray-400 dark:text-gray-500">
+                {{ currentUniformIndex + 1 }} / {{ uniforms.length }}
+              </span>
+              <button
+                type="button"
+                @click="prevUniform"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
+                aria-label="Uniforme anterior"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                @click="nextUniform"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10"
+                aria-label="Próximo uniforme"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div v-if="uniformsLoading" class="flex items-center justify-center py-10">
+            <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
+          </div>
+
+          <!-- Carousel content -->
+          <div v-else class="relative">
+            <div class="flex items-center gap-3">
+              <!-- Prev arrow (overlay) -->
+              <button
+                v-if="uniforms.length > 1"
+                type="button"
+                @click="prevUniform"
+                class="absolute left-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-md transition hover:bg-white dark:bg-gray-900/80 dark:text-gray-100 dark:hover:bg-gray-900"
+                aria-label="Uniforme anterior"
+              >
+                ←
+              </button>
+
+              <!-- Current uniform image -->
+              <div class="mx-auto w-full">
+                <div
+                  class="group relative mx-auto flex aspect-square max-h-80 w-full items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 dark:border-white/10 dark:bg-gray-700/40"
+                >
+                  <img
+                    v-if="currentUniformPhoto"
+                    :src="currentUniformPhoto"
+                    :alt="currentUniform?.name || 'Uniforme'"
+                    class="h-full w-full cursor-zoom-in object-contain transition duration-200 group-hover:scale-105"
+                    @click="openUniformLightbox(currentUniformPhoto)"
+                  />
+                  <div v-else class="flex flex-col items-center justify-center text-gray-300 dark:text-gray-600">
+                    <svg class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 4.5 4 6.5V10l2.5-1v9.5h11V9L20 10V6.5L16.5 4.5 14 6a2 2 0 0 1-4 0L7.5 4.5Z" />
+                    </svg>
+                    <span class="mt-2 text-xs">Sem foto</span>
+                  </div>
+
+                  <!-- Expand button -->
+                  <button
+                    v-if="currentUniformPhoto"
+                    type="button"
+                    @click="openUniformLightbox(currentUniformPhoto)"
+                    class="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 shadow transition hover:bg-white dark:bg-gray-900/80 dark:text-gray-100 dark:hover:bg-gray-900"
+                    aria-label="Ampliar uniforme"
+                    title="Ampliar"
+                  >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M20.25 20.25v-4.5m0 4.5h-4.5m4.5 0L15 15M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Next arrow (overlay) -->
+              <button
+                v-if="uniforms.length > 1"
+                type="button"
+                @click="nextUniform"
+                class="absolute right-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-md transition hover:bg-white dark:bg-gray-900/80 dark:text-gray-100 dark:hover:bg-gray-900"
+                aria-label="Próximo uniforme"
+              >
+                →
+              </button>
+            </div>
+
+            <!-- Current uniform info -->
+            <div class="mt-4 text-center">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                {{ currentUniform?.name || 'Uniforme' }}
+              </p>
+              <p v-if="currentUniform?.price_cents != null" class="mt-0.5 text-xs font-medium text-orange-600 dark:text-orange-400">
+                {{ formatUniformPrice(currentUniform.price_cents) }}
+              </p>
+            </div>
+
+            <!-- Thumbnails -->
+            <div v-if="uniforms.length > 1" class="mt-4 flex flex-wrap justify-center gap-2">
+              <button
+                v-for="(uniform, index) in uniforms"
+                :key="uniform.id"
+                type="button"
+                @click="currentUniformIndex = index"
+                class="h-12 w-12 overflow-hidden rounded-lg border transition"
+                :class="index === currentUniformIndex
+                  ? 'border-orange-500 ring-2 ring-orange-500/30'
+                  : 'border-gray-200 opacity-70 hover:opacity-100 dark:border-white/10'"
+              >
+                <img
+                  v-if="uniformPhoto(uniform)"
+                  :src="uniformPhoto(uniform)"
+                  :alt="uniform.name"
+                  class="h-full w-full object-cover"
+                />
+                <span v-else class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-300 dark:bg-white/5 dark:text-gray-600">—</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
       </div>
 
       <!-- Interest Modal -->
@@ -391,7 +524,7 @@
       <div v-if="isLightboxOpen"
            class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer"
            @click.self="closeLightbox">
-        <img :src="team.logo_url"
+        <img :src="lightboxImageUrl || team.logo_url"
              class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg cursor-pointer"
              @click="closeLightbox" />
       </div>
@@ -434,6 +567,7 @@ export default {
       showInterestModal: false,
       loading: false,
       isLightboxOpen: false,
+      lightboxImageUrl: null,
       fallbackImage: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
       teamPlayer: null,
       notifyMatch: true,
@@ -485,6 +619,12 @@ export default {
         return total
       }, this.emptyStats())
     },
+    currentUniform() {
+      return this.uniforms[this.currentUniformIndex] || null
+    },
+    currentUniformPhoto() {
+      return this.currentUniform ? this.uniformPhoto(this.currentUniform) : null
+    },
   },
   methods: {
     emptyStats() {
@@ -525,11 +665,13 @@ export default {
     },
     openLightbox() {
       if (!this.team?.logo_url) return;
+      this.lightboxImageUrl = null;
       this.isLightboxOpen = true;
       document.body.classList.add('overflow-hidden');
     },
     closeLightbox() {
       this.isLightboxOpen = false;
+      this.lightboxImageUrl = null;
       document.body.classList.remove('overflow-hidden');
     },
     async getTeamInformation() {

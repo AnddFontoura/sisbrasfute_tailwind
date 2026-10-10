@@ -122,6 +122,17 @@
                   >
                     Visualizar
                   </router-link>
+                  <a
+                    :href="teamShowUrl(team)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 rounded-lg border border-orange-300 bg-white px-3 py-1.5 text-xs font-semibold text-orange-600 transition hover:bg-orange-50 dark:border-orange-500/30 dark:bg-transparent dark:text-orange-400 dark:hover:bg-orange-500/10"
+                  >
+                    Abrir em nova aba
+                    <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
                   <button
                     v-if="team.has_logo"
                     @click="removeLogo(team)"
@@ -192,6 +203,14 @@ export default {
   },
 
   methods: {
+    teamShowUrl(team) {
+      const route = this.$router.resolve({
+        name: "team-show",
+        params: { id: team.id },
+      });
+      return route.href;
+    },
+
     async loadModalities() {
       try {
         const { data } = await api.get("/modalities/list");

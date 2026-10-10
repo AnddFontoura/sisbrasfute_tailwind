@@ -926,10 +926,16 @@ export default {
       try {
         await api.delete(`/matches/${this.matchId}/players/self-assign`);
 
+        // Atualização otimista imediata.
         position.player_name = null;
         position.player_nickname = null;
         position.team_player_id = null;
+        position.payment_status = null;
+        position.number = null;
         this.currentAssignment = null;
+
+        // Recarrega do backend para refletir o estado real (vaga liberada para todos).
+        await this.loadPositions();
 
         // Reload wallet balance after refund
         this.loadWalletBalance();
