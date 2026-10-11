@@ -55,10 +55,16 @@
                 class="h-full w-full object-cover transition duration-200 group-hover:scale-105"
               />
               <span
-                class="absolute right-2 top-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
                 :class="statusBadgeClass(court.status)"
               >
                 {{ statusLabel(court.status) }}
+              </span>
+              <span
+                v-if="court.my_role && court.my_role !== 'owner'"
+                class="absolute left-2 top-2 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-700 dark:bg-orange-500/20 dark:text-orange-400"
+              >
+                {{ roleLabel(court.my_role) }}
               </span>
             </div>
           </router-link>
@@ -89,6 +95,13 @@
                 class="inline-flex items-center rounded-lg border border-orange-300 bg-white px-3 py-1.5 text-xs font-semibold text-orange-600 transition hover:bg-orange-50 dark:border-orange-500/30 dark:bg-transparent dark:text-orange-400 dark:hover:bg-orange-500/10"
               >
                 Editar
+              </router-link>
+              <router-link
+                v-if="court.my_role === 'owner' || court.my_role === 'manager'"
+                :to="{ name: 'court-admin', params: { courtId: court.id } }"
+                class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:bg-transparent dark:text-gray-300 dark:hover:bg-white/5"
+              >
+                Administrar
               </router-link>
             </div>
           </div>
@@ -134,6 +147,11 @@ export default {
         rejected: "Rejeitada",
       };
       return map[status] ?? status;
+    },
+
+    roleLabel(role) {
+      const map = { owner: "Proprietário", manager: "Gerente", employee: "Funcionário" };
+      return map[role] ?? role;
     },
 
     statusBadgeClass(status) {

@@ -19,12 +19,22 @@
               📍 {{ court.city_info?.name }} / {{ court.city_info?.state_info?.name }}
             </p>
           </div>
-          <span
-            class="inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold"
-            :class="statusBadgeClass(court.status)"
-          >
-            {{ statusLabel(court.status) }}
-          </span>
+          <div class="flex items-center gap-3">
+            <router-link
+              v-if="court.my_role === 'owner' || court.my_role === 'manager'"
+              :to="{ name: 'court-admin', params: { courtId: court.id } }"
+              class="inline-flex w-fit items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
+            >
+              <Cog6ToothIcon class="h-4 w-4" />
+              Administrar
+            </router-link>
+            <span
+              class="inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold"
+              :class="statusBadgeClass(court.status)"
+            >
+              {{ statusLabel(court.status) }}
+            </span>
+          </div>
         </div>
 
         <!-- Photo carousel -->
@@ -253,7 +263,7 @@
 <script>
 import api from "@/services/api";
 import systemLayout from "@/components/layouts/systemLayout.vue";
-import { MapIcon, MapPinIcon, TrophyIcon, Square3Stack3DIcon } from "@heroicons/vue/20/solid";
+import { MapIcon, MapPinIcon, TrophyIcon, Square3Stack3DIcon, Cog6ToothIcon } from "@heroicons/vue/20/solid";
 import Swal from "@/services/swal.js";
 
 export default {
@@ -264,6 +274,7 @@ export default {
     MapPinIcon,
     TrophyIcon,
     Square3Stack3DIcon,
+    Cog6ToothIcon,
   },
   data() {
     return {

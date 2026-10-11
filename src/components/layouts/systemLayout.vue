@@ -644,6 +644,7 @@ export default {
           children: [
             { name: "Minhas Quadras", href: "/courts/my-courts" },
             { name: "Cadastrar Quadra", href: "/courts/form" },
+            { name: "Convites de Quadra", href: "/court-invitation/received" },
           ],
         },
         {
