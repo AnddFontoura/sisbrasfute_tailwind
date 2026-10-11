@@ -555,6 +555,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   BoltIcon,
+  BuildingOffice2Icon,
 } from "@heroicons/vue/20/solid";
 
 export default {
@@ -582,6 +583,7 @@ export default {
     ChevronDownIcon,
     ChevronRightIcon,
     GlobeAmericasIcon,
+    BuildingOffice2Icon,
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
@@ -636,6 +638,15 @@ export default {
           ],
         },
         {
+          name: "Quadras",
+          icon: BuildingOffice2Icon,
+          current: false,
+          children: [
+            { name: "Minhas Quadras", href: "/courts/my-courts" },
+            { name: "Cadastrar Quadra", href: "/courts/form" },
+          ],
+        },
+        {
           name: "Financeiro",
           icon: ChartPieIcon,
           current: false,
@@ -661,6 +672,7 @@ export default {
         { name: "Posições de Jogo", href: "/admin/game-positions" },
         { name: "Config. Taxas", href: "/admin/fee-config" },
         { name: "Receita", href: "/admin/revenue" },
+        { name: "Quadras (Aprovação)", href: "/admin/courts" },
       ],
       currentPageName: false,
     };

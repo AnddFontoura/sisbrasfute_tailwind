@@ -1,6 +1,6 @@
 <template>
   <div class="mt-3">
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">Modalidades que joga</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" :aria-label="labelName">{{ labelName }}</label>
     <Multiselect
       id="stateSelect"
       :mode="isMultiselect"
@@ -33,6 +33,10 @@ export default {
     },
     modelValue: {
       type: Array
+    },
+    labelName: {
+      type: String,
+      default: 'Modalidades que joga'
     },
   },
   data() {
