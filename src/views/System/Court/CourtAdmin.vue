@@ -49,13 +49,12 @@
               Equipe
             </button>
             <button
+              v-if="canManageReservations"
               type="button"
-              disabled
-              class="cursor-not-allowed whitespace-nowrap border-b-2 border-transparent px-1 py-3 text-sm font-semibold text-gray-300 dark:text-gray-600"
-              title="Em breve"
+              @click="activeTab = 'reservations'"
+              :class="tabClass('reservations')"
             >
               Reservas
-              <span class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-400 dark:bg-gray-700 dark:text-gray-500">Em breve</span>
             </button>
           </nav>
         </div>
@@ -411,6 +410,11 @@
             </div>
           </div>
         </section>
+
+        <!-- Tab: Reservas -->
+        <section v-show="activeTab === 'reservations'" v-if="canManageReservations">
+          <CourtReservations :court-id="courtId" />
+        </section>
       </template>
     </main>
   </system-layout>
@@ -424,6 +428,7 @@ import ModalitiesSelect from "@/components/form/ModalitiesSelect.vue";
 import systemLayout from "@/components/layouts/systemLayout.vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import Swal from "@/services/swal.js";
+import CourtReservations from "@/views/System/Court/CourtReservations.vue";
 
 export default {
   name: "CourtAdmin",
@@ -433,6 +438,7 @@ export default {
     ModalitiesSelect,
     systemLayout,
     QuillEditor,
+    CourtReservations,
   },
   data() {
     return {
@@ -494,6 +500,9 @@ export default {
     canEditData() {
       return this.myRole === "owner" || this.myRole === "manager";
     },
+    canManageReservations() {
+      return ["owner", "manager", "employee"].includes(this.myRole);
+    },
     totalPhotoCount() {
       return this.existingPhotos.length + this.photoFiles.length;
     },
@@ -553,8 +562,10 @@ export default {
 
         if (this.canEditData) {
           this.activeTab = "data";
+        } else if (this.canManageReservations) {
+          this.activeTab = "reservations";
         } else {
-          this.activeTab = "team";
+          this.activeTab = "data";
         }
 
         if (this.isOwner) {
