@@ -231,6 +231,23 @@
                 <dd class="text-sm text-gray-900 dark:text-white">{{ selectedUser.is_admin ? 'Sim' : 'Não' }}</dd>
               </div>
               <div>
+                <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400">Acesso a Quadras</dt>
+                <dd class="text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>{{ selectedUser.court_allowed ? 'Habilitado' : 'Desabilitado' }}</span>
+                  <button
+                    type="button"
+                    @click="toggleCourtAllowed(selectedUser.id)"
+                    :disabled="togglingCourtAllowed"
+                    :class="selectedUser.court_allowed
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'bg-orange-500 hover:bg-orange-600'"
+                    class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold text-white transition disabled:opacity-50"
+                  >
+                    {{ togglingCourtAllowed ? '...' : (selectedUser.court_allowed ? 'Desabilitar' : 'Habilitar') }}
+                  </button>
+                </dd>
+              </div>
+              <div>
                 <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400">Idioma</dt>
                 <dd class="text-sm text-gray-900 dark:text-white">{{ selectedUser.language || '—' }}</dd>
               </div>
@@ -331,6 +348,7 @@ export default {
       modalLoading: false,
       selectedUser: null,
       verifyingEmail: false,
+      togglingCourtAllowed: false,
       debounceTimer: null,
     }
   },
@@ -438,6 +456,39 @@ export default {
         })
       } finally {
         this.verifyingEmail = false
+      }
+    },
+
+    async toggleCourtAllowed(userId) {
+      this.togglingCourtAllowed = true
+      try {
+        const { data } = await api.post(`/admin/users/${userId}/court-allowed`)
+        if (this.selectedUser) {
+          this.selectedUser.court_allowed = data.court_allowed
+        }
+        const row = this.users.find((u) => u.id === userId)
+        if (row) {
+          row.court_allowed = data.court_allowed
+        }
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Acesso a quadras atualizado.',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+      } catch (err) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.response?.data?.message || err.response?.data?.error || 'Erro ao atualizar acesso.',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+      } finally {
+        this.togglingCourtAllowed = false
       }
     },
   },

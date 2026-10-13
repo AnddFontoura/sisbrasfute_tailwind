@@ -70,7 +70,7 @@
                       </p>
 
                       <ul role="list" class="space-y-1">
-                        <li v-for="item in navigation" :key="item.name">
+                        <li v-for="item in visibleNavigation" :key="item.name">
                           <a
                             v-if="!item.children"
                             @click.prevent="$router.push(item.href); isSidebarOpen = false"
@@ -227,7 +227,7 @@
               </p>
 
               <ul role="list" class="space-y-1">
-                <li v-for="item in navigation" :key="item.name">
+                <li v-for="item in visibleNavigation" :key="item.name">
                   <a
                     v-if="!item.children"
                     @click.prevent="$router.push(item.href)"
@@ -592,6 +592,17 @@ export default {
     const notificationsStore = useNotificationsStore();
     return { notificationsStore };
   },
+  computed: {
+    // `user` is set in mounted() from the auth store; fall back to the store so
+    // the gate resolves even before mount.
+    isCourtAllowed() {
+      return !!(this.user?.court_allowed ?? useAuthStore().user?.court_allowed);
+    },
+    // Hide the "Quadras" group for users without the court-allowed flag.
+    visibleNavigation() {
+      return this.navigation.filter((i) => i.name !== 'Quadras' || this.isCourtAllowed);
+    },
+  },
   data() {
     return {
       user: {},
@@ -644,8 +655,15 @@ export default {
           children: [
             { name: "Minhas Quadras", href: "/courts/my-courts" },
             { name: "Cadastrar Quadra", href: "/courts/form" },
-            { name: "Convites de Quadra", href: "/court-invitation/received" },
           ],
+        },
+        {
+          // Always visible to any authed user (invitees without court-allowed
+          // must be able to reach and accept an invitation).
+          name: "Convites de Quadra",
+          icon: DocumentDuplicateIcon,
+          current: false,
+          href: "/court-invitation/received",
         },
         {
           name: "Financeiro",

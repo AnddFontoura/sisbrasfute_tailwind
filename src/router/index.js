@@ -72,6 +72,14 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  // Bloqueia rotas de quadra que exigem a flag court-allowed
+  if (to.meta.requiresCourtAllowed) {
+    const authStore = useAuthStore()
+    if (!authStore.isCourtAllowed) {
+      return next({ name: 'dashboard' })
+    }
+  }
+
   // Se rota exige role específica
   //if (to.meta.requiresRole && userRole !== to.meta.requiresRole) {
   //  return next({ name: "Dashboard" }) // ou uma página de "Acesso Negado"

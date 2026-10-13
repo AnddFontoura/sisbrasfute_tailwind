@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', {
     isEmailVerified: (state) => !!state.user?.email_verified_at,
     userName: (state) => state.user?.name || 'Usuário',
     isAdmin: (state) => !!state.user?.is_admin,
+    isCourtAllowed: (state) => !!state.user?.court_allowed,
   },
   actions: {
     async login(email, password) {
