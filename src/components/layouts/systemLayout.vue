@@ -660,6 +660,7 @@ export default {
         { name: "Notificações", href: "/admin/notifications" },
         { name: "Posições de Jogo", href: "/admin/game-positions" },
         { name: "Config. Taxas", href: "/admin/fee-config" },
+        { name: "Meios de Pagamento", href: "/admin/payment-methods" },
         { name: "Receita", href: "/admin/revenue" },
       ],
       currentPageName: false,

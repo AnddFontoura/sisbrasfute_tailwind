@@ -42,6 +42,12 @@ export default [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/admin/payment-methods',
+    name: 'admin-payment-methods',
+    component: () => import('../views/System/Admin/AdminPaymentMethods.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/admin/revenue',
     name: 'admin-revenue',
     component: () => import('../views/System/Admin/AdminRevenue.vue'),
