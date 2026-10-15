@@ -53,4 +53,10 @@ export default [
     component: () => import('../views/System/Admin/AdminRevenue.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: '/admin/courts',
+    name: 'admin-courts',
+    component: () => import('../views/System/Admin/AdminCourtList.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 ]

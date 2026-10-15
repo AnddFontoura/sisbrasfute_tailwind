@@ -43,12 +43,14 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Informações Pessoais</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
-              <input v-model="form.playerName" type="text" placeholder="Seu nome completo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nome <span class="text-red-500">*</span></label>
+              <input v-model="form.playerName" type="text" maxlength="254" required placeholder="Seu nome completo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" :class="errors.playerName ? 'outline-red-500' : ''" @input="errors.playerName = ''" />
+              <p v-if="errors.playerName" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.playerName }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Apelido</label>
-              <input v-model="form.playerNickName" type="text" placeholder="Como te chamam em campo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" />
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Apelido <span class="text-red-500">*</span></label>
+              <input v-model="form.playerNickName" type="text" maxlength="254" required placeholder="Como te chamam em campo" class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500" :class="errors.playerNickName ? 'outline-red-500' : ''" @input="errors.playerNickName = ''" />
+              <p v-if="errors.playerNickName" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.playerNickName }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Data de Nascimento</label>
@@ -237,6 +239,10 @@ export default {
       photoError: null,
       removePhoto: false,
       existingPhotoUrl: null,
+      errors: {
+        playerName: '',
+        playerNickName: '',
+      },
     }
   },
   mounted () {
@@ -332,7 +338,33 @@ export default {
       this.form.playerKwaii = this.normalizeSocialHandle(this.form.playerKwaii, ['kwai.com'])
       this.form.playerGDA = this.normalizeSocialHandle(this.form.playerGDA, ['goleiro.app', 'goleirodealuguel.com.br'])
     },
+    validateRequired() {
+      this.errors.playerName = ''
+      this.errors.playerNickName = ''
+
+      if (!this.form.playerName || !String(this.form.playerName).trim()) {
+        this.errors.playerName = 'O nome é obrigatório.'
+      }
+      if (!this.form.playerNickName || !String(this.form.playerNickName).trim()) {
+        this.errors.playerNickName = 'O apelido é obrigatório.'
+      }
+
+      return !this.errors.playerName && !this.errors.playerNickName
+    },
     async handleSubmit() {
+      // Nome e apelido são NOT NULL no banco — barra o envio antes de chamar a API.
+      if (!this.validateRequired()) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Preencha os campos obrigatórios.',
+          showConfirmButton: false,
+          timer: 2500,
+        })
+        return
+      }
+
       this.loading = true
 
       // Garante que apenas o handle seja salvo, mesmo que colem a URL completa.

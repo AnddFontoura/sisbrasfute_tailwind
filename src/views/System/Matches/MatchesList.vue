@@ -265,6 +265,12 @@ export default {
   created() {
     this.teamId = this.$route.params.teamId ?? null
     this.auth = useAuthStore()
+    // Seed date filters from the query string when present (e.g. opened from the calendar).
+    this.filters.date_start = this.$route.query.date_start ?? this.filters.date_start
+    this.filters.date_end = this.$route.query.date_end ?? this.filters.date_end
+    if (this.$route.query.date_start || this.$route.query.date_end) {
+      this.showFilters = true
+    }
     this.loadMyTeams()
     this.getMatchesList()
   },

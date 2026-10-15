@@ -123,16 +123,15 @@
           Nenhuma posição configurada para esta partida.
         </div>
 
-        <!-- Positions split view: two columns -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Home team column -->
-          <div>
+        <!-- Positions split view: one list per team / sub-team, side by side -->
+        <div v-else class="grid grid-cols-1 gap-6" :class="columnsGridClass">
+          <div v-for="column in positionColumns" :key="column.key">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 px-1">
-              {{ homeTeamName }}
+              {{ column.title }}
             </h3>
             <div class="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div
-                v-for="position in homePositions"
+                v-for="position in column.positions"
                 :key="position.id"
                 class="py-3 px-3 flex items-center justify-between gap-4"
               >
@@ -208,96 +207,7 @@
                 </div>
               </div>
               <!-- Empty state for column -->
-              <div v-if="homePositions.length === 0" class="py-4 px-3 text-center text-sm text-gray-400 dark:text-gray-500">
-                Nenhuma posição disponível
-              </div>
-            </div>
-          </div>
-
-          <!-- Visitor team column -->
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 px-1">
-              {{ visitorTeamName }}
-            </h3>
-            <div class="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div
-                v-for="position in visitorPositions"
-                :key="position.id"
-                class="py-3 px-3 flex items-center justify-between gap-4"
-              >
-                <div class="flex-1 min-w-0">
-                  <div class="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-0.5">
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                      {{ position.game_position_name }}
-                    </span>
-                    <span class="text-xs font-medium text-orange-600 dark:text-orange-400">
-                      {{ formatCurrency(position.value) }}
-                    </span>
-                  </div>
-                  <div class="mt-1">
-                    <!-- Available position -->
-                    <span
-                      v-if="getPositionState(position) === 'available'"
-                      class="text-sm italic text-green-600 dark:text-green-400"
-                    >
-                      Disponível
-                    </span>
-
-                    <!-- My position -->
-                    <span
-                      v-else-if="getPositionState(position) === 'mine'"
-                      class="text-sm font-semibold text-orange-700 dark:text-orange-300"
-                    >
-                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-orange-200 dark:bg-orange-500/30 px-1.5 text-xs font-bold">#{{ position.number }}</span>
-                      {{ position.player_name }}
-                      <span v-if="position.player_nickname" class="text-orange-500 dark:text-orange-400">
-                        ({{ position.player_nickname }})
-                      </span>
-                      <span
-                        v-if="position.payment_status === 'pending'"
-                        class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
-                      >
-                        Aguardando pagamento
-                      </span>
-                    </span>
-
-                    <!-- Occupied by another player -->
-                    <span
-                      v-else
-                      class="text-sm text-gray-700 dark:text-gray-300"
-                    >
-                      <span v-if="position.number" class="mr-1 inline-flex items-center justify-center rounded bg-gray-200 dark:bg-white/10 px-1.5 text-xs font-bold">#{{ position.number }}</span>
-                      {{ position.player_name }}
-                      <span v-if="position.player_nickname" class="text-gray-500 dark:text-gray-400">
-                        ({{ position.player_nickname }})
-                      </span>
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Action buttons -->
-                <div class="flex-shrink-0">
-                  <button
-                    v-if="getPositionState(position) === 'available' && canChooseOn(position)"
-                    type="button"
-                    @click="handleChoose(position)"
-                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
-                  >
-                    Escolher
-                  </button>
-
-                  <button
-                    v-else-if="getPositionState(position) === 'mine'"
-                    type="button"
-                    @click="handleRelease(position)"
-                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 min-h-[44px] min-w-[44px]"
-                  >
-                    {{ position.payment_status === 'pending' ? 'Cancelar' : 'Liberar posição' }}
-                  </button>
-                </div>
-              </div>
-              <!-- Empty state for column -->
-              <div v-if="visitorPositions.length === 0" class="py-4 px-3 text-center text-sm text-gray-400 dark:text-gray-500">
+              <div v-if="column.positions.length === 0" class="py-4 px-3 text-center text-sm text-gray-400 dark:text-gray-500">
                 Nenhuma posição disponível
               </div>
             </div>
@@ -467,19 +377,66 @@ export default {
     hasEnemyTeam() {
       return !!this.enemyTeamId;
     },
-    homePositions() {
-      if (!this.positions || this.positions.length === 0) return [];
-      if (this.homeTeamId != null && this.positions.some(p => p.team_id != null)) {
-        return this.positions.filter(p => p.team_id === this.homeTeamId);
-      }
-      return this.positions;
+    // match_type comes from the backend enum: 0 = intra-team ("Partida entre
+    // o time"), 1 = friendly, 2 = championship.
+    isTeamMatch() {
+      return Number(this.matchInfo.match_type) === 0;
     },
-    visitorPositions() {
-      if (!this.positions || this.positions.length === 0) return [];
-      if (this.enemyTeamId != null) {
-        return this.positions.filter(p => p.team_id === this.enemyTeamId);
+    // Number of internal sub-teams for an intra-team match.
+    teamsCount() {
+      return Math.max(1, Number(this.matchInfo.teams_count ?? 1));
+    },
+    /**
+     * Builds the columns rendered side by side.
+     *
+     * - Intra-team match: one column per sub-team (Time A, Time B, ...),
+     *   split by the position's team_reference. All share the creator team_id.
+     * - Opponent match: two columns, the creator team and the opponent, split
+     *   by team_id. The opponent column uses its real name (your "Time B").
+     * - Fallback: a single column with every position.
+     */
+    positionColumns() {
+      const positions = this.positions || [];
+      if (positions.length === 0) return [];
+
+      if (this.isTeamMatch) {
+        // Distinct team_reference values define the sub-teams. Fall back to a
+        // single reference when the backend did not tag them.
+        const references = [...new Set(positions.map(p => Number(p.team_reference) || 1))]
+          .sort((a, b) => a - b);
+        const refs = references.length ? references : [1];
+
+        return refs.map(ref => ({
+          key: `ref-${ref}`,
+          title: this.subTeamName(ref),
+          positions: positions.filter(p => (Number(p.team_reference) || 1) === ref),
+        }));
       }
-      return [];
+
+      if (this.enemyTeamId != null && positions.some(p => p.team_id != null)) {
+        return [
+          {
+            key: 'home',
+            title: this.homeTeamName,
+            positions: positions.filter(p => p.team_id === this.homeTeamId),
+          },
+          {
+            key: 'visitor',
+            title: this.visitorTeamName,
+            positions: positions.filter(p => p.team_id === this.enemyTeamId),
+          },
+        ];
+      }
+
+      return [
+        { key: 'single', title: this.homeTeamName, positions },
+      ];
+    },
+    columnsGridClass() {
+      const count = this.positionColumns.length;
+      if (count >= 3) return 'md:grid-cols-3';
+      if (count === 2) return 'md:grid-cols-2';
+      return 'md:grid-cols-1';
     },
   },
   created() {
@@ -666,9 +623,23 @@ export default {
       return 'occupied';
     },
 
+    subTeamName(reference) {
+      // "Time A", "Time B", ... — reference is 1-based.
+      const letter = String.fromCharCode(64 + Number(reference || 1));
+      return `Time ${letter}`;
+    },
+
     canChooseOn(position) {
-      // The user can only pick a position on the side of their own team.
-      return this.isMember && this.currentTeamId != null && position.team_id === this.currentTeamId;
+      if (!this.isMember || this.currentTeamId == null) return false;
+
+      // Intra-team match: every slot belongs to the creator team, so a member
+      // may pick a position in any sub-team (Time A, Time B, ...).
+      if (this.isTeamMatch) {
+        return position.team_id === this.currentTeamId;
+      }
+
+      // Opponent match: the user can only pick on the side of their own team.
+      return position.team_id === this.currentTeamId;
     },
 
     async handleChoose(position) {

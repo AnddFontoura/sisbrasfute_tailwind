@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from "@/stores/auth"
 import auth from './auth.js'
 import team from './team.js'
+import court from './court.js'
 import teamFinance from "@/router/team-finance.js";
 import matches from './matches.js'
 import playerProfile from './player-profile.js'
@@ -35,6 +36,7 @@ const router = createRouter({
     },
     ...auth,
     ...team,
+    ...court,
     ...teamFinance,
     ...playerProfile,
     ...matches,
@@ -66,6 +68,14 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAdmin) {
     const authStore = useAuthStore()
     if (!authStore.isAdmin) {
+      return next({ name: 'dashboard' })
+    }
+  }
+
+  // Bloqueia rotas de quadra que exigem a flag court-allowed
+  if (to.meta.requiresCourtAllowed) {
+    const authStore = useAuthStore()
+    if (!authStore.isCourtAllowed) {
       return next({ name: 'dashboard' })
     }
   }
