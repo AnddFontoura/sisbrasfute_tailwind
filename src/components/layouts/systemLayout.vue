@@ -46,7 +46,7 @@
                 </div>
               </TransitionChild>
 
-              <aside class="flex min-h-full grow flex-col border-r border-white/10 bg-[#070707]">
+              <aside class="flex h-full grow flex-col overflow-hidden border-r border-white/10 bg-[#070707]">
                 <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-6">
                   <div class="flex size-10 items-center justify-center rounded-sm bg-orange-500 shadow-[0_0_24px_rgba(249,115,22,0.35)]">
                     <BoltIcon class="size-6 text-white" aria-hidden="true" />
@@ -62,7 +62,7 @@
                   </div>
                 </div>
 
-                <nav class="flex flex-1 flex-col overflow-y-auto px-4 py-6">
+                <nav class="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-6">
                   <div class="space-y-7">
                     <div>
                       <p class="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-zinc-600">
@@ -203,7 +203,7 @@
     </TransitionRoot>
 
     <aside class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div class="flex grow flex-col border-r border-white/10 bg-[#070707]">
+      <div class="flex h-full grow flex-col overflow-hidden border-r border-white/10 bg-[#070707]">
         <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-6">
           <div class="flex size-10 items-center justify-center rounded-sm bg-orange-500 shadow-[0_0_24px_rgba(249,115,22,0.35)]">
             <BoltIcon class="size-6 text-white" aria-hidden="true" />
@@ -219,7 +219,7 @@
           </div>
         </div>
 
-        <nav class="flex flex-1 flex-col overflow-y-auto px-4 py-6">
+        <nav class="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-6">
           <div class="space-y-7">
             <div>
               <p class="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-zinc-600">
