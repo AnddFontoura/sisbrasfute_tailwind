@@ -1,13 +1,28 @@
 <template>
   <system-layout>
     <main class="space-y-6">
-      <!-- Loading -->
-      <div v-if="loading && !team.name" class="flex items-center justify-center py-20">
-        <svg class="animate-spin h-8 w-8 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-        <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
+      <!-- Header Card — skeleton while the team info is loading -->
+      <div v-if="loading && !team.name" class="rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden animate-pulse">
+        <!-- Banner placeholder -->
+        <div class="h-40 w-full bg-gray-200 dark:bg-gray-700 lg:h-56"></div>
+
+        <div class="px-4 sm:px-6 lg:px-8 pb-6">
+          <div class="-mt-14 sm:-mt-18 sm:flex sm:items-end sm:space-x-5">
+            <div class="flex">
+              <div class="size-28 rounded-full ring-4 ring-white sm:size-36 dark:ring-gray-800 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+            <div class="mt-4 sm:mt-0 sm:flex sm:min-w-0 sm:flex-1 sm:items-end sm:justify-between sm:pb-2">
+              <div class="min-w-0 flex-1 space-y-2">
+                <div class="h-7 w-48 rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
+              </div>
+              <div class="mt-4 sm:mt-0 flex gap-2">
+                <div class="h-9 w-24 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                <div class="h-9 w-24 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Header Card -->
@@ -45,11 +60,26 @@
         </div>
       </div>
 
+      <!-- Info Cards — skeleton while loading -->
+      <div v-if="loading && !team.name" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div
+          v-for="n in 3"
+          :key="n"
+          class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700 animate-pulse"
+        >
+          <div class="h-10 w-10 shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-3 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div class="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Info Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
-            <component is="MapIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <MapIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</p>
@@ -59,7 +89,7 @@
 
         <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
-            <component is="MapPinIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <MapPinIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cidade</p>
@@ -69,7 +99,7 @@
 
         <div class="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
-            <component is="CalendarIcon" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <CalendarIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fundação</p>
@@ -250,13 +280,19 @@
             </div>
           </div>
 
-          <!-- Loading players -->
-          <div v-if="playersLoading" class="flex items-center justify-center py-10">
-            <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
+          <!-- Loading players — skeleton cards -->
+          <div v-if="playersLoading" class="space-y-3">
+            <div
+              v-for="n in 4"
+              :key="n"
+              class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-700/40 animate-pulse"
+            >
+              <div class="h-12 w-12 shrink-0 rounded-full bg-gray-200 dark:bg-gray-600"></div>
+              <div class="min-w-0 flex-1 space-y-2">
+                <div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-600"></div>
+                <div class="h-3 w-20 rounded bg-gray-200 dark:bg-gray-600"></div>
+              </div>
+            </div>
           </div>
 
           <!-- Empty state -->
@@ -337,13 +373,13 @@
             </div>
           </div>
 
-          <!-- Loading -->
-          <div v-if="uniformsLoading" class="flex items-center justify-center py-10">
-            <svg class="animate-spin h-6 w-6 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">Carregando...</span>
+          <!-- Loading — skeleton carousel -->
+          <div v-if="uniformsLoading" class="animate-pulse">
+            <div class="mx-auto flex aspect-square max-h-80 w-full items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+            <div class="mt-4 flex flex-col items-center gap-2">
+              <div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
+              <div class="h-3 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
+            </div>
           </div>
 
           <!-- Carousel content -->
