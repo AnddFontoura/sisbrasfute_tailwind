@@ -8,10 +8,15 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import SkeletonLoader from './components/skeleton/SkeletonLoader.vue'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+
+// Registered globally so any screen can show a skeleton placeholder while its
+// async data loads, without importing the component everywhere.
+app.component('SkeletonLoader', SkeletonLoader)
 
 app.mount('#app')

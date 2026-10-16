@@ -1,14 +1,17 @@
 <template>
   <div class="mt-3">
-  <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="citySelect">{{ labelName }}</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="citySelect">{{ labelName }}</label>
     <Multiselect
       id="citySelect"
       v-model="internalValue"
-      :options="this.cities"
+      :options="cities"
       track-by="name"
       label="name"
       :searchable="true"
       value-prop="id"
+      :loading="loading"
+      :disabled="isDisabled"
+      :placeholder="currentPlaceholder"
     />
   </div>
 </template>
@@ -28,6 +31,10 @@ export default {
       type: String,
       default: "Cidade",
     },
+    placeholder: {
+      type: String,
+      default: "Selecione a cidade",
+    },
     modelValue: [String, Number],
     stateId: [String, Number], // vem do pai
   },
@@ -35,18 +42,25 @@ export default {
     return {
       cities: [],
       internalValue: this.modelValue,
+      loading: false,
     }
+  },
+  computed: {
+    // The city field stays locked until a state is chosen (reduces user error).
+    // While the list is loading we keep it enabled so the Multiselect's own
+    // spinner shows; the `loading` prop already prevents interaction.
+    isDisabled() {
+      return !this.stateId
+    },
+    currentPlaceholder() {
+      if (!this.stateId) return "Selecione o estado primeiro"
+      if (this.loading) return "Carregando cidades..."
+      return this.placeholder
+    },
   },
   async mounted() {
     if (this.stateId) {
-      try {
-        const { data } = await api.get("/cities/list", {
-          params: { stateId: this.stateId },
-        })
-        this.cities = data.cities
-      } catch (err) {
-        console.error("Erro ao carregar cidades:", err)
-      }
+      await this.fetchCities(this.stateId)
     }
   },
   watch: {
@@ -56,26 +70,35 @@ export default {
     internalValue(val) {
       this.$emit("update:modelValue", val)
     },
-    async stateId(newVal, oldVal) {
+    async stateId(newVal) {
       if (newVal) {
-        try {
-          const { data } = await api.get("/cities/list", {
-            params: { stateId: newVal },
-          })
-          this.cities = data.cities
-
-          // If the current internalValue is not in the new cities list, clear it
-          // This handles the case where user changes state (should clear city)
-          // But preserves the city when loading for the first time (edit mode)
-          if (this.internalValue && !this.cities.some(c => c.id === this.internalValue)) {
-            this.internalValue = null
-          }
-        } catch (err) {
-          console.error("Erro ao carregar cidades:", err)
-        }
+        // Changing the state reloads the list and clears a now-invalid city.
+        await this.fetchCities(newVal)
       } else {
         this.cities = []
         this.internalValue = null
+      }
+    },
+  },
+  methods: {
+    async fetchCities(stateId) {
+      this.loading = true
+      try {
+        const { data } = await api.get("/cities/list", {
+          params: { stateId },
+        })
+        this.cities = data.cities
+
+        // Keep the current city only if it belongs to the loaded list; this
+        // preserves the value on first load (edit mode) and clears it when the
+        // user switches to a state that doesn't have it.
+        if (this.internalValue && !this.cities.some(c => c.id === this.internalValue)) {
+          this.internalValue = null
+        }
+      } catch (err) {
+        console.error("Erro ao carregar cidades:", err)
+      } finally {
+        this.loading = false
       }
     },
   },

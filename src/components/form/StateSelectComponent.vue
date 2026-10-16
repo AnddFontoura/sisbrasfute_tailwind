@@ -1,15 +1,17 @@
 <template>
-
   <div class="mt-3">
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200" aria-label="stateSelect">{{ labelName }}</label>
     <Multiselect
       id="stateSelect"
       v-model="internalValue"
-      :options="this.states"
+      :options="states"
       track-by="name"
       label="name"
       :searchable="true"
       value-prop="id"
+      :loading="loading"
+      :disabled="loading"
+      :placeholder="loading ? 'Carregando estados...' : placeholder"
     />
   </div>
 </template>
@@ -30,11 +32,16 @@ export default {
       type: String,
       default: "Estado",
     },
+    placeholder: {
+      type: String,
+      default: "Selecione o estado",
+    },
   },
   data() {
     return {
       states: [],
       internalValue: this.modelValue,
+      loading: false,
     }
   },
   watch: {
@@ -46,11 +53,14 @@ export default {
     },
   },
   async mounted() {
+    this.loading = true
     try {
       const { data } = await api.get("/states/list")
       this.states = data.states
     } catch (err) {
       console.error("Erro ao carregar estados:", err)
+    } finally {
+      this.loading = false
     }
   },
 }
