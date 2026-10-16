@@ -578,6 +578,10 @@ export default {
       playersFilterName: '',
       playersLoading: false,
       playersSearchTimeout: null,
+      // Team uniforms carousel
+      uniforms: [],
+      uniformsLoading: false,
+      currentUniformIndex: 0,
       playerFallbackAvatar: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" fill="%239ca3af" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>'),
     }
   },
@@ -585,6 +589,7 @@ export default {
     this.teamId = this.$route.params.id
     this.getTeamInformation()
     this.getTeamPlayers()
+    this.getTeamUniforms()
   },
   mounted() {
     this._escHandler = (e) => { if (e.key === 'Escape' && this.isLightboxOpen) this.closeLightbox(); };
@@ -661,6 +666,49 @@ export default {
       this.playersSearchTimeout = setTimeout(() => {
         this.getTeamPlayers(1)
       }, 400)
+    },
+    async getTeamUniforms() {
+      if (!this.teamId) return
+
+      this.uniformsLoading = true
+
+      try {
+        const response = await api.get(`/team/${this.teamId}/uniforms`)
+        this.uniforms = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+        this.currentUniformIndex = 0
+      } catch {
+        // Listing may be restricted (e.g. non-managers get 403); fail silently
+        // and simply keep the carousel hidden.
+        this.uniforms = []
+      } finally {
+        this.uniformsLoading = false
+      }
+    },
+    uniformPhoto(uniform) {
+      return uniform?.photo_url || null
+    },
+    formatUniformPrice(priceCents) {
+      const cents = Number(priceCents)
+      if (!Number.isFinite(cents) || cents <= 0) return 'Gratuito'
+      return (cents / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      })
+    },
+    prevUniform() {
+      if (this.uniforms.length === 0) return
+      this.currentUniformIndex =
+        (this.currentUniformIndex - 1 + this.uniforms.length) % this.uniforms.length
+    },
+    nextUniform() {
+      if (this.uniforms.length === 0) return
+      this.currentUniformIndex = (this.currentUniformIndex + 1) % this.uniforms.length
+    },
+    openUniformLightbox(photoUrl) {
+      if (!photoUrl) return
+      this.lightboxImageUrl = photoUrl
+      this.isLightboxOpen = true
+      document.body.classList.add('overflow-hidden')
     },
     openLightbox() {
       if (!this.team?.logo_url) return;

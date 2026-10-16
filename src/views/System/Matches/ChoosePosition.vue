@@ -670,8 +670,10 @@ export default {
       }
 
       const positionValue = Number(position.value || 0);
-      const feeCents = this.systemFee || 0;
       const positionValueCents = positionValue * 100;
+      // Fee only applies to paid positions (mirrors the backend: a free vaga
+      // never incurs a fee).
+      const feeCents = positionValueCents > 0 ? (this.systemFee || 0) : 0;
       const totalCostCents = positionValueCents + feeCents;
 
       // Free position: assign directly without choosing a method.
